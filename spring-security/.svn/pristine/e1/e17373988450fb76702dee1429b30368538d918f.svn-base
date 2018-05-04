@@ -1,7 +1,0 @@
-package com.techstudio.common;
-
-public class LocalConstant {
-	
-	public static final int QUANTITY = 2;
-	
-}

@@ -1,8 +1,0 @@
-<%@ include file="../include/import.jsp"%>
-<%@ include file="../include/timeout_alert.jsp"%>
-
-<div id="sidebar">
-	<ul>
-		<li><a href="#"><i class="fa fa-key"></i><span><spring:message code="menu.resetpassword" /></span></a></li>
-	</ul>
-</div>
