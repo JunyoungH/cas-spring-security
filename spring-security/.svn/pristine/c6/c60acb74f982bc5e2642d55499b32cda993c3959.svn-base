@@ -1,0 +1,76 @@
+/*Techstudio Inc TinyMCE Handler v1.0
+ * author:Charles Lee
+ * in 2016*/
+
+define(['tinyMCE','urlParamHandler'],function(tinyMCE,urlParamHandler){
+	
+	function setupTinyMCE(optionPara){
+		
+		
+//		console.log(optionPara.element);
+		
+		var obj = tinyMCE.init({
+//			selector : "textarea#txt",
+			selector : "textarea#" + optionPara.element,
+			theme : "modern",
+			height : 400,
+			language : urlParamHandler.getGetValue('locale')?urlParamHandler.getGetValue('locale'):'en',
+			fontsize_formats : "8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 36pt 48pt 72pt",
+			plugins : [
+					"advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker",
+					"searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime nonbreaking",
+					"save table contextmenu directionality emoticons template paste textcolor" ],
+			image_advtab : true,
+			content_css : "../css/tinymce_content.css",
+			toolbar : "fontsizeselect | insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link | print fullpage | forecolor backcolor emoticons | image | preview |",
+			style_formats : [ {
+				title : 'Bold text',
+				inline : 'b'
+			}, {
+				title : 'Red text',
+				inline : 'span',
+				styles : {
+					color : '#ff0000'
+				}
+			}, {
+				title : 'Red header',
+				block : 'h1',
+				styles : {
+					color : '#ff0000'
+				}
+			}, {
+				title : 'Example 1',
+				inline : 'span',
+				classes : 'example1'
+			}, {
+				title : 'Example 2',
+				inline : 'span',
+				classes : 'example2'
+			}, {
+				title : 'Table styles'
+			}, {
+				title : 'Table row 1',
+				selector : 'tr',
+				classes : 'tablerow1'
+			} ]
+		});
+		
+		return obj;
+	};
+	
+	function saveTinyMCE(){
+		
+		tinyMCE.triggerSave();
+		
+	};
+   
+	
+	return{
+		
+		setupTinyMCE:setupTinyMCE,
+		saveTinyMCE:saveTinyMCE
+	};
+	
+	
+	
+});

@@ -1,0 +1,15 @@
+package com.techstudio.dao.am;
+
+
+import org.springframework.stereotype.Repository;
+
+import com.techstudio.dao.BaseJPARepository;
+import com.techstudio.model.am.RoleDTO;
+
+
+@Repository
+public interface RoleDao extends BaseJPARepository<RoleDTO, Long>{
+
+	RoleDTO findByRoleId(Long roleId)throws Exception;
+
+}

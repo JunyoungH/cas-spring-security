@@ -1,0 +1,69 @@
+package com.techstudio.dao.am;
+
+import java.util.List;
+
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.techstudio.dao.BaseJPARepository;
+import com.techstudio.model.am.OrganizationDTO;
+
+
+@Repository
+public interface OrganizationDao extends BaseJPARepository<OrganizationDTO, Long>, JpaSpecificationExecutor<OrganizationDTO>{
+
+	List<OrganizationDTO> findByDeleteFlagAndSuperior_Ou(int deleteFlag, String superiorOu);
+
+	OrganizationDTO findByOrganizationId(Long organizationId);
+
+	@Modifying
+	@Query("UPDATE OrganizationDTO o SET o.deleteFlag = ?1 WHERE o.organizationId = ?2")
+	void setDeleteFlagByOrganizationId(int deleteFlag, long organizationId);
+	
+//	@Modifying
+//	@Query("UPDATE OrganizationDTO o SET o.deleteFlag = ?1 WHERE o.ou LIKE ?2 AND o.deleteFlag <> ?1")
+//	void setDeleteFlagByOuPattern(int deleteFlag, String ouPattern);
+
+	List<OrganizationDTO> findByOu(String ouBelongsTo);
+
+	List<OrganizationDTO> findByHierarchyLevel(Integer hierarchyLevel);
+
+	List<OrganizationDTO> findByDeleteFlagAndSuperior_OrganizationId(int deleteFlag, long organizationId);
+
+	List<OrganizationDTO> findByOrganizationNameAndOrganizationIdNotIn(
+			String organizationName, List<Long> organizationIdList);
+
+	List<OrganizationDTO> findByDeleteFlagAndOu(int deleteFlag,
+			String currentLoginOu);
+
+	List<OrganizationDTO> findByDeleteFlagNotAndHierarchyLevel(int deleteFlag, int heirachyLevel);
+	
+	List<OrganizationDTO> findByDeleteFlagAndHierarchyLevel(int organizationStatus, int hierarchyLevel);
+
+	List<OrganizationDTO> findByDeleteFlagNotAndHierarchyLevelAndOuEndingWith(int deleteFlag, int heirachyLevel, String ouSearchPattern);
+
+	List<OrganizationDTO> findByDeleteFlagNotAndOu(int deleteFlag, String loginOu);
+
+	List<OrganizationDTO> findByDeleteFlagNotAndHierarchyLevelBetween(
+			int deleteFlag, int fromLevel, int toLevel, Sort sort);
+
+	List<OrganizationDTO> findByDeleteFlagNotAndHierarchyLevelBetweenAndOuEndingWith(
+			int deleteFlag, int fromLevel, int toLevel,
+			String ouSearchPattern, Sort sort);
+
+	List<OrganizationDTO> findByDeleteFlagNotAndSuperior_Ou(
+			int organizationStatus, String ou);
+
+	List<OrganizationDTO> findByDeleteFlagNotAndSuperior_Superior_Ou(
+			int organizationStatus, String ou);
+
+	List<OrganizationDTO> findByDeleteFlagNotAndOuLike(int deleteFlag,
+			String ouPattern);
+
+	List<OrganizationDTO> findByDeleteFlagAndHierarchyLevelNotAndSuperior_OuIsNull(
+			int deleteFlag, int hierarchyLevel);
+
+}

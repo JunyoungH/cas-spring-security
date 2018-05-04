@@ -1,0 +1,343 @@
+/*Techstudio Inc Datatable Handler v1.0
+ * author:Charles Lee
+ * in 2016*/
+
+define(['datatables','select2'],function(){
+	
+	 var tableInitOrg ={
+			 
+				"bServerSide" : true,
+				"bSort": true,
+				"order": [[ 0, "desc" ]],
+				"sDom" : '<""l>t<"F"p>',
+				"bAutoWidth": false,
+				"responsive":true,
+				"bJQueryUI" : true,
+				"bSearchable" : false,
+				"sPaginationType" : "full_numbers",
+//				"sAjaxSource" : ajaxurl,
+//				"columnDefs": [
+//								{
+//								"targets": [0],
+//								"visible": false
+//								}
+//							],
+				"language":  {
+				    "emptyTable":     $("#emptyTable").html(),
+				    "lengthMenu":     $("#lengthMenu").html(),
+				    "loadingRecords": $("#loadingRecords").html(),
+				    "processing":     $("#processing").html(),
+				    "zeroRecords":    $("#zeroRecords").html(),
+				    "paginate": {
+				        "first":      $("#firstDatatable").html(),
+				        "last":       $("#lastDatatable").html(),
+				        "next":       $("#nextDatatable").html(),
+				        "previous":   $("#prevDatatable").html()
+				    }
+				}
+			};
+
+	
+	 function createDatatable(optionPara){
+		 
+		 var oTable;
+			
+			var ajaxurl = optionPara.ajaxurl;
+			var element = optionPara.element;
+			var selected = optionPara.selectmode;
+			var afterDrawBack = optionPara.afterdraw;
+			
+			var specButs = optionPara.specButtons;
+			var sortColArr = optionPara.nosortcolumn;
+			var hiderColArr =  optionPara.hidecolumn;
+			var dataFilter = optionPara.datafilter;
+			var newDom = optionPara.newdom;
+			var newDisplayLength = optionPara.newdisplaylength;
+			
+			
+			
+			var tableInit = null;
+			
+//			console.log("tableInitOrg before:");
+//			console.log(tableInitOrg);
+			
+			tableInit = tableInitOrg;
+			
+			tableInit = jQuery.extend(true, {}, tableInitOrg);
+			
+//			console.log(tableInit["columnDefs"]);
+			
+			if(tableInit["columnDefs"]==undefined){
+				tableInit["columnDefs"]=[];
+			}
+			
+//			console.log(tableInit["columnDefs"]);
+//			console.log(tableInit["sAjaxSource"]);
+//			console.log(tableInit["columnDefs"].length);
+//			
+			tableInit["sAjaxSource"]= ajaxurl;
+//			
+//			console.log("tableInit after:");
+//			console.log(tableInit["sAjaxSource"]);
+//			console.log(tableInit["columnDefs"].length);
+//			
+//			console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			
+			if(newDom!=null&&newDom!=undefined){
+				
+				tableInit["sDom"] = newDom;
+			}
+			
+			if(newDisplayLength!=null&&newDisplayLength!=undefined){
+				
+				tableInit["iDisplayLength"] = newDisplayLength;
+			}
+			
+			
+			
+			if(dataFilter!=null&&dataFilter!=undefined){
+				
+				tableInit["bDestroy"] = true;
+				tableInit["fnServerParams"] =  function (aoData) {
+					for(var i=0;i<dataFilter.length;i++){
+						aoData.push(dataFilter[i]);
+					};
+					
+					
+				};
+			}
+			
+			
+			
+			if(afterDrawBack!=null&&afterDrawBack!=undefined){
+				
+				tableInit["fnDrawCallback"] =  function (oSetting) {
+					
+					afterDrawBack();
+					
+				};
+			}
+			
+			
+			
+			if(sortColArr!=null&&sortColArr!=undefined){
+				
+				
+				for(var i=0;i<sortColArr.length;i++){
+					tableInit["columnDefs"] = tableInit["columnDefs"].concat({
+						"targets": [parseInt(sortColArr[i])],
+						"orderable": false
+					});
+				}
+			}
+			
+			if(hiderColArr!=null&&hiderColArr!=undefined){
+				
+				
+				for(var i=0;i<hiderColArr.length;i++){
+					tableInit["columnDefs"] = tableInit["columnDefs"].concat({
+						"targets": [parseInt(hiderColArr[i])],
+						"visible": false
+					});
+				}
+			}
+			
+			
+			if(specButs!=null&&specButs!=undefined){
+				
+				
+				for(var i=0;i<specButs.length;i++){
+					
+					var butPara = specButs[i];
+					
+//					console.log("butPara['position']::");
+//					console.log(butPara['position']);
+					
+					tableInit["columnDefs"] = tableInit["columnDefs"].concat({
+						"targets": [butPara['position']],
+						"data":null,
+						"orderable": false,
+						"defaultContent":"<button class='fa fa-"+whichBut(butPara.type).icon +" btn btn-success "+ whichBut(butPara.type).bnclass+"' style='font-family:FontAwesome'></button>"
+//						"defaultContent":"<button class='fa fa-pencil btn btn-success editButton'></button>"
+					});
+					
+				}
+				
+			}
+			
+			console.log("tableInit:");
+			console.log(tableInit);
+			
+			if ($.fn.dataTable.isDataTable('#' + element) ) {
+				$(document).off('click','#'+element+' tbody tr');
+				oTable = $('#' + element).DataTable();
+				oTable.destroy();
+			}
+			
+			
+			oTable = $('#' + element).DataTable(tableInit); //initiate table
+			
+			
+			//Add buttion functions
+			if(specButs!=null&&specButs!=undefined){
+				
+				for(var i=0;i<specButs.length;i++){
+					
+					var butPara = specButs[i];
+					
+					specilBnFunc(oTable,element,whichBut(butPara.type).bnclass,butPara['func']);
+					
+//					specilBnFunc(oTable,element,whichBut(butPara.type).bnclass,butPara['func'],butPara['callbackCol']);
+					
+					
+				}
+				
+			}
+			
+			
+			
+			$('select[name='+element+'_length]').select2();//keep select style
+			
+			
+			//Setup selectmode
+			if(selected=="1"){
+				singleSelect(oTable,element,optionPara);
+			}
+			else if(selected=="2"){
+				mulitSelect(oTable,element,optionPara);
+			}
+			
+			return oTable;
+			
+				
+	 };
+	
+	
+	 function refreshDatatable(optionPara,dataFilter){
+		 
+		 return buildtable(optionPara,dataFilter);
+				
+	};
+		
+	
+	/*mains function*/
+	function singleSelect(oTable,element,optionPara){
+		
+//		$(document).on('click','#cpTable tbody tr', function()  {
+		$(document).on('click','#'+element+' tbody tr', function()  {
+			if ($(this).hasClass('checked') ) {
+	            $(this).removeClass('checked');
+	            optionPara.returnback=null;
+	        }
+	        else {
+	        	oTable.$('tr.checked').removeClass('checked');
+	            $(this).addClass('checked');
+	            console.log($(this));
+	            console.log(this.id);
+	            optionPara.returnback = this.id;
+	        }
+		});
+	};
+	
+	
+	
+	function mulitSelect(oTable,element,optionPara){
+		
+		$(document).on('click','#'+element+' tbody tr', function() {
+			if ($(this).hasClass('checked')) {
+				$(this).removeClass('checked');
+			} else {
+				$(this).addClass('checked');
+			}
+			
+			optionPara.returnback = listId(oTable);
+		});
+	};
+	
+	
+	
+	
+	
+	return{
+		
+		createDatatable:createDatatable
+		
+	};
+	
+	/*private functions*/
+	
+	
+	function listId(ObjectTable) {
+		var artmp = [];
+		var selectedRows = ObjectTable.$('tr.checked');
+
+		var url = "";
+
+		if (selectedRows.length <= 0) {
+			
+			return null;
+			
+		} else {
+
+			for (var j = 0; j < selectedRows.length; j++) {
+
+				artmp[j] = ObjectTable.row(selectedRows[j]).data()[0];
+			}
+				// console.log(artmp[j]);
+
+				for (var i = 0; i < artmp.length; i++) {
+
+					if(i==0) url = artmp[0];
+					
+					if (i > 0) {
+						url = url+","+artmp[i];
+					} 
+				}
+
+			console.log(url);
+			return url;
+
+		}
+	};
+	
+	
+	function specilBnFunc(oTable, element,bnClass,runIt){
+		$('#'+element+' tbody').on('click','.'+bnClass, function() {
+
+			var rowData = oTable.row($(this).parents('tr')).data();
+			
+			
+//			var ob = {
+//
+//			'id' : rowData[0]
+//
+//			};
+//			runIt(rowData[callback]);
+			runIt(rowData);
+		});
+
+	};
+	
+	function whichBut(bnType){
+		switch (bnType){
+		case "edit":
+			return {
+				icon:'pencil',
+				bnclass:'editButton'
+			};
+		case "user":
+			return {
+				icon:'user',
+				bnclass:'userButton'
+			};
+		case "preview":
+			return {
+				icon:'eye',
+				bnclass:'previewButton'
+			};
+		}
+	}
+
+	
+	
+});

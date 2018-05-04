@@ -1,0 +1,51 @@
+<%@ page pageEncoding="UTF-8"%>
+<%@ include file="../include/import.jsp"%>
+<%@ include file="../home/resetpassword_header.jsp"%>
+<jsp:include page="../home/resetpassword_leftnav.jsp" />
+
+<!-- Attributes List -->
+		
+<div id="SPRING_EXT" style="display: none">${ SPRING_EXT }</div>
+
+<!-- Attributes List -->
+
+<div id="WEBAPPS" style="display: none;">${ WEBAPPS }</div>
+<div id="content">
+	<div id="content-header">
+		<h1><spring:message code="menu.resetpassword" /></h1>
+	</div>
+
+	<div id="breadcrumb">
+		<a href="${ WEBAPPS }/main${ SPRING_EXT }" title="<spring:message code="breadcrumb.home.title" />" class="tip-bottom"><i class="icon-home"></i><spring:message code="breadcrumb.home" /></a> 
+		<a><spring:message code="breadcrumb.account.resetpassword" /></a>
+	</div>
+	
+	<!-- ----------------------------------------------------------- NO TOKEN PAGE ------------------------------------------------------------ -->
+	<div class="container-fluid" >
+		<div class="row">
+			<div class="col-xs-12 center">
+				
+				<div class="widget-box">
+					<div class="widget-title">
+						<span class="icon"><i class="fa fa-pencil-square-o"></i></span>
+						<h5><spring:message code="breadcrumb.account.resetpassword" /></h5>
+					</div>
+					
+					<div class="widget-content nopadding">
+						<table>
+							<tr>
+								<td><h5><spring:message code="resetpassword.tokenexpired" /></h5></td>
+								<td><a href="${ WEBAPPS }/account/forgotpassword${ SPRING_EXT }"><spring:message code="resetpassword.link.tryagain" /></a></td>
+							</tr>
+						</table>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- ----------------------------------------------------------- NO TOKEN PAGE ------------------------------------------------------------ -->
+</div>
+
+<%@ include file="../include/copyright.jsp"%>
+<%@ include file="../home/footer.jsp"%>	

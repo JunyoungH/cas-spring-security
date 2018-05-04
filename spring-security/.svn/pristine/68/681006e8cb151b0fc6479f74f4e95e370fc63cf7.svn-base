@@ -1,0 +1,252 @@
+/*Techstudio Inc Datatable Handler v1.0
+ * author:Charles Lee
+ * in 2016*/
+
+define(['fullcalendar'],function(){
+	
+	
+
+	
+	 function createCalendar(optionPara){
+		 
+		 var external_element = optionPara.external_element;
+		 var external_element_remove = optionPara.external_element_remove;
+		 var events = optionPara.events;
+		 var elementTop = optionPara.element;
+		 var events_url = optionPara.events_url;
+		 
+		 
+		 
+		 if(external_element!=undefined&&external_element!=null){
+			 
+			 if(events!=undefined&&events!=null){
+				 for(var i=0;i<events.title.length;i++){
+					 $('#'+external_element).append('<div id='+ events.relevantid[i] +' class="external-event ui-draggable label '
+							 						+ events.type[i] +'">'+ events.title[i]+'</div>');
+				 }
+			 }
+		 }
+		 
+		 
+		 
+		 var date = new Date();
+		 
+//			var d = date.getDate();
+//			var m = date.getMonth();
+//			var y = date.getFullYear();	
+			
+			$('#'+elementTop).fullCalendar({
+				header: {
+					left: 'prev,next today myCustomButton',
+					center: 'title',
+					right: 'month,agendaWeek,agendaDay'
+				},
+				events: events_url,
+				editable: true,
+				droppable: true, // this allows things to be dropped onto the calendar !!!
+				drop: function(date, allDay) { // this function is called when something is dropped
+					
+					// retrieve the dropped element's stored Event Object
+					var originalEventObject = $(this).data('eventObject');
+//					var originalEventObject = $(this).html();
+					
+						
+					// we need to copy it, so that multiple events don't have a reference to the same object
+					var copiedEventObject = $.extend({}, originalEventObject);
+						
+					// assign it the date that was reported
+					copiedEventObject.start = date;
+					copiedEventObject.allDay = allDay;
+					copiedEventObject.outId = $(this).attr('id');
+					
+//					console.log("originalEventObject:");
+//					console.log(originalEventObject);
+//					
+//					console.log("copiedEventObject:");
+//					console.log(copiedEventObject);
+//					
+//					console.log(this);
+					
+					
+					// render the event on the calendar
+					// the last `true` argument determines if the event "sticks" (http://arshaw.com/fullcalendar/docs/event_rendering/renderEvent/)
+					$('#'+elementTop).fullCalendar('renderEvent', copiedEventObject, true);
+					if (external_element_remove==true) {
+						$(this).remove();
+					}
+//					
+//					console.log("clientEvents:");
+//					console.log($('#'+element).fullCalendar('clientEvents'));
+					
+//					refreshSelected(element);
+					dataRefine(elementTop);
+				},
+				eventDragStop:function(event, jsEvent, ui, view ){
+					console.log("----------------------->");
+					console.log(event);
+					console.log(jsEvent);
+					console.log(jsEvent.pageX);
+					console.log(jsEvent.pageY);
+					console.log($("#"+elementTop));
+					console.log('$("#"+element).pageX---->'+$("#"+elementTop).offset().top);
+					console.log('$("#"+element).pageY---->'+$("#"+elementTop).offset().left);
+					var mouseXX = jsEvent.pageX;
+					var mouseYY = jsEvent.pageY;
+					if(mouseXX>$("#"+elementTop).offset().left+$("#"+elementTop).width()||
+							mouseXX<$("#"+elementTop).offset().left||
+							mouseYY>$("#"+elementTop).offset().top+$("#"+elementTop).height()||
+							mouseYY<$("#"+elementTop).offset().top
+							){
+						console.log("outside");
+						$('#'+elementTop).fullCalendar('removeEvents',event._id);
+					}else{
+						console.log("inside");
+					}
+					console.log(ui);
+					console.log(view);
+					console.log("----------------------->");
+				},
+//				eventResizeStop:function(event, jsEvent, ui, view){
+////					console.log(event === $(this));
+////					console.log(jsEvent);
+////					console.log(ui);
+////					console.log(event.id);
+//					
+//				},
+				customButtons: {
+			        myCustomButton: {
+			            text: 'Remove Events',
+			            click: function() {
+			            	$('.fc-event-selected').each(function (i,v) {
+			            			$('#'+elementTop).fullCalendar('removeEvents',$(v).find('#itemid').html())
+		                    });
+			            	
+			            	dataRefine(elementTop);
+
+					    }
+			        }
+			    },
+				eventRender:function(event, element, view) {
+//					console.log(event);
+//					console.log(element);
+//					console.log(view);
+					refreshSelected(element,event.outId,event._id);
+//					$(element).attr('id',relevantid);
+//					relevantid = null;
+					dataRefine(elementTop);
+				},
+				eventDestroy:function(event, element, view){
+					
+				}
+			});
+			
+			$('#'+external_element+' div.external-event').each(function() {		
+				// create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
+				// it doesn't need to have a start or end
+				var eventObject = {
+					title: $.trim($(this).text()) // use the element's text as the event title
+				};
+					
+				// store the Event Object in the DOM element so we can get to it later
+				$(this).data('eventObject', eventObject);
+					
+				// make the event draggable using jQuery UI
+				$(this).draggable({
+					zIndex: 999,
+					revert: true,      // will cause the event to go back to its
+					revertDuration: 0  //  original position after the drag
+				});		
+			});		
+			
+	 };
+	
+	
+	
+	
+	
+	return{
+		
+		createCalendar:createCalendar
+		
+	};
+	
+	/*private functions*/
+	function refreshSelected(element,relevantid,itemid){
+//		var target = $('#'+element).find('fc-event-container');
+//		console.log(target);
+//		$('#'+element).find('fc-event-container').on('click', function() {
+		$(element).append('<div id="relevantid">'+relevantid+'</div>');
+		$(element).append('<div class="itemid">'+itemid+'</div>');
+		$(element).on('click', function() {
+			if ($(this).hasClass('fc-event-selected')) {
+				$(this).removeClass('fc-event-selected');
+//				$(this).css("background-color","")
+				var childId = $(this).find('.itemid').html();
+				console.log("childId:"+childId);
+				var allChild =[];
+				var j=0;
+				$('.itemid').each(function (i,v) {
+					console.log("v:"+v);
+					console.log("$(v).html():"+$(v).html());
+        			if($(v).html()===childId) {
+        				allChild[j]=v;
+        				j++;
+        			}
+				});
+				console.log("allChild:"+allChild);
+				for(var i=0;i<allChild.length;i++){
+					$(allChild[i]).parent().removeClass('fc-event-selected');
+					$(allChild[i]).parent().css("background-color","");
+				}
+				
+			} else {
+				$(this).addClass('fc-event-selected');
+//				$(this).css("background-color","#000");
+				var childId = $(this).find('.itemid').html();
+				console.log("childId:"+childId);
+				var allChild =[];
+				var j=0;
+				$('.itemid').each(function (i,v) {
+					console.log("v:"+v);
+					console.log("$(v).html():"+$(v).html());
+        			if($(v).html()===childId) {
+        				allChild[j]=v;
+        				j++;
+        			}
+				});
+				
+				for(var i=0;i<allChild.length;i++){
+					$(allChild[i]).parent().addClass('fc-event-selected');
+					$(allChild[i]).parent().css("background-color","#000");
+				}
+			}
+		});
+		
+	}
+	 
+	
+	function dataRefine(element){
+		
+		var returnData = [];
+		console.log($('#'+element).fullCalendar('clientEvents'));
+		
+		var oData = $('#'+element).fullCalendar('clientEvents');
+		
+		for(var i=0;i<oData.length;i++){
+			var anObject = {};
+			anObject.id = oData[i].outId;
+			anObject.start =  oData[i].start;
+			console.log(oData[i]);
+			anObject.end =  oData[i].end;
+			returnData.push(anObject);
+		}
+		
+		console.log(returnData);
+		
+		return returnData;
+	}
+	
+	
+	
+	
+});

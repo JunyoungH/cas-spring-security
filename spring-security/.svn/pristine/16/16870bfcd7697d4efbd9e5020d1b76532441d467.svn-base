@@ -1,0 +1,263 @@
+/**
+ * JS for Organization Add
+ */
+
+$(document).ready(function(){
+			
+	if($('#errmsg').html().trim().length!=0 && $('#errmsg').html().trim()!="")
+	{
+		alertNotification($('#errmsg').html());
+		
+	}
+	
+	/*Auto-fill-in OU column(readonly)*/
+	$('#readonlyOu').val($('#shortFormatOu').html());
+	var fullOu = $('#superiorOu').html();
+	
+	$('#organizationName').keyup(function(e){
+		
+		if($('#organizationName').val() != "" && $('#organizationName').val() != null){
+			
+			if($('#superiorOu').html()!= "" && $('#superiorOu').html()!= null){
+				$('#readonlyOu').val($('#shortFormatOu').html()+"."+$('#organizationName').val());
+				fullOu = $('#superiorOu').html()+"."+$('#organizationName').val();
+			}else{
+				$('#readonlyOu').val($('#organizationName').val());
+				fullOu = $('#organizationName').val();
+			}
+			
+		}else{
+			
+			$('#readonlyOu').val($('#shortFormatOu').html());
+			fullOu = $('#superiorOu').html();
+			
+		}
+		
+		$('#ou').val(fullOu);
+		
+	});
+	/*Auto-fill-in OU column*/
+	
+//	load_organization_alias_dropdown();
+	
+	$( "#submitButton" ).click(function(e) {
+		e.preventDefault(); //To prevent the browser from refreshing the page
+		if($("#basic_validate").valid()){
+			bootbox.dialog({
+				//closeButton: false,
+	            title: $('#title').html(),
+	            message: '<div class="modal-body" style="margin:5%; text-align:center; font-size:18px">'+
+	            $('#alertRedirectMessage').html()+'</div>',
+	            buttons: {
+	                next: {
+	                    label: $('#hiddenButNext').html(),
+	                    className: "btn-primary",
+	                    callback: function () {
+	                    	$('#flag').val("true");
+	                    	
+//	                    	var aliasMultipleSelect = $('#aliasMultipleSelect').val();
+//	                    	for(var i=0; i<aliasMultipleSelect.length; i++) {
+//	                    		
+//	                    		if(i==0){
+//	                    			$('#aliasList').val(aliasMultipleSelect[i]);
+//	                    		}else{
+//	                    			$('#aliasList').val($('#aliasList').val()+","+aliasMultipleSelect[i]);
+//	                    		}
+//	                    		
+//							}
+	                    	
+	                    	$( "#basic_validate" ).submit();
+	                    }
+	                },
+	//                no: {
+	//                    label: $('#hiddenButNo').html(),
+	//                    className: "btn-primary",
+	//                    callback: function () {
+	//                    	$('#flag').val("false");
+	//                    	$( "#basic_validate" ).submit();
+	//                    }
+	//                }
+	                
+	            }
+	        });
+		}
+	});
+	
+	$.validator.addMethod('isValidName', function(value) {
+		
+		var validName = "^[0-9a-zA-Z_]{1,}$";
+		
+		return value.match(validName);
+		
+            
+        }, $("#errormsgOrganizationNameInvalid").html());
+
+	// Form Validation
+    var basic_validate = $("#basic_validate").validate({
+		rules:{
+			
+			organizationName:{
+				required:true,
+				isValidName:true,
+				remote:{
+					type : 'POST',
+		            url : 'check_unique_ou.wilas',
+		            data : {
+		            	'ou': function(){
+		            		return $('#ou').val();
+		            	}
+		            },
+		            dataType : 'json',
+				},
+				maxlength:148
+			},
+			companyName:{
+				required:true,
+				maxlength:43
+			},
+			companyRegNum:{
+				maxlength:43
+			},
+			billingAddr:{
+				maxlength:148
+			},
+			contactName:{
+				required:true,
+				maxlength:98
+			},
+			contactEmail:{
+				required:true,
+				email: true,
+				maxlength:148
+			},
+			contactDid:{
+				digits:true,
+				maxlength:28
+			},
+			contactMobile:{
+				required:true,
+				digits:true,
+				maxlength:15
+			},
+			contactFax:{
+				digits:true,
+				maxlength:15
+			},
+			techContactName:{
+				maxlength:98
+			},
+			techContactEmail:{
+				email: true,
+				maxlength:148
+			},
+			techContactNum:{
+				digits:true,
+				maxlength:28
+			},
+			territories:{
+				maxlength:48
+			},
+			remarks:{
+				maxlength:250
+			}
+			
+		},
+		messages: {
+			
+			organizationName:{
+				required:$("#errormsgOrganizationNameRequired").html(),
+				remote:$("#errormsgOrganizationNameExists").html(),
+				maxlength:$("#errormsgMaxlength").html()
+			},
+			ou:{
+				required:$("#errormsgOuRequired").html(),
+			},
+			companyName:{
+				required:$("#errormsgCompanyNameRequired").html(),
+				maxlength:$("#errormsgMaxlength43").html()
+			},
+			companyRegNum:{
+				maxlength:$("#errormsgMaxlength43").html()
+			},
+			billingAddr:{
+				maxlength:$("#errormsgMaxlength").html()
+			},
+			contactName:{
+				required:$("#errormsgContractNameRequired").html(),
+				maxlength:$("#errormsgMaxlength98").html()
+			},
+			contactEmail:{
+				required:$("#errormsgEmailRequired").html(),
+				email:$("#errormsgEmail").html(),
+				maxlength:$("#errormsgMaxlength").html()
+			},
+			contactDid:{
+				digits: $("#errormsgDigits").html(),
+				maxlength:$("#errormsgMaxlength28").html()
+			},
+			contactMobile:{
+				required:$("#errormsgContactDidRequired").html(),
+				digits: $("#errormsgDigits").html(),
+				maxlength:$("#errormsgMobileMaxlength").html()
+			},
+			contactFax:{
+				digits: $("#errormsgDigits").html(),
+				maxlength:$("#errormsgMobileMaxlength").html()
+			},
+			techContactName:{
+				maxlength:$("#errormsgMaxlength98").html()
+			},
+			techContactEmail:{
+				email:$("#errormsgEmail").html(),
+				maxlength:$("#errormsgMaxlength").html()
+			},
+			techContactNum:{
+				digits: $("#errormsgDigits").html(),
+				maxlength:$("#errormsgMobileMaxlength").html()
+			},
+			territories:{
+				maxlength:$("#errormsgMaxlength48").html()
+			},
+			remarks:{
+				maxlength:$("#errormsgMaxlength250").html()
+			}
+			
+		},
+		errorClass: "help-inline",
+		errorElement: "span",
+		highlight:function(element, errorClass, validClass) {
+			$(element).parents('.form-group').removeClass('has-success').addClass('has-error');
+		},
+		unhighlight: function(element, errorClass, validClass) {
+			$(element).parents('.form-group').removeClass('has-error').addClass('has-success');
+		}
+	});
+	
+    function load_organization_alias_dropdown(){
+    	
+    	var parameters = {
+    			'hierarchyLevelString' : $('#hierarchyLevel').html()
+    		};
+    	$.ajax({
+    		type : 'POST',
+    		url : 'load_organization_alias_dropdown'+$("#SPRING_EXT").html(),
+    		data : parameters,
+    		dataType : 'json',
+    		success : function(data) {
+    			
+    			$('#aliasMultipleSelect').empty();
+    			$.each(data, function (i, data) {
+    			    $('#aliasMultipleSelect').append($('<option>', { 
+    			        value: data.id,
+    			        text : data.name 
+    			    }));
+    			});
+    			
+    		}
+    	});
+    	
+	}
+    
+});
+	
+	

@@ -1,0 +1,355 @@
+/**
+ * JS for List Accounts
+ */
+
+$(document)
+		.ready(
+				function() {
+
+					var oTable = $('.data-table').DataTable({
+						"bSort" : true,
+						"bServerSide" : true,
+						"order": [[ 0, "desc" ]],
+						"sDom" : '<""l>t<"F"p>',
+						"bJQueryUI" : true,
+						"bAutoWidth" : false,
+						"bSearchable" : false,
+						"sPaginationType" : "full_numbers",
+						"sAjaxSource" : "ajax_list"+$("#SPRING_EXT").html(),
+						"fnServerParams": function (aoData) {
+							aoData.push({"name": "isManage", "value": $("#isManage").html()});
+							aoData.push({"name": "isReadOnly", "value": $("#isReadOnly").html()});
+							aoData.push({"name": "isAdmin", "value": $("#isAdmin").html()});
+						},
+						"aaSorting": [[0,'asc']],
+						"columnDefs": [
+									    {
+									        "targets": [0],
+									        "visible": false,
+									        "class":"hide_column"
+									    },
+									    {
+									        "targets": [4],
+									        "visible": false,
+									        "class":"hide_column"
+									    },
+									    {
+									        "targets": [6],
+									        "visible": false,
+									        "class":"hide_column"
+									    },
+									    {
+									        "targets": [9],
+									        "visible": false,
+									        "class":"hide_column"
+									    },
+									    {
+											"targets": [10],
+											"orderable": false,
+										}
+						],
+						"language":  {
+				    	    "emptyTable":     $("#emptyTable").html(),
+				    	    "lengthMenu":     $("#lengthMenu").html(),
+				    	    "loadingRecords": $("#loadingRecords").html(),
+				    	    "processing":     $("#processing").html(),
+				    	    "zeroRecords":    $("#zeroRecords").html(),
+				    	    "paginate": {
+				    	        "first":      $("#firstDatatable").html(),
+				    	        "last":       $("#lastDatatable").html(),
+				    	        "next":       $("#nextDatatable").html(),
+				    	        "previous":   $("#prevDatatable").html()
+				    	    }
+				    	}
+					});
+					$('select[name=dataTable_length]').select2();
+					
+					$('#hierarchy_level').change(function() {
+						
+				        reload_organization_id_dropdown();
+				        
+				    });
+					
+					function reload_organization_id_dropdown(){
+						
+						var ob = {
+								'hierarchyLevel' : $('#hierarchy_level').val()
+							};
+						$.ajax({
+							type : 'GET',
+							url : 'reload_organization_id_dropdown'+$("#SPRING_EXT").html(),
+							data : ob,
+							dataType : 'json',
+							success : function(data) {
+								
+								$('#ou').empty();
+								$('#ou').append($('<option>', { 
+							        value: "all",
+							        text : $("#placeholderAllOrganizationIDs").html()
+							    }));
+								$.each(data, function (i, data) {
+								    $('#ou').append($('<option>', { 
+								        value: i,
+								        text : data 
+								    }));
+								});
+								
+								$("#ou option:first").prop("selected", "selected").change();
+								
+							}
+						});
+					}
+					
+					$("#resetButton").click(function(){
+						
+						$("#hierarchy_level").val("all").change();
+						$("#ou").val("all").change();
+						$("#status").val("10").change();
+						$("#first_name").val("");
+						$("#contact_email").val("");
+						$("#contact_mobile").val("");
+						 
+					 });
+					
+					if($('#errmsg').html().trim().length!=0 && $('#errmsg').html().trim()!="")
+					{
+						alertNotification($('#errmsg').html());
+						
+					}
+
+					$('.data-table tbody').on('click','.editButton', function() {
+						
+						var rowData = oTable.row($(this).parents('tr')).data();
+						window.location.href='editInfo'+$("#SPRING_EXT").html()+'?id='+rowData[0]
+						
+					});
+					
+					$('.data-table tbody').on('click','.readOnlyButton', function() {
+						
+						var rowData = oTable.row($(this).parents('tr')).data();
+						window.location.href='readOnlyInfo'+$("#SPRING_EXT").html()+'?id='+rowData[0]
+						
+					});
+					
+					$(document).on('click', '.data-table tbody tr', function() {
+						if ($(this).hasClass('checked')) {
+
+							$(this).removeClass('checked');
+
+						} else {
+							$(this).addClass('checked');
+						}
+					});
+
+					var dialog_buttons = {}; 
+					
+					dialog_buttons[$("#hiddenButYes").html()] = function(){
+						
+						var idSting = listId(oTable);
+						console.log(idSting);
+						if (idSting != null) {
+							var ob = {
+								'id' : idSting
+							};
+
+							$.ajax({
+								type : 'POST',
+								url : 'delete'+$("#SPRING_EXT").html(),
+								data : ob,
+								dataType : 'xml',
+								success : function(data) {
+
+								},
+								complete : function(xhr, status) {
+									oTable.ajax.reload();
+								}
+							});
+						}
+						deleteConfirmDiv.dialog("close");
+						
+					};
+					
+					dialog_buttons[$("#hiddenButCancel").html()] = function(){
+						
+						deleteConfirmDiv.dialog("close");
+						
+					};
+					
+					var deleteConfirmDiv = $("#deleteConfirm").dialog({
+						autoOpen : false,
+						resizable: false,
+						height : 300,
+						width : $(window).width()*0.35,
+						modal : true,
+						position: ['center','center-20%'],
+						buttons : dialog_buttons,
+						close : function() {
+
+						},
+						show: {
+							effect: "puff",
+							duration: 250
+						},
+						hide: {
+							effect: "puff",
+							duration: 250
+						}
+					});
+
+					$('#deleterow').click(function() {
+						
+						var selectedRows = oTable.$('tr.checked');
+
+						if (selectedRows.length <= 0) {
+							
+							alertNotification($('#alert1least').html());
+							
+						}else{
+							$("#deleteConfirm").show();
+							deleteConfirmDiv.dialog("open");
+						}
+
+
+					});
+					
+					$("#submitButton").click(function(){
+						oTable = null;
+						oTable = $('.data-table').DataTable({
+							"bSort" : true,
+							"bDestroy": true,
+							"order": [[ 0, "desc" ]],
+							"bServerSide" : true,
+							"sDom" : '<""l>t<"F"p>',
+							"bJQueryUI" : true,
+							"bSearchable" : false,
+							"bAutoWidth" : false,
+							"sPaginationType" : "full_numbers",
+							"sAjaxSource" : "ajax_list"+$("#SPRING_EXT").html(),
+							"fnServerParams": function (aoData) {
+								aoData.push({"name": "isManage", "value": $("#isManage").html()});
+								aoData.push({"name": "isReadOnly", "value": $("#isReadOnly").html()});
+								aoData.push({"name": "isAdmin", "value": $("#isAdmin").html()});
+								aoData.push({"name": "ou", "value": $("#ou").val()});
+								aoData.push({"name": "hierarchy_level", "value": $("#hierarchy_level").val()});
+								aoData.push({"name": "first_name", "value": $("#first_name").val()});
+								aoData.push({"name": "last_name", "value": $("#last_name").val()});
+								aoData.push({"name": "contact_email", "value": $("#contact_email").val()});
+								aoData.push({"name": "status", "value": $("#status").val()});
+							},
+							"columnDefs": [
+										    {
+										        "targets": [0],
+										        "visible": false,
+										        "class":"hide_column"
+										    },
+										    {
+										        "targets": [4],
+										        "visible": false,
+										        "class":"hide_column"
+										    },
+										    {
+										        "targets": [6],
+										        "visible": false,
+										        "class":"hide_column"
+										    },
+										    {
+										        "targets": [9],
+										        "visible": false,
+										        "class":"hide_column"
+										    },
+										    {
+												"targets": [10],	
+												"orderable": false,
+											}
+							],
+							"aaSorting": [[0,'asc']],
+				 			"language":  {
+				 	    	    "emptyTable":     $("#emptyTable").html(),
+				 	    	    "lengthMenu":     $("#lengthMenu").html(),
+				 	    	    "loadingRecords": $("#loadingRecords").html(),
+				 	    	    "processing":     $("#processing").html(),
+				 	    	    "zeroRecords":    $("#zeroRecords").html(),
+				 	    	    "paginate": {
+				 	    	        "first":      $("#firstDatatable").html(),
+				 	    	        "last":       $("#lastDatatable").html(),
+				 	    	        "next":       $("#nextDatatable").html(),
+				 	    	        "previous":   $("#prevDatatable").html()
+				 	    	    }
+				 	    	}
+						});
+						$('select[name=dataTable_length]').select2();
+						
+					});
+					
+
+					function listId(ObjectTable) {
+						
+						var loginHierarchyLevel = parseInt($("#loginHierarchyLevel").html(), 10);
+						console.log("loginHierarchyLevel: "+loginHierarchyLevel);
+						var accountIdArray = [];
+						var accountLevelArray = [];
+						
+						var selectedRows = ObjectTable.$('tr.checked');
+
+						var availableId = "";
+						var unavailableId = "";
+
+						if (selectedRows.length <= 0) {
+							
+							alertNotification($('#alert1least').html());
+							return null;
+							
+						} else {
+
+							for (var j = 0; j < selectedRows.length; j++) {
+
+								accountIdArray[j] = ObjectTable.row(selectedRows[j]).data()[0];
+								accountLevelArray[j] = ObjectTable.row(selectedRows[j]).data()[9];
+								
+							}
+							console.log("accountIdArray: "+accountIdArray);
+							console.log("accountLevelArray: "+accountLevelArray);
+
+							var errorCounter = 0
+							var correctCounter = 0
+							for (var j = 0; j < accountLevelArray.length; j++) {
+								
+								console.log("result: "+(parseInt(accountLevelArray[j], 10)-loginHierarchyLevel>1));
+								if(parseInt(accountLevelArray[j], 10)-loginHierarchyLevel>1){
+									
+									if(errorCounter==0){
+										unavailableId = accountIdArray[j];
+									}else{
+										unavailableId += ","+accountIdArray[j];
+									}
+									errorCounter++;
+									
+								}else{
+									
+									if(correctCounter==0){
+										availableId = accountIdArray[j];
+									}else{
+										availableId += ","+accountIdArray[j];
+									}
+									correctCounter++;
+									
+								}
+							}
+							
+							console.log("availableId: "+availableId);
+							console.log("errorCounter: "+errorCounter);
+							if(errorCounter!=0 && correctCounter==0){
+								
+								alertNotification("Delete Unsuccessful! It only allows to delete account(s) you created.");
+								
+							}else if(errorCounter!=0 && correctCounter!=0){
+								
+								alertNotification("Delete successful! But some account(s) are unable to delete, since these account(s) didn't create by you.");
+								
+							}
+							
+							return availableId;
+
+						}
+					}
+				});

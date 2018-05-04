@@ -1,0 +1,81 @@
+package com.techstudio.common;
+
+import java.security.cert.CertificateException;
+import java.util.Map;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.apache.log4j.Logger;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.client.urlconnection.HTTPSProperties;
+
+public class EasyClient {
+	
+	private static final Logger log = Logger.getLogger(EasyClient.class);
+	
+	public Client getClient()
+	{
+// Create a trust manager that does not validate certificate chains
+		
+        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+                
+				@Override
+				public void checkClientTrusted(java.security.cert.X509Certificate[] arg0, String arg1)
+						throws CertificateException {
+					// TODO Auto-generated method stub
+					
+				}
+				@Override
+				public void checkServerTrusted(java.security.cert.X509Certificate[] arg0, String arg1)
+						throws CertificateException {
+					// TODO Auto-generated method stub
+					
+				}
+            }
+        };
+		
+		try{
+			
+			SSLContext ctx = SSLContext.getInstance("SSL");
+			
+			ctx.init(null, trustAllCerts, new java.security.SecureRandom());
+			
+			DefaultClientConfig config = new DefaultClientConfig();
+	        Map<String, Object> properties = config.getProperties();
+	        
+	        HTTPSProperties httpsProperties = new HTTPSProperties(
+	                new HostnameVerifier()
+	                {
+	                    @Override
+	                    public boolean verify( String s, SSLSession sslSession )
+	                    {
+	                        return true;
+	                    }
+	                },ctx
+	        );
+	        properties.put( HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, httpsProperties );
+	        config.getClasses().add( JacksonJsonProvider.class );
+			
+			Client client = Client.create(config);
+			
+			return client;
+			
+			
+		} catch (Exception e){
+			
+			log.error(e,e);
+		}
+		return null;
+	}
+
+}

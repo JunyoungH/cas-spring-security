@@ -1,0 +1,79 @@
+package com.techstudio.model.am;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+
+@Entity
+@Table(name="am_ssid" )
+public class SsidDTO implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5829062756190426703L;
+
+	@Id	
+	@Column(name = "ssid_id", columnDefinition="bigint", unique = true, nullable=false)
+	private Long ssidId;
+	
+	@Column(name = "ssid", columnDefinition="varchar(45)", nullable=true)
+	private String ssid;
+	
+//	@Transient
+//	private String ;
+
+/* Constructor (You can create an constructor for default value setting) */
+	
+	public SsidDTO(){
+		
+	}
+
+	
+/* Relationship */
+	
+	@ManyToOne
+    @JoinColumn(name="cp_id")
+    private CaptivePortalDTO captivePortalDTO; // Foreign key to table am_captive_portal
+	
+	
+/* Getter and Setter */
+
+
+	public Long getSsidId() {
+		return ssidId;
+	}
+
+
+	public void setSsidId(Long ssidId) {
+		this.ssidId = ssidId;
+	}
+
+
+	public String getSsid() {
+		return ssid;
+	}
+
+
+	public void setSsid(String ssid) {
+		this.ssid = ssid;
+	}
+
+
+	public CaptivePortalDTO getCaptivePortalDTO() {
+		return captivePortalDTO;
+	}
+
+
+	public void setCaptivePortalDTO(CaptivePortalDTO captivePortalDTO) {
+		this.captivePortalDTO = captivePortalDTO;
+	}
+	
+
+}

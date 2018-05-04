@@ -1,0 +1,20 @@
+package com.techstudio.test;
+
+import org.springframework.security.crypto.codec.Base64;
+
+public class LdapShaSaltHelper {
+	
+	private static final int SHA_LENGTH = 20;
+	
+	public static byte[] extractSalt(String encPass) {
+        String encPassNoLabel = encPass.substring(6);
+
+        byte[] hashAndSalt = Base64.decode(encPassNoLabel.getBytes());
+        int saltLength = hashAndSalt.length - SHA_LENGTH;
+        byte[] salt = new byte[saltLength];
+        System.arraycopy(hashAndSalt, SHA_LENGTH, salt, 0, saltLength);
+
+        return salt;
+    }
+
+}

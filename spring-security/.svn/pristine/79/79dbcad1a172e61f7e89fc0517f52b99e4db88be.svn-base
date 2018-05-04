@@ -1,0 +1,107 @@
+/**
+ * JS for Edit Account Detail Information
+ */
+
+$(document).ready(function(){
+			
+	if($('#errmsg').html().trim().length!=0 && $('#errmsg').html().trim()!="")
+	{
+		alertNotification($('#errmsg').html());
+		
+	}
+	
+	$('#readonlyOu').val($('#shortFormatOu').html());
+	$('#readonlyLoginUid').val($('#loginUid').val());
+	$('#readonlyFirstName').val($('#firstName').val());
+	$('#readonlyMidName').val($('#midName').val());
+	$('#readonlyLastName').val($('#lastName').val());
+	$('#readonlyContractNum').val($('#contractNum').val());
+	$('#readonlyRemarks').val($('#remarks').val());
+	$("#roleId option[value='" + $('#prameterRoleId').html() + "']").prop("selected", "selected").change();
+	
+	$( "#submitButton" ).click(function(e) {
+		
+		e.preventDefault(); //To prevent the browser from refreshing the page
+    	$( "#basic_validate" ).submit();
+		
+	});
+			
+	// Form Validation
+    $("#basic_validate").validate({
+    	rules:{
+			
+			loginUid:{
+				required:true,
+				email:true,
+				remote:{
+					type : 'POST',
+		            url : 'check_unique_loginuid_exclude_loginuid_is_being_editing.wilas',
+		            data : {
+		            	'accountId': function(){
+		            		return $('#accountId').val();
+		            	},
+		            	'loginUid': function(){
+		            		return $('#loginUid').val();
+		            	}
+		            },
+		            dataType : 'json',
+				},
+				maxlength:148
+			},
+			firstName:{
+				required:true,
+				maxlength:148
+			},
+			midName:{
+				maxlength:148
+			},
+			lastName:{
+				required:true,
+				maxlength:148
+			},
+			contractNum:{
+				digits:true,
+				maxlength:15
+			},
+			remarks:{
+				maxlength:250
+			}
+			
+		},
+		messages: {
+			
+			loginUid:{
+				required:$("#errormsgAccountEmailRequired").html(),
+				email:$("#errormsgEmail").html(),
+				remote:$("#errormsgEmailExists").html(),
+				maxlength:$("#errormsgMaxlength").html()
+			},
+			firstName:{
+				required:$("#errormsgAccountFirstNameRequired").html(),
+				maxlength:$("#errormsgMaxlength").html()
+			},
+			lastName:{
+				required:$("#errormsgAccountLastNameRequired").html(),
+				maxlength:$("#errormsgMaxlength").html()
+			},
+			contractNum:{
+				digits: $("#errormsgDigits").html(),
+				maxlength:$("#errormsgMobileMaxlength").html()
+			},
+			remarks:{
+				maxlength:$("#errormsgMaxlength250").html()
+			},
+			
+			
+		},
+		errorClass: "help-inline",
+		errorElement: "span",
+		highlight:function(element, errorClass, validClass) {
+			$(element).parents('.form-group').removeClass('has-success').addClass('has-error');
+		},
+		unhighlight: function(element, errorClass, validClass) {
+			$(element).parents('.form-group').removeClass('has-error').addClass('has-success');
+		}
+	});
+	
+});

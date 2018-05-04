@@ -1,0 +1,45 @@
+/*Techstudio Inc Timeout Handler v1.0
+ * author:Charles Lee
+ * in 2016*/
+
+define(['bootbox'],function(bootbox){
+	
+	var timeLimit;
+
+	function startTimeout(timeoutPara){
+			
+		timeLimit = timeoutPara*60*1000;
+		timeout_init(timeLimit);
+				
+	}
+	
+	function timeout_init(timeLimit) {
+		
+	    setTimeout(sessionTimeoutCounter_trigger, timeLimit);
+	    
+	}
+	
+	function sessionTimeoutCounter_trigger() {
+
+		bootbox.confirm($("#sessionOut").html(), function(result) {
+
+			if (result == true) {
+				
+				window.location="home/logout.wilas";
+				
+			}else{
+				
+				setTimeout(sessionTimeoutCounter_trigger, timeLimit);
+			}
+			
+		});
+	}
+		
+		
+	return{
+			
+		startTimeout:startTimeout
+	};
+	
+
+});

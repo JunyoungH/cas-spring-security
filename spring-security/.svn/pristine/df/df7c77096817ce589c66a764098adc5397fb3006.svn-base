@@ -1,0 +1,846 @@
+wilas.first.message=hi,there, welcome to wilas
+
+alert.sessionout=The session is expired. Click 'OK' to process to login.
+alert.organization.suspended=Your account has been suspended. Please contact administrator to restore your account.
+
+#Recover Form
+#screen.recoverform.instruction=Enter your e-mail address below and we will send you instructions how to recover a password.
+screen.recoverform.instruction=Please enter E-mail address
+screen.recoverform.placeholder.email=E-mail address
+screen.recoverform.label.clicktologin=Click to login
+screen.recoverform.button.submit=Submit
+
+#Header
+header.welcome=Hi
+header.profile=Profile
+header.usercatergory=User Type
+
+#**********************************************
+#Left Navigation Menu Labels
+#**********************************************
+#Dashboard
+menu.dashboard=Dashboard
+
+#Account Management
+menu.am.am.main=Account Management
+menu.am.am.my=My Account
+menu.am.am.add=Add Account
+menu.am.am.view=View Account
+
+#Role Management
+menu.am.role.main=Role Management
+menu.am.role.view=View Role
+menu.am.role.add=Add Role
+
+#Organization
+menu.am.organization.main=Organization
+menu.am.organization.view=View Organization
+menu.am.organization.add=Add Organization
+menu.am.licenses.cp=View Captive Portal
+menu.am.assign.license=Assign Captive Portal
+
+#Licenses
+menu.am.licenses.main=Licenses
+menu.am.licenses.quota=Quota Management
+
+#Captive Portal
+menu.cp.cp.main=Captive Portal
+menu.cp.cp.view=View Portals
+
+#Theme
+menu.cp.themes.main=Themes
+menu.cp.themes.view=View Themes
+
+#Pages
+menu.cp.pages.main=Pages
+menu.cp.pages.view=View Pages
+menu.cp.pages.add=Add Page
+
+#Content
+menu.cp.contents.main=Contents
+menu.cp.contents.view=View Contents
+menu.cp.contents.add=Add Contents
+menu.cp.contents.category=Manage Campaign
+
+#Reports
+menu.cp.reports.main=Reports
+menu.cp.reports.audit=New vs Returning Report
+menu.cp.reports.detail=Visitors Detail Report
+menu.cp.reports.login=Visitors Login Report
+menu.cp.reports.transaction=Activities Audit Report
+menu.cp.reports.simpleformqanda=Simple Form Report
+menu.cp.reports.apengagement=AP Engagement Report
+menu.cp.reports.dailyengagement=Daily Engagement Report
+menu.cp.reports.countriesotp=TOP 10 Countries OTP Analytic Report
+menu.cp.reports.scheduler=Report Scheduler
+menu.cp.reports.summary=Summary Report
+menu.cp.reports.unique=Unique Visitors Audit Report
+menu.cp.reports.activities=Visitor Activities Audit Report
+menu.cp.reports.profile=Visitor Profile Report
+menu.cp.reports.quickdownloads=Quick Downloads
+
+#Location Analytic
+menu.bi.location=Location Analytics
+menu.bi.location.dashboard=Analytic Summary
+menu.bi.location.summary=Detail Location Analytic
+menu.bi.location.zoneDetail=Tabulated Zone Analytic
+menu.bi.location.heatmap=Location Heatmap
+menu.bi.location.movement=Movement Analytic
+
+#Web Analytic
+menu.bi.web=Web Analytic
+menu.bi.web.social_summary=Visitor Engagement Summary
+menu.bi.web.dashboard=CP Engagement Summary
+menu.bi.web.device=Device Analytic
+menu.bi.web.platform=Device Platform Analytic
+menu.bi.web.engagement=CP Engagement Analytic
+menu.bi.web.action=Page Access Analytic
+menu.bi.web.subscriber=Demographic Analytic
+menu.bi.web.campaign=Campaign ROI Analytic
+
+#Traffic Analytic
+menu.bi.traffic=Traffic Analytics
+menu.bi.traffic.traffic=Data Utilization Analytic
+
+#Sales Analytic
+menu.bi.3d=Sales Analytic
+menu.bi.3d.sales=Revenue vs Visitor Analytic
+menu.bi.3d.transaction=Transaction vs Visitor Analytic
+menu.bi.3d.amount=Item Sold vs Visitor Analytic
+
+#Marketing Campaign
+menu.pm.campaign=Marketing Campaign
+menu.pm.campaign.list=View Campaigns
+menu.pm.campaign.create=Create Campaign
+
+#Marketing Content
+menu.pm.content=Marketing Content
+menu.pm.content.create=Create Content Template
+menu.pm.content.list=View Content Templates
+
+#Marketing App
+menu.pm.app=Marketing App
+menu.pm.app.list=View App Setting
+menu.pm.app.create=Create App Setting
+
+#Marketing Policy
+menu.pm.policy=Marketing Policy
+menu.pm.policy.create=Create Policy
+menu.pm.policy.list=View Policies
+
+#Marketing Report
+menu.pm.report=Marketing Report
+menu.pm.report.detail=Detail Report
+menu.pm.report.summary=Summary Report
+
+#License Management
+menu.lm.license.main=License Management
+menu.lm.license=License
+menu.lm.ap=AP
+menu.lm.group=AP Group
+
+#User Guide
+menu.userguide=User Guide
+
+#Logout
+menu.logout=Logout
+
+#**********************************************
+
+menu.resetpassword=Reset Password
+
+#Breadcrumb Trail
+breadcrumb.home=Dashboard
+breadcrumb.home.title=Back to Dashboard
+breadcrumb.account.main=Account Management
+breadcrumb.account.edit=My Account
+breadcrumb.account.add=Add Account
+breadcrumb.account.view=View Account
+breadcrumb.account.resetpassword=Reset Password
+breadcrumb.role=Role Management
+breadcrumb.organization.main=Organization
+breadcrumb.organization.add=Add Organization
+breadcrumb.organization.edit=Edit Organization
+breadcrumb.organization.view=View Organization
+breadcrumb.distributors.view=List Distributors
+breadcrumb.distributor.add=Add Distributor
+breadcrumb.distributor.edit=Edit Distributor
+breadcrumb.resellers.view=List Resellers
+breadcrumb.resellers.add=Add Resellers
+breadcrumb.resellers.edit=Edit Resellers
+breadcrumb.clients.view=List Clients
+breadcrumb.clients.add=Add Client
+breadcrumb.clients.edit=Edit Clients
+breadcrumb.clients.cp=Captive Portal URL Management
+breadcrumb.clients.piwik=Piwik Management
+breadcrumb.departments.view=List Departments
+breadcrumb.departments.add=Add Departments
+breadcrumb.departments.edit=edit Departments
+breadcrumb.departments.cp=Captive Portal URL Management
+breadcrumb.departments.piwik=Piwik Management
+
+#table column name
+table.columnname.owner=Owner
+table.columnname.status=Status
+table.status.active=Active
+table.status.inactive=Inactive
+table.status.suspended=Suspended
+table.server.loading=Loading data from server
+title.mandatoryfields=Mandatory Fields
+table.icon.help=Single click to select a record. Click 'pencil' icon to edit a record.
+table.columnname.detail=Details
+
+#filter placeholder
+filter.placeholder.SearchByFirstName=Search by First Name
+filter.placeholder.SearchByContactEmail=Search by Contact Email
+filter.placeholder.SearchByContactMobile=Search by Contact Mobile
+filter.placeholder.SearchByCompanyName=Search by Company Name
+filter.placeholder.SearchByTechContactEmail=Search by Tech Contact Email
+filter.placeholder.SearchByPaymentDetail=Search by Payment Detail
+filter.placeholder.SelectAnOrganizationUnits=Select An Organization ID
+filter.placeholder.SelectAllOrganizationUnits=Select All Organization IDs
+filter.placeholder.AllOrganizationIDs=All
+filter.placeholder.AllUserTypes=All
+filter.placeholder.SelectAllClients=All Clients
+filter.placeholder.SelectAllResellers=All Resellers
+filter.placeholder.SelectADepartmentName=Select a Department Name
+filter.placeholder.SearchByDepartmentName=Search by Department Name
+filter.placeholder.SearchByClientName=Search by Client Name
+filter.placeholder.SearchByOu=Search by Organization ID
+filter.placeholder.AllStatus=All
+filter.placeholder.active=Active
+filter.placeholder.suspend=Suspend
+
+#popup window
+popupwindow.piwik.title=Piwik Detail
+popupwindow.captiveportal.title=Captive Portal Detail
+popupwindow.account.title=Account Detail
+popupwindow.distributor.title=Distributor Detail
+popupwindow.reseller.title=Reseller Detail
+popupwindow.client.title=Client Detail
+popupwindow.department.title=Department Detail
+
+#button
+button.add=Add
+button.save=Save
+button.send=Send
+button.cancel=Cancel
+button.delete=Delete
+button.edit=Edit
+button.search=Search
+button.reset=Reset
+button.generate=Generate
+button.ok=OK
+button.yes=Yes
+button.no=No
+button.next=Next
+button.back=Back
+
+button.confirm=Confirm
+
+#drowdown
+drowdown.active=Active
+drowdown.suspend=Suspend
+
+#alert
+alert.error=Error
+alert.notification=WILAS Notification
+alert.1atleast=Please select at least 1 record
+alert.1clientatleast=Please select at least 1 client's record
+alert.function.1atleast=Please select at least 1 function
+
+#pageType
+pagetype.normal=Normal						
+pagetype.tandc=Terms & Condition
+pagetype.uandp=Username & Password
+pagetype.sfq=Simple Form
+pagetype.otp=SMS OTP
+pagetype.socialmedia=Social Media
+pagetype.email=Email OTP
+
+#Internal Respond
+crud.respond.add.successful=Add Successfully
+crud.respond.add.unsuccessful=Add Unsuccessfully
+
+crud.respond.edit.successful=Edit Successfully
+crud.respond.edit.unsuccessful=Edit Unsuccessfully
+
+crud.respond.delete.successful=Remove Successfully
+crud.respond.delete.unsuccessful=Remove Unsuccessfully
+
+crud.respond.clearsession.successful=Clear session Successfully
+crud.respond.clearsession.unsuccessful=Clear session Unsuccessfully
+
+crud.respond.delete.categoryused=Cannot delete. Category is using by Contents.
+crud.respond.delete.contentused=Cannot delete. Content is using by Pages.
+crud.respond.delete.pageused=Cannot delete. Page is using by Captive portals.
+
+#Account Management
+
+#My Account
+title.myAccount.big=Edit Account
+myAccount.form.organization=Organization
+myAccount.form.uid=Email(UID)
+myAccount.form.password=Password
+myAccount.form.confirmPw=Confirm Password
+
+#Add Account
+title.addAccount.big=Add Account
+addAccount.form.email=Email
+addAccount.form.first=First Name
+addAccount.form.Mid=Middle Name
+addAccount.form.last=Last Name
+addAccount.form.mobile=Mobile No.
+addAccount.form.belong=Belongs to which organization?
+addAccount.form.roles=Roles
+addAccount.form.status=Status
+addAccount.form.remark=Remark
+addAccount.alert.title=WILAS Notification
+addAccount.alert.message=Please create a new country admin first!
+addAccount.notification.resetpassword=User Account created successfully. An email will be sent to the user to setup the account. Please inform the user to change their password.
+
+#View Account
+filter.viewAccount.big=Search Filter
+filter.viewAccount.ou=Organization
+filter.viewAccount.firstname=First Name
+filter.viewAccount.lastname=Last Name
+filter.viewAccount.email=Email
+filter.viewAccount.mobile=Contact Mobile
+filter.viewAccount.status=Status
+title.viewAccount.table=Account List
+table.viewAccount.columnname.id=Account ID
+table.viewAccount.columnname.first=First Name
+table.viewAccount.columnname.Mid=Middle Name
+table.viewAccount.columnname.last=Last Name
+table.viewAccount.columnname.email=Contact Email
+table.viewAccount.columnname.mobile=Contact Mobile
+table.viewAccount.columnname.ou=Organization
+table.viewAccount.columnname.usercatergory=User Type
+button.viewAccount.add=Add Account
+button.viewAccount.delete=Delete Account
+
+#Edit Account
+title.editAccount.big=My Account Info
+editAccount.form.email=Email
+editAccount.form.first=First Name
+editAccount.form.Mid=Middle Name
+editAccount.form.last=Last Name
+editAccount.form.mobile=Mobile No.
+editAccount.form.belong=Belongs to which organization?
+editAccount.form.roles=Roles
+editAccount.form.status=Status
+editAccount.form.remark=Remark
+editAccount.update.passwordpolicyfail=Username and Password update failed! The password does not meet the password policy requirements.
+editAccount.update.unknown=Encounter a unknown error,Please contact your admin! 
+
+#Resetpassword
+resetpassword.title=This page is for user to reset the account login password. A new password must not be the same as the last 3 passwords previously used.
+resetpassword.notoken1=The account session is expired or used. Please click on “Forget Password” in 
+resetpassword.notoken2=Login Page
+resetpassword.notoken3= to reset your account.
+resetpassword.link.tryagain= please try again.
+resetpassword.tokenexpired=Token is expired,
+resetpassword.passwordpolicyfail=Update password failed! The password doesn't meet the password policy requirements,
+resetpassword.password=A valid password should be 8 to 16 characters in length and not contain parts of the username, consists of lower and upper case alphabets, numeric digits and special characters, and must contain at least 1 capital letter.
+
+#Account Auto-logout
+alertbox.title=WILAS Notification
+alertbox.message=Your account had been updated. The system will redirect you to login now.
+alertbox.redirecttologinpage.message=Your account information already changed, the system will redirect you to login page and ask you to log in again.
+
+#Role Management
+title.addRole.big=Add Role
+title.editRole.big=Edit Role
+breadcrumb.role.management=Role Management
+breadcrumb.role.view=View Role
+breadcrumb.role.add=Add Role
+breadcrumb.role.edit=Edit Role
+title.role.table=Role List
+table.role.columnname.id=Role ID
+table.role.columnname.name=Role Name
+table.role.columnname.ou=Organizaiton ID
+table.role.columnname.usertype=User Type
+button.role.add=Add Role
+button.role.delete=Delete Role
+button.role.undo=Undo
+button.role.redo=Redo
+rolemgt.label.organizationid=Organization
+rolemgt.label.rolename=Role Name
+rolemgt.label.rolefunctions=Role Functions
+rolemgt.alert.title=WILAS Notification
+rolemgt.assign.alert=Please enter a role name first!
+rolemgt.delete.alert=Delete Role(s), Are you sure?
+rolemgt.delete.success=Role(s) deleted Successful!
+rolemgt.delete.failed=Role(s) can't be deleted, because some accounts are using it. 
+rolemgt.role.atleastonefunction=Please assign as least one function to role!
+
+#Organization List
+filter.organizationList.title=Search Filter
+filter.organizationList.companyName=Company Name
+filter.organizationList.organizationName=Organization Name
+filter.organizationList.email=Contact Email
+filter.organizationList.contactName=Contact Name
+filter.organizationList.mobile=Contact Number
+filter.organizationList.techemail=Tech Contact Email
+filter.organizationList.userType=User Type
+filter.organizationList.ou=Organization
+filter.OrganizationList.status=Status
+title.listOrganization.table=Organization List
+table.organizationList.columnname.id=Organization ID
+table.organizationList.columnname.company=Company Name
+table.organizationList.columnname.email=Contact Email
+table.organizationList.columnname.mobile=Contact Number
+table.organizationList.columnname.techemail=Tech Contact Email
+table.organizationList.columnname.contactName=Contact Name
+table.organizationList.columnname.ou=Organization ID
+table.organizationList.columnname.usercatergory=User Type
+table.organizationList.columnname.payment=Payment Detail
+button.organizationList.add=Add Organization
+button.organizationList.delete=Delete Organization
+
+#Add Organization
+title.addOrganization.big=Add Organization
+organization.form.Name=Organization Name
+organization.form.ou=Organization
+organization.form.alias=Organization Alias
+organization.form.status=Status
+organization.form.company=Company Name
+organization.form.regnum=Company Reg No.
+organization.form.address=Billing Address
+organization.form.contact=Contact Name
+organization.form.email=Contact Email
+organization.form.DID=Contact Number 1
+organization.form.mobile=Contact Number 2
+organization.form.fax=Contact Fax
+organization.form.techname=Technical Contact Name
+organization.form.techemail=Technical Contact Email
+organization.form.technumber=Technical Contact Number
+organization.form.territories=Territories
+organization.form.remark=Remark
+
+#edit Organization
+title.editOrganization.big=Edit Organization
+
+#View Distributors
+filter.viewDistributors.big=Search Filter
+filter.viewDistributors.company=Company Name
+filter.viewDistributors.email=Contact Email
+filter.viewDistributors.mobile=Contact Mobile
+filter.viewDistributors.techemail=Tech Contact Email
+filter.viewDistributors.ou=Organization ID
+table.viewDistributors.columnname.id=Distributor ID
+table.viewDistributors.columnname.company=Company Name
+table.viewDistributors.columnname.email=Contact Email
+table.viewDistributors.columnname.Mobile=Contact Mobile
+table.viewDistributors.columnname.techemail=Tech Contact Email
+table.viewDistributors.columnname.ou=Organization ID
+button.viewDistributors.add=Add Distributor
+button.viewDistributors.delete=Delete Distributor
+
+#Add Distributor
+title.addDistributor.big=Add Distributor
+addDistributor.form.Name=Distributor Name
+addDistributor.form.ou=Organization ID
+addDistributor.form.status=Status
+addDistributor.form.company=Company Name
+addDistributor.form.regnum=Company Reg Num
+addDistributor.form.address=Billing Address
+addDistributor.form.contact=Contact Name
+addDistributor.form.email=Contact Email
+addDistributor.form.DID=Contact DID
+addDistributor.form.mobile=Contact Mobile
+addDistributor.form.fax=Contact fax
+addDistributor.form.techname=Technical Contact Name
+addDistributor.form.techemail=Technical Contact Email
+addDistributor.form.technumber=Technical Contact Number
+addDistributor.form.territories=Territories
+addDistributor.form.remark=Remark
+
+#edit Distributor
+title.editDistributor.big=Edit Distributor
+editDistributor.form.Name=Distributor Name
+editDistributor.form.ou=Organization ID
+editDistributor.form.status=Status
+editDistributor.form.company=Company Name
+editDistributor.form.regnum=Company Reg Num
+editDistributor.form.address=Billing Address
+editDistributor.form.contact=Contact Name
+editDistributor.form.email=Contact Email
+editDistributor.form.DID=Contact DID
+editDistributor.form.mobile=Contact Mobile
+editDistributor.form.fax=Contact fax
+editDistributor.form.techname=Technical Contact Name
+editDistributor.form.techemail=Technical Contact Email
+editDistributor.form.technumber=Technical Contact Number
+editDistributor.form.territories=Territories
+editDistributor.form.remark=Remark
+
+
+#View Resellers
+filter.viewResellers.big=Search Filter
+filter.viewResellers.company=Company Name
+filter.viewResellers.email=Contact Email
+filter.viewResellers.mobile=Contact Mobile
+filter.viewResellers.techemail=Tech Contact Email
+filter.viewResellers.ou=Organization ID
+table.viewResellers.columnname.id=Reseller ID
+table.viewResellers.columnname.company=Company Name
+table.viewResellers.columnname.email=Contact Email
+table.viewResellers.columnname.Mobile=Contact Mobile
+table.viewResellers.columnname.techemail=Tech Contact Email
+table.viewResellers.columnname.ou=Organization ID
+table.viewResellers.columnname.distributorou=Distributor Organization ID
+button.viewResellers.add=Add Reseller
+button.viewResellers.delete=Delete Reseller
+
+#Add Reseller
+title.addReseller.big=Add Reseller
+addReseller.form.Name=Reseller Name
+addReseller.form.ou=Organization Name
+addReseller.form.status=Status
+addReseller.form.company=Company Name
+addReseller.form.regnum=Company Reg Num
+addReseller.form.address=Billing Address
+addReseller.form.contact=Contact Name
+addReseller.form.email=Contact Email
+addReseller.form.DID=Contact DID
+addReseller.form.mobile=Contact Mobile
+addReseller.form.fax=Contact fax
+addReseller.form.techname=Technical Contact Name
+addReseller.form.techemail=Technical Contact Email
+addReseller.form.technumber=Technical Contact Number
+addReseller.form.territories=Territories
+addReseller.form.remark=Remark
+
+#edit Reseller
+title.editReseller.big=Edit Reseller
+editReseller.form.Name=Reseller Name
+editReseller.form.ou=Organization Name
+editReseller.form.status=Status
+editReseller.form.company=Company Name
+editReseller.form.regnum=Company Reg Num
+editReseller.form.address=Billing Address
+editReseller.form.contact=Contact Name
+editReseller.form.email=Contact Email
+editReseller.form.DID=Contact DID
+editReseller.form.mobile=Contact Mobile
+editReseller.form.fax=Contact fax
+editReseller.form.techname=Technical Contact Name
+editReseller.form.techemail=Technical Contact Email
+editReseller.form.technumber=Technical Contact Number
+editReseller.form.territories=Territories
+editReseller.form.remark=Remark
+
+#View Clients
+filter.viewClients.big=Search Filter
+filter.viewClients.company=Company Name
+filter.viewClients.email=Contact Email
+filter.viewClients.mobile=Contact Mobile
+filter.viewClients.payment=Payment Detail
+filter.viewClients.ou=Organization ID
+title.viewClient.table=Client List
+table.viewClients.columnname.id=Client ID
+table.viewClients.columnname.company=Company Name
+table.viewClients.columnname.email=Contact Email
+table.viewClients.columnname.mobile=Contact Mobile
+table.viewClients.columnname.payment=Payment Detail
+table.viewClients.columnname.ou=Organization ID
+table.viewClients.columnname.action=Action
+button.viewClients.add=Add Client
+button.viewClients.delete=Delete Client
+
+#Client CP APPLICATION POPUP
+button.applyCp=Request CP License
+popupwindow.client.application=CP License Application Form
+form.cpApplication.cpsever=CP Server
+form.cpApplication.cpcloud=CP Cloud
+form.cpApplication.cplite=CP Lite
+form.cpApplication.cplitedomainname=CP Lite Domain Name
+form.cpApplication.normalpage=Normal Page
+form.cpApplication.termandcondition=Term And Condition
+form.cpApplication.usernameandpassword=Username And Password
+form.cpApplication.questionandform=Question And Form
+form.cpApplication.otp=OTP
+form.cpApplication.socialmedialogin=Social Media Login
+form.cpApplication.emailonetimelink=Email One Time Link
+form.cpApplication.analytic=Analytic
+form.cpApplication.quantity=Quantity:
+form.cpApplication.message=Application has been submitted, please wait for approval!
+
+#add clients
+title.addClient.big=Add Clients
+addClient.form.ID=Client ID
+addClient.form.Name=Client Name
+addClient.form.ou=Organization ID
+addClient.form.status=Status
+addClient.form.company=Company Name
+addClient.form.regnum=Company Reg Num
+addClient.form.address=Billing Address
+addClient.form.payment=Payment Detail
+addClient.form.contact=Contact Name
+addClient.form.email=Contact Email
+addClient.form.DID=Contact DID
+addClient.form.mobile=Contact Mobile
+addClient.form.fax=Contact fax
+addClient.form.remark=Remark
+addClient.form.paymode=Pay Mode
+addClient.form.server=OTP Server ID
+
+#edit clients
+title.editClient.big=Edit Clients
+editClient.form.Name=Client Name
+editClient.form.ou=Organization ID
+editClient.form.status=Status
+editClient.form.company=Company Name
+editClient.form.regnum=Company Reg Num
+editClient.form.address=Billing Address
+editClient.form.payment=Payment Detail
+editClient.form.contact=Contact Name
+editClient.form.email=Contact Email
+editClient.form.DID=Contact DID
+editClient.form.mobile=Contact Mobile
+editClient.form.fax=Contact fax
+editClient.form.remark=Remark
+
+#CP management
+title.cpManagement.big=Setup Captive Portal
+title.cpManagement.viewCpQuota=View Captive Portal URL
+filter.cpManagement.big=Search Filter
+filter.cpManagement.organizationName=Organization Name
+filter.cpManagement.reseller=Reseller Name
+filter.cpManagement.client=Client Name
+filter.cpManagement.email=Email
+filter.cpManagement.ou=Organization ID
+title.cpManagement.table=Captive Portal List
+table.cpManagement.columnname.id=CaptivePortal ID
+table.cpManagement.columnname.name=CaptivePortal Name
+table.cpManagement.columnname.description=Description
+table.cpManagement.columnname.code=Special Code
+table.cpManagement.columnname.server=Sever
+table.cpManagement.columnname.type=Authentication Type
+table.cpManagement.columnname.domain=Domain Name
+table.cpManagement.columnname.status=Status
+table.cpManagement.columnname.startdate=Start Date
+table.cpManagement.columnname.enddate=End Date
+table.cpManagement.columnname.remark=Remarks
+button.cpManagement.delete=Delete Captive Portal
+cp.assign.alert=Please select a captiveportal before you assign!
+
+
+#piwik management
+title.piwikOrganizations.big=Piwik Management
+filter.piwikOrganizations.big=Search Filter
+title.piwikOrganizations.table=Piwik List
+table.piwikOrganization.columnname.id=Site ID
+table.piwikOrganization.columnname.serverid=Analytic Server ID
+table.piwikOrganization.columnname.servername=Analytic Server Name
+table.piwikOrganization.columnname.serverurl=Analytic Server URL
+table.piwikOrganization.columnname.owner=Owner
+table.piwikOrganization.columnname.action=Action
+button.piwikOrganization.delete=Delete Piwik
+
+#Quota management
+breadcrumb.licenses.main=Licenses
+title.quotaManagement.big=Access Point Quota Management
+title.quotaManagement.info=Quota Information
+quotaManagement.info.ApQuota=AP Quota:
+quotaManagement.info.ApAssigned=AP Assigned:
+quotaManagement.info.deviceQuota=Device Quota:
+quotaManagement.info.deviceAssigned=Device Assigned:
+title.viewQuota.table=AP Quota List
+table.viewQuota.columnname.ou=Organization
+table.viewQuota.columnname.apquota=Quantity of AP Quota
+table.viewQuota.columnname.apassigned=Quantity of Assigned AP Quota to Next Level
+table.viewQuota.columnname.devicequota=Device Quota
+table.viewQuota.columnname.deviceassigned=Device Assigned
+table.viewQuota.columnname.action=Assign AP Quota
+popupwindow.quota.title=Edit AP Quota
+quotapopup.inputfiled.ou=Organization
+quotapopup.inputfiled.ApQuota=Quantity of AP Quota
+quotapopup.inputfiled.DeviceQuota=Device Quota
+
+#View Departments
+title.viewDepartments.big=Department List
+filter.viewDepartments.big=Search Filter
+filter.viewDepartments.department=Department Name
+filter.viewDepartments.ou=Organization ID
+table.viewDepartments.columnname.id=Department ID
+table.viewDepartments.columnname.name=Department Name
+table.viewDepartments.columnname.email=Contact Email
+table.viewDepartments.columnname.address=Department Address
+table.viewDepartments.columnname.ou=Organization ID
+button.viewDepartments.add=Add Department
+button.viewDepartments.delete=Delete Department
+
+#add Department
+title.addDepartment.big=Add Department
+addDepartment.form.Name=Department Name
+addDepartment.form.ou=Organization ID
+addDepartment.form.status=Status
+addDepartment.form.address=Department Address
+addDepartment.form.email=Contact Email
+addDepartment.form.description=Department Description
+addDepartment.form.remark=Remark
+
+#edit Department
+title.editDepartment.big=Edit Department
+editDepartment.form.Name=Department Name
+editDepartment.form.ou=Organization ID
+editDepartment.form.status=Status
+editDepartment.form.address=Department Address
+editDepartment.form.email=Contact Email
+editDepartment.form.description=Department Description
+editDepartment.form.remark=Remark
+
+#CP management
+title.captiveportal.assign=Assign Captive Portal
+filter.cpDepartment.big=Search Filter
+filter.cpDepartment.name=Department Name
+filter.cpDepartment.cp=Captive Portal Name
+title.cpDepartment.table=CaptivePortal List
+table.cpDepartment.columnname.id=CaptivePortal ID
+table.cpDepartment.columnname.name=Name
+table.cpDepartment.columnname.description=Description
+table.cpDepartment.columnname.code=Special Code
+table.cpDepartment.columnname.type=Authentication Type
+table.cpDepartment.columnname.domain=Domain Name
+table.cpDepartment.columnname.status=Status
+table.cpDepartment.columnname.startdate=Start Date
+table.cpDepartment.columnname.enddate=End Date
+table.cpDepartment.columnname.remark=Remarks
+
+#Piwik management
+title.piwikDepartment.big=Piwik Management
+filter.piwikDepartment.big=Search Filter
+filter.piwikDepartment.name=Department Name
+filter.piwikDepartment.piwik=Piwik Name
+title.piwikDepartment.table=Piwik List
+table.piwikDepartment.columnname.id=Site ID
+table.piwikDepartment.columnname.serverid=Analytic Server ID
+table.piwikDepartment.columnname.servername=Analytic Server Name
+table.piwikDepartment.columnname.serverurl=Analytic Server URL
+table.piwikDepartment.columnname.owner=Owner
+button.piwikDepartment.delete=Delete Piwik
+text.piwikDepartment.selectAll=Select All
+
+piwik.create.successful.part1=Piwik site_id: 
+piwik.create.successful.part2=, created piwik successfully! 
+piwik.create.successful=Created piwik successfully!
+piwik.update.successful=Updated piwik successfully!
+piwik.update.failed=Updated piwik failed!
+piwik.delete.successful=Deleted piwik successfully!
+piwik.delete.failed=Deleted piwik failed!
+piwik.assign.alert=Please select a piwik before you assign!
+piwik.relationship.cancel=Canceled piwik-agent relationship between piwik and agent!
+
+#CP URL management
+title.cpUrlManagement.info=Information
+cpUrlManagement.info.ApQuota=AP Quota:
+cpUrlManagement.info.CpUrlQuantity=CP URL Quantity:
+cp.url.create.fail=Currently can not create a CP URL! The quantity of the CP URL has exceeded the AP quota. Please contact your reseller.
+
+#Licenses
+filter.cpClients.clientname=Client Name
+filter.cpClients.email=Email
+filter.cpClients.ou=Organization ID
+
+#validation messages
+distributorValidator.distributor_name.duplicateDistributorName=Distributor Name already Existed!
+distributorValidator.distributor_name.duplicateDistributorOu=Organization ID already Existed!
+distributorValidator.distributor_name.wrongFormatDistributorName=Do Not Create Distributor Name Contains '.' !
+distributorValidator.distributor_email.duplicateDistributorEmail=Email already Existed!
+
+resellerValidator.reseller_name.duplicateResellerName=Reseller Name already Existed!
+resellerValidator.reseller_name.duplicateResellerOu=Organization ID already Existed!
+resellerValidator.reseller_name.wrongFormatResellerName=Do Not Create Reseller Name Contains '.' !
+resellerValidator.reseller_email.duplicateResellerEmail=Email already Existed!
+
+clientValidator.client_name.duplicateClientName=Client Name already Existed!
+clientValidator.client_name.duplicateClientOu=Organization ID already Existed!
+clientValidator.client_name.wrongFormatClientName=Do Not Create Client Name Contains '.' !
+clientValidator.client_ou.wrongFormatClientOu=Do Not Create Organization ID Contains '.' !
+clientValidator.client_email.duplicateClientEmail=Email already Existed!
+
+agentValidator.agent_name.duplicateAgentName=Department Name already Existed!
+agentValidator.agent_ou.duplicateAgentOu=Organization ID already Existed!
+agentValidator.agent_name.wrongFormatAgentName=Do Not Create Department Name Contains '.' !
+agentValidator.agent_ou.wrongFormatAgentOu=Do Not Create Organization ID Contains '.' !
+agentValidator.agent_email.duplicateAgentEmail=Email already Existed!
+
+#validation messages
+errormsg.email=Please enter a valid email address
+errormsg.ou.required=Please enter an Organization ID
+errormsg.rolename.exists=Role Name already exists
+errormsg.rolename.required=Please enter a Role Name
+errormsg.companyname.required=Please enter a Company Name
+errormsg.contractname.required=Please enter a Contract Name
+errormsg.email.required=Please enter an Email
+errormsg.email.exists=Email address already exists
+errormsg.organizationname.exists=Organization ID already exists
+errormsg.contractdid.required=Please enter a Contract Number
+errormsg.maxlength=Please enter no more than 148 characters
+errormsg.mobile.maxlength=Please enter no more than 15 digits
+errormsg.maxlength.28=Please enter no more than 28 characters
+errormsg.maxlength.43=Please enter no more than 43 characters
+errormsg.maxlength.48=Please enter no more than 48 characters
+errormsg.maxlength.98=Please enter no more than 98 characters
+errormsg.maxlength.150=Please enter no more than 150 characters
+errormsg.maxlength.250=Please enter no more than 250 characters
+errormsg.digits=Please enter only digits
+errormsg.password.required=Please enter a password
+errormsg.password.minlength=Please enter at least 8 characters
+errormsg.password.maxlength=Please enter no more than 16 characters
+errormsg.password.equalto=Please enter the same password again
+errormsg.account.email.required=Please enter an Email
+errormsg.account.firstname.required=Please enter a First Name
+errormsg.account.lastname.required=Please enter a Last Name
+errormsg.account.uid.required=Please enter an UID
+errormsg.organization.name.required=Please enter a Organization name
+errormsg.organization.name.invalid=Organization name should only contain digits, alphabets or underscores
+errormsg.distributor.name.required=Please enter a Distributor name
+errormsg.reseller.name.required=Please enter a Reseller name
+errormsg.client.name.required=Please enter a Client name
+errormsg.department.name.required=Please enter a Department name
+errormsg.cp.name.required=Please enter a captive portal name
+errormsg.startdate.required=Please enter a startdate
+errormsg.enddate.required=Please enter an enddate
+errormsg.cplitedomainname.required=Please enter a CP lite domain name
+errormsg.password.atleastonecapital=Password should contain at least one capital
+
+#CaptivePortal API CRUD
+cp.api.insertorupdate.success=The Captive Portal had been created/updated successfully.
+cp.api.insertorupdate.fail=The captiveporttal failed to update or insert on Captive Portal Platform.
+cp.api.delete.success=The captiveporttal has been removed on Captive Portal Platform.
+cp.api.delete.fail=The captiveporttal failed to remove on Captive Portal Platform.
+api.unknownerror=Unknown Error! Please contact your admin!
+cp.lite.notonline=CP lite doesn't online!
+
+#Piwik API CRUD
+piwik.api.insert.success=The piwik has been inserted on Captive Portal Platform.
+piwik.api.insert.fail=The piwik failed to insert on Captive Portal Platform.
+piwik.api.update.success=The piwik has been updated on Captive Portal Platform.
+piwik.api.update.fail=The piwik failed to update on Captive Portal Platform.
+piwik.api.delete.success=The piwik has been removed on Captive Portal Platform.
+piwik.api.delete.fail=The piwik failed to remove on Captive Portal Platform.
+
+alert.redirectmessage=New organization created successfully. Please proceed to add a new user account.
+alert.welcomemessage.firsthalf=Welcome 
+alert.welcomemessage.secondhalf=! Now you are logging as 
+alert.welcomemessage.rootadmin=Root Admin
+alert.welcomemessage.distributor=Distributor
+alert.welcomemessage.reseller=Reseller
+alert.welcomemessage.client=Client
+alert.welcomemessage.department=Department Administrator
+alert.welcomemessage.fullstop=.
+
+#datatable option
+datatable.emptyTable=No data available
+datatable.info="Showing _START_ to _END_ of _TOTAL_ entries"
+datatable.lengthMenu=Show _MENU_ entries
+datatable.loadingRecords=Loading
+datatable.processing=Processing
+datatable.zeroRecords=No matching records found
+datatable.first=First
+datatable.last=Last
+datatable.next=Next
+datatable.previous=Previous 

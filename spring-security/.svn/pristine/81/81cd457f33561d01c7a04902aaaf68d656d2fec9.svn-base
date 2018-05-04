@@ -1,0 +1,213 @@
+package com.techstudio.form.controller.am;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.jsoup.helper.StringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.techstudio.common.StatusCode;
+import com.techstudio.dao.am.AccountDao;
+import com.techstudio.dao.am.OrganizationDao;
+import com.techstudio.dao.am.PiwikSiteDao;
+import com.techstudio.form.controller.BaseController;
+import com.techstudio.model.am.AccountDTO;
+import com.techstudio.model.am.OrganizationDTO;
+import com.techstudio.model.am.PiwikSiteDTO;
+import com.techstudio.service.am.AccountServiceImpl;
+import com.techstudio.util.PrincipalUtils;
+
+@Controller
+public class ApiController extends BaseController {
+	
+	private static final Logger log = Logger.getLogger(ApiController.class);
+	
+	private static final int ORGANIZATION_DELETE_FLAG_NORMAL = 0;
+	private static final int ROOT_ADMIN_HIERARCHY_LEVEL = 0;
+
+	@Autowired
+	private OrganizationDao organizationDao;
+	
+	@Autowired
+	private AccountDao accountDao;
+	
+	@Autowired
+	private PiwikSiteDao piwikSiteDao;
+	
+	@Autowired
+	private AccountServiceImpl accountService;
+
+	@Override
+	protected String getModuleFolder() {
+		
+		return "api/";
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "api/getAllOrganizationsAndAccounts" + SPRING_EXT, headers = "Accept=application/json")
+	public List<OrganizationDTO> getAllOrganizationsAndAccounts(
+			Authentication principal
+			) 
+	{
+		
+		log.debug("ApiController | api/getAllOrganizationsAndAccounts | entry");
+		List<OrganizationDTO> organizationList = organizationDao.findAll();
+		for(OrganizationDTO o : organizationList) {
+			List<AccountDTO> accountList = accountDao.findByOrganizationDTO_OrganizationId(o.getOrganizationId());
+			o.setSubodinates(null);
+			o.setAccountList(accountList);
+		}
+		
+		
+		log.info("|getAllOrganizationsAndAccounts()|"+StatusCode.API_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|NO PARAMETER|List successfully.");
+		log.debug("ApiController | api/getAllOrganizationsAndAccounts | exit");
+		
+		return organizationList;
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "api/getAccountStatusByUid" + SPRING_EXT, headers = "Accept=application/json")
+	public int getOuStatusByOu(
+			@RequestParam("ldapUid") String ldapUid
+			) 
+	{
+		
+		log.debug("ApiController | api/getAccountStatusByUid | entry");
+		int accountStatus = accountService.getAccountStatusByLoginUid(ldapUid);
+		
+		
+		log.info("|getAccountStatusByUid()|"+StatusCode.API_SUCCESS+"|"+accountStatus+"|NO PARAMETER|Call API successfully.");
+		log.debug("ApiController | api/getAccountStatusByUid | exit");
+		
+		return accountStatus;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "api/getpiwiklist" + SPRING_EXT, headers = "Accept=application/json")
+	public List<PiwikSiteDTO> get_piwik_list(
+			@RequestParam String ou,
+			Authentication principal
+			) 
+	{
+		log.debug("ApiController | api/getpiwiklist | entry");
+		
+		List<PiwikSiteDTO> piwikSiteList = piwikSiteDao.findByOu(ou);
+		
+		log.info("|getPiwikList()|"+StatusCode.API_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|NO PARAMETER|List successfully.");
+		log.debug("ApiController | api/getpiwiklist | exit");
+		return piwikSiteList;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "api/getSubOrganizationsByOuAndHierarchyRange" + SPRING_EXT, headers = "Accept=application/json")
+	public List<OrganizationDTO> getSubOrganizationsByOuAndHierarchyRange(
+			Authentication principal,
+			@RequestParam("ou") String superiorOu,
+			@RequestParam("hierarchyRange") int hierarchyRange
+			) 
+	{
+		
+		log.debug("ApiController | api/getSubOrganizationsByOuAndHierarchyRange | entry");
+		
+		List<OrganizationDTO> subodinates = recursionGetSubOrganizationsBySuperiorOu(superiorOu, hierarchyRange);
+		
+		log.info("|getSubOrganizationsByOuAndHierarchyRange()|"+StatusCode.API_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|NO PARAMETER|List successfully.");
+		log.debug("ApiController | api/getSubOrganizationsByOuAndHierarchyRange | exit");
+		
+		return subodinates;
+	}
+
+	private List<OrganizationDTO> recursionGetSubOrganizationsBySuperiorOu(
+			String superiorOu, int hierarchyRange) {
+		
+		List<OrganizationDTO> subodinates = new ArrayList<OrganizationDTO>();
+		if(hierarchyRange > 0) {
+			if(StringUtil.isBlank(superiorOu)) {
+				subodinates = organizationDao.findByDeleteFlagAndHierarchyLevelNotAndSuperior_OuIsNull(ORGANIZATION_DELETE_FLAG_NORMAL, ROOT_ADMIN_HIERARCHY_LEVEL);
+			}else {
+				subodinates = organizationDao.findByDeleteFlagAndSuperior_Ou(ORGANIZATION_DELETE_FLAG_NORMAL, superiorOu);
+			}
+			System.out.println("Size: "+subodinates.size());
+			if(subodinates.size()>0) {
+				hierarchyRange--;
+				for(OrganizationDTO o : subodinates) {
+					/*Set Lazyloading proxy to null*/
+					o.setAccountList(null);
+					List<OrganizationDTO> subodinateList = recursionGetSubOrganizationsBySuperiorOu(o.getOu(), hierarchyRange);
+					o.setSubodinates(subodinateList);
+				}
+			}
+		}
+		
+		return subodinates;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "api/getOrganizationByOu" + SPRING_EXT, headers = "Accept=application/json")
+	public OrganizationDTO getOrganizationByOu(
+			@RequestParam("ou") String ou,
+			Authentication principal
+			) 
+	{
+		
+		log.debug("ApiController | api/getOrganizationByOu | entry");
+		List<OrganizationDTO> organizationList = organizationDao.findByDeleteFlagAndOu(ORGANIZATION_DELETE_FLAG_NORMAL, ou);
+		if(organizationList.size()==0) {
+			log.info("|getOrganizationByOu()|"+StatusCode.API_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|NO PARAMETER|No organization found by ou: "+ou);
+			log.debug("ApiController | api/getOrganizationByOu | exit");
+			return null;
+		}else {
+			OrganizationDTO organization = organizationList.get(0);
+			organization.setSubodinates(null);
+			organization.setAccountList(null);
+			
+			log.info("|getOrganizationByOu()|"+StatusCode.API_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|NO PARAMETER|Call API successfully.");
+			log.debug("ApiController | api/getOrganizationByOu | exit");
+			
+			return organization;
+		}
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "api/updateQuota" + SPRING_EXT, headers = "Accept=application/json")
+	public OrganizationDTO updateQuota(
+			@RequestParam("ou") String ou,
+			@RequestParam(value="quota", required = false) String quota,
+			@RequestParam(value="assigned", required = false) String assigned,
+			Authentication principal
+			) 
+	{
+		
+		log.debug("ApiController | api/updateQuota | entry");
+		OrganizationDTO organization = organizationDao.findByDeleteFlagAndOu(ORGANIZATION_DELETE_FLAG_NORMAL, ou).get(0);
+		
+		if(!StringUtils.isBlank(quota)) {
+			String [] originalQuota = organization.getQuota().split(",");
+			organization.setQuota(quota+","+originalQuota[1]);
+		}
+		
+		if(!StringUtils.isBlank(assigned)) {
+			String [] originalAssigned = organization.getAssigned().split(",");
+			organization.setAssigned(assigned+","+originalAssigned[1]);
+		}
+		
+		organizationDao.save(organization);
+		log.info("|getOrganizationByOu()|"+StatusCode.API_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|NO PARAMETER|Call API successfully.");
+		log.debug("ApiController | api/updateQuota | exit");
+		
+		organization.setAccountList(null);
+		return organization;
+		
+	}
+}

@@ -1,0 +1,632 @@
+/**
+ * JS for Agent
+ */
+
+$(document)
+		.ready(
+				function() {
+
+					var action = "add";
+					
+					var roleTable = $('#roleList').DataTable({
+						"bSort" : false,
+						"bServerSide" : true,
+						"sDom" : '<""l>t<"F"p>',
+						"bJQueryUI" : true,
+						"bSearchable" : false,
+						"sPaginationType" : "full_numbers",
+						"sAjaxSource" : "ajax_role_list"+$("#SPRING_EXT").html(),
+						
+						"aoColumns" : [
+						               	{ "sName": "Role ID" },
+						 				{ "sName": "Role Name" },
+						 				{ "sName": "Ou" },
+						 				{ "sName": "Role Hierarchy" }
+						],
+						"language":  {
+				    	    "emptyTable":     $("#emptyTable").html(),
+				    	    "lengthMenu":     $("#lengthMenu").html(),
+				    	    "loadingRecords": $("#loadingRecords").html(),
+				    	    "processing":     $("#processing").html(),
+				    	    "zeroRecords":    $("#zeroRecords").html(),
+				    	    "paginate": {
+				    	        "first":      $("#firstDatatable").html(),
+				    	        "last":       $("#lastDatatable").html(),
+				    	        "next":       $("#nextDatatable").html(),
+				    	        "previous":   $("#prevDatatable").html()
+				    	    }
+				    	}
+					});
+					
+					var roleFunctionTable = null;
+					
+					var restFunctionTable = null;
+					
+					var dialog_buttons = {}; 
+					
+					dialog_buttons[$("#hiddenButConfirm").html()] = function(){
+						
+						var ob = {
+							'role_id' : $("#role_id").val()
+						};
+
+						$.ajax({
+							type : 'POST',
+							url : 'check_functions_in_role'+$("#SPRING_EXT").html(),
+							data : ob,
+							dataType : 'json',
+							success : function(data) {
+								if(data.checkResult){
+									dialogDiv.dialog("close");
+									roleTable.ajax.reload();
+								}else{
+									alertNotification($("#rolemgtRoleAtLeastOneFunction").html());
+								}
+							}
+							
+						});
+						
+					};
+					
+					var dialogDiv = $("#dialog-form").dialog({
+						autoOpen : false,
+						resizable: false,
+						height : $(window).height()*0.95,
+						width : $(window).width(),
+						modal : true,
+//						buttons : {
+//							Cancel : function() {
+//								dialogDiv.dialog("close");
+//								roleTable.ajax.reload();
+//							}
+//						},
+						buttons : dialog_buttons,
+						close : function() {
+
+						},
+						show: {
+							effect: "puff",
+							duration: 500
+						},
+						hide: {
+							effect: "puff",
+							duration: 500
+						}
+					});
+					
+					
+					$(document).on('click', '.data-table tbody tr', function() {
+						if ($(this).hasClass('checked')) {
+
+							$(this).removeClass('checked');
+
+						} else {
+							$(this).addClass('checked');
+						}
+					});
+					
+					$('#hierarchy').change(function() {
+						
+						reloadRoleFunctionList();
+						reloadRestFunctionList();
+						
+				    });
+					
+					
+					/* ------------------------------------------------------ Add Role-----------------------------------------------------------*/
+					
+					$('#add-btn').click(function() {
+						action = "add";
+						$("#role_id").val("0");
+						//getHierarchyList();
+						addFunctionsDefaultList($('#hierarchy').val());
+						dialogDiv.dialog("open");
+						$('#role_name_div').show();
+						$('#new_role_name').val("");
+					});
+					
+					/* ------------------------------------------------------ Add Role-----------------------------------------------------------*/
+					
+					 
+					/* ------------------------------------------------------ Edit Role-----------------------------------------------------------*/
+					
+					$(document).on('dblclick', '#roleList tbody tr',
+							function() {
+						action = "edit";
+						var id = this.id;
+						var hierarchy = $(this).find("td:eq(3)").html();
+						$("#role_id").val(id);
+						$("#hierarchy").val(hierarchy).change();
+						console.log("role_id: "+$("#role_id").val());
+						dialogDiv.dialog("open");
+						$('#role_name_div').hide();
+//						reloadRoleFunctionList();
+//						reloadRestFunctionList();
+								
+					});
+					
+					/* ------------------------------------------------------ Edit Role-----------------------------------------------------------*/
+					
+					
+					/* ------------------------------------------------------ Delete Role-----------------------------------------------------------*/
+					
+					$('#deleterow').click(function() {
+						
+						var idSting = listId(roleTable);
+						console.log(idSting);
+						if (idSting != null) {
+							bootbox.dialog({
+					            title: $('#title').html(),
+					            message: '<div class="modal-body" style="margin:5%; text-align:center; font-size:18px">'+
+					            $('#message').html()+'</div>',
+					            buttons: {
+					                success: {
+					                    label: $('#confirm').html(),
+					                    className: "btn-primary",
+					                    callback: function () {
+					                    	var ob = {
+												'id' : idSting
+											};
+				
+											$.ajax({
+												type : 'POST',
+												url : 'role_delete'+$("#SPRING_EXT").html(),
+												data : ob,
+												dataType : 'html',
+												success : function(data) {
+													alertNotification(data);
+													roleTable.ajax.reload();
+												},
+												complete : function(xhr, status) {
+													roleTable.ajax.reload();
+												}
+											});
+					                    }
+					                },
+									cancel: {
+					                    label: $('#cancel').html(),
+					                    className: "btn-primary"
+					                }
+					            }
+					        });
+						}
+							
+					});
+					
+					/* ------------------------------------------------------ Delete Role-----------------------------------------------------------*/
+					
+					/* ---------------------------------------------------Edit Functions------------------------------------------------------*/
+					
+					/* After button be clicked, all functions from rest function list will be assigned to role function list */
+					$('#assign_all_functions_to_role').click(function() {
+						
+						if(action=="add"){
+							
+							if ($("#new_role_name").val() == "" || $("#new_role_name").val() == null) {
+//								$.gritter.add({
+//									title : 'Notification',
+//									text : 'Please enter a role name first!'
+//								});
+								alertNotification($('#rolemgtAssignAlert').html());
+							}else{
+								$('#ajaxLoading').show();
+								$('#mainPanel').hide();
+								var ob = {
+									'role_id' : $("#role_id").val(),
+									'hierarchy' : $("#hierarchy").val(),
+									'new_role_name' : $("#new_role_name").val(),
+								};
+	
+								$.ajax({
+									type : 'POST',
+									url : 'assign_all_functions'+$("#SPRING_EXT").html(),
+									data : ob,
+									dataType : 'json',
+									success : function(data) {
+										$("#role_id").val(data.role_id);
+									},
+									complete : function(xhr, status) {
+										reloadRoleFunctionList();
+										reloadRestFunctionList();
+										$('#ajaxLoading').hide();
+										$('#mainPanel').show();
+									}
+								});
+								
+							}
+						}
+							
+						if(action=="edit"){
+							$('#ajaxLoading').show();
+							$('#mainPanel').hide();
+							var ob = {
+								'role_id' : $("#role_id").val(),
+								'hierarchy' : $("#hierarchy").val(),
+								'new_role_name' : $("#new_role_name").val(),
+							};
+
+							$.ajax({
+								type : 'POST',
+								url : 'assign_all_functions'+$("#SPRING_EXT").html(),
+								data : ob,
+								dataType : 'json',
+								success : function(data) {
+									
+								},
+								complete : function(xhr, status) {
+									reloadRoleFunctionList();
+									reloadRestFunctionList();
+									$('#ajaxLoading').hide();
+									$('#mainPanel').show();
+								}
+							});
+							
+						}
+						
+					});
+					
+					/* After button be clicked, some functions from rest function list will be assigned to role function list */
+					$('#assign_functions_to_role').click(function() {
+						
+						if(action=="add"){
+							
+							if ($("#new_role_name").val() == "" || $("#new_role_name").val() == null) {
+//								$.gritter.add({
+//									title : 'Notification',
+//									text : 'Please enter a role name first!'
+//								});
+								alertNotification($('#rolemgtAssignAlert').html());
+								
+							}else{
+								
+								var assignFunctionIdsListSting = listId(restFunctionTable);
+								console.log(assignFunctionIdsListSting);
+								
+								if(assignFunctionIdsListSting!=null){
+									$('#ajaxLoading').show();
+									$('#mainPanel').hide();
+									var ob = {
+										'role_id' : $("#role_id").val(),
+										'new_role_name' : $("#new_role_name").val(),
+										'hierarchy' : $("#hierarchy").val(),
+										'function_ids' : assignFunctionIdsListSting
+									};
+		
+									$.ajax({
+										type : 'POST',
+										url : 'assign_functions'+$("#SPRING_EXT").html(),
+										data : ob,
+										dataType : 'json',
+										success : function(data) {
+											$("#role_id").val(data.role_id);
+										},
+										complete : function(xhr, status) {
+											reloadRoleFunctionList();
+											reloadRestFunctionList();
+											$('#ajaxLoading').hide();
+											$('#mainPanel').show();
+										}
+									});
+								}
+									
+							}
+							
+						}
+						if(action == "edit"){
+							
+							var assignFunctionIdsListSting = listId(restFunctionTable);
+							console.log(assignFunctionIdsListSting);
+							if(assignFunctionIdsListSting!=null){
+								$('#ajaxLoading').show();
+								$('#mainPanel').hide();
+								var ob = {
+									'role_id' : $("#role_id").val(),
+									'hierarchy' : $("#hierarchy").val(),
+									'new_role_name' : $("#new_role_name").val(),
+									'function_ids' : assignFunctionIdsListSting
+								};
+	
+								$.ajax({
+									type : 'POST',
+									url : 'assign_functions'+$("#SPRING_EXT").html(),
+									data : ob,
+									dataType : 'json',
+									success : function(data) {
+	
+									},
+									complete : function(xhr, status) {
+										reloadRoleFunctionList();
+										reloadRestFunctionList();
+										$('#ajaxLoading').hide();
+										$('#mainPanel').show();
+									}
+								});
+							}
+								
+						}
+							
+					});
+					
+					
+					/* After button be clicked, some functions from role function list will be removed and return to rest function list */
+					$('#cancel_functions_from_role').click(function() {
+						
+						var selectedRoleFunctionIdsList = listId(roleFunctionTable);
+						console.log(selectedRoleFunctionIdsList);
+						
+						if(selectedRoleFunctionIdsList!=null){
+							$('#ajaxLoading').show();
+							$('#mainPanel').hide();
+						    var ob = {
+								'role_id' : $("#role_id").val(),
+								'function_ids' : selectedRoleFunctionIdsList
+							};
+
+							$.ajax({
+								type : 'POST',
+								url : 'remove_functions'+$("#SPRING_EXT").html(),
+								data : ob,
+								dataType : 'json',
+								success : function(data) {
+
+								},
+								complete : function(xhr, status) {
+									//roleFunctionList.ajax.reload();
+									reloadRoleFunctionList();
+									reloadRestFunctionList();
+									$('#ajaxLoading').hide();
+									$('#mainPanel').show();
+								}
+							});
+						}
+					});
+					
+					/* After button be clicked, all functions from role function list will be removed and return to rest function list */
+					$('#cancel_all_functions_from_role').click(function() {
+						$('#ajaxLoading').show();
+						$('#mainPanel').hide();
+						var ob = {
+								'role_id' : $("#role_id").val(),
+							};
+
+							$.ajax({
+								type : 'POST',
+								url : 'remove_all_functions'+$("#SPRING_EXT").html(),
+								data : ob,
+								dataType : 'json',
+								success : function(data) {
+
+								},
+								complete : function(xhr, status) {
+									reloadRoleFunctionList();
+									reloadRestFunctionList();
+									$('#ajaxLoading').hide();
+									$('#mainPanel').show();
+								}
+							});
+						
+					});
+					
+					/* ---------------------------------------------------Edit Functions------------------------------------------------------*/
+					
+					
+					function listId(ObjectTable) {
+						var tmp = [];
+						var selectedRows = ObjectTable.$('tr.checked');
+						console.log("select rows: "+selectedRows);
+						var idList = "";
+
+						if (selectedRows.length <= 0) {
+//							$.gritter.add({
+//								title : 'Notification',
+//								text : 'Please select at least 1 record'
+//							});
+							alertNotification($('#alert1least').html());
+							return null;
+						} else {
+
+							for (var j = 0; j < selectedRows.length; j++) {
+
+								//tmp[j] = ObjectTable.row($(selectedRows[j])).data[0];
+								tmp[j] = selectedRows[j].id;
+								console.log("select row id: "+tmp[j]);
+							}
+							// console.log(artmp[j]);
+
+							for (var i = 0; i < tmp.length; i++) {
+
+								if (i == 0)
+									idList = tmp[0];
+
+								if (i > 0) {
+									idList = idList + "," + tmp[i];
+								}
+							}
+
+							console.log(idList);
+							return idList;
+
+						}
+					}
+					
+					function getHierarchyList() {
+						
+						$('#hierarchy').empty();
+						$.ajax({
+							type : 'GET',
+							url : 'get_hierarchy_list'+$("#SPRING_EXT").html(),
+							dataType : 'json',
+							success : function(data) {
+								$.each(data, function (i, data) {
+								    $('#hierarchy').append($('<option>', { 
+								        value: data.hierarchy_id,
+								        text : data.hierarchy_name 
+								    }));
+								});
+								$("#hierarchy option:first").prop("selected", "selected").change();
+								//alert("Hierarchy dropdown updated successfully!");
+							}
+							
+						});
+						
+						
+					}
+					
+					function addFunctionsDefaultList(hierarchy) {
+						
+						roleFunctionTable=null;
+						restFunctionTable=null;
+						roleFunctionTable = $('#roleFunctionList').DataTable({
+							"bSort" : false,
+							"bServerSide" : true,
+							"sDom" : '<>t<"F"p>',
+							"bJQueryUI" : true,
+							"bSearchable" : false,
+							"bDestroy" : true,
+							"sPaginationType" : "full_numbers",
+							"sAjaxSource" : "ajax_role_function_list"+$("#SPRING_EXT").html(),
+							"fnServerParams": function (aoData) {
+								aoData.push({"name": "role_id", "value": "0"});
+							},
+							"columnDefs": [
+										    {
+										        "targets": [0],
+										        "visible": false
+										       
+										    }
+							],
+							"language":  {
+					    	    "emptyTable":     $("#emptyTable").html(),
+					    	    "lengthMenu":     $("#lengthMenu").html(),
+					    	    "loadingRecords": $("#loadingRecords").html(),
+					    	    "processing":     $("#processing").html(),
+					    	    "zeroRecords":    $("#zeroRecords").html(),
+					    	    "paginate": {
+					    	        "first":      $("#firstDatatable").html(),
+					    	        "last":       $("#lastDatatable").html(),
+					    	        "next":       $("#nextDatatable").html(),
+					    	        "previous":   $("#prevDatatable").html()
+					    	    }
+					    	}
+						});
+						
+						restFunctionTable = $('#restFunctionList').DataTable({
+							"bSort" : false,
+							"bServerSide" : true,
+							"sDom" : '<>t<"F"p>',
+							"bJQueryUI" : true,
+							"bSearchable" : false,
+							"bDestroy" : true,
+							"sPaginationType" : "full_numbers",
+							"sAjaxSource" : "ajax_available_function_list"+$("#SPRING_EXT").html(),
+							"fnServerParams": function (aoData) {
+								aoData.push({"name": "role_id", "value": "0"});
+								aoData.push({"name": "hierarchy", "value": hierarchy});
+							},
+							"columnDefs": [
+										    {
+										        "targets": [0],
+										        "visible": false
+										       
+										    }
+							],
+							"language":  {
+					    	    "emptyTable":     $("#emptyTable").html(),
+					    	    "lengthMenu":     $("#lengthMenu").html(),
+					    	    "loadingRecords": $("#loadingRecords").html(),
+					    	    "processing":     $("#processing").html(),
+					    	    "zeroRecords":    $("#zeroRecords").html(),
+					    	    "paginate": {
+					    	        "first":      $("#firstDatatable").html(),
+					    	        "last":       $("#lastDatatable").html(),
+					    	        "next":       $("#nextDatatable").html(),
+					    	        "previous":   $("#prevDatatable").html()
+					    	    }
+					    	}
+							
+						});
+							
+					}
+					
+					function reloadRoleFunctionList() {
+						roleFunctionTable=null;
+						//roleFunctionTable.destroy();
+						roleFunctionTable = $('#roleFunctionList').DataTable({
+							"bSort" : false,
+							"bServerSide" : true,
+							"sDom" : '<>t<"F"p>',
+							"bJQueryUI" : true,
+							"bSearchable" : false,
+							"bDestroy" : true,
+							"sPaginationType" : "full_numbers",
+							"sAjaxSource" : "ajax_role_function_list"+$("#SPRING_EXT").html(),
+							"fnServerParams": function (aoData) {
+								aoData.push({"name": "role_id", "value": $("#role_id").val()});
+							},
+							"columnDefs": [
+										    {
+										        "targets": [0],
+										        "visible": false
+										       
+										    }
+							],
+							"language":  {
+					    	    "emptyTable":     $("#emptyTable").html(),
+					    	    "lengthMenu":     $("#lengthMenu").html(),
+					    	    "loadingRecords": $("#loadingRecords").html(),
+					    	    "processing":     $("#processing").html(),
+					    	    "zeroRecords":    $("#zeroRecords").html(),
+					    	    "paginate": {
+					    	        "first":      $("#firstDatatable").html(),
+					    	        "last":       $("#lastDatatable").html(),
+					    	        "next":       $("#nextDatatable").html(),
+					    	        "previous":   $("#prevDatatable").html()
+					    	    }
+					    	}
+						});
+						
+					}
+					
+					function reloadRestFunctionList() {
+						restFunctionTable=null;
+						//restFunctionTable.destroy();
+						restFunctionTable = $('#restFunctionList').DataTable({
+							"bSort" : false,
+							"bServerSide" : true,
+							"sDom" : '<>t<"F"p>',
+							"bJQueryUI" : true,
+							"bSearchable" : false,
+							"bDestroy" : true,
+							"sPaginationType" : "full_numbers",
+							"sAjaxSource" : "reload_rest_functions_list"+$("#SPRING_EXT").html(),
+							"fnServerParams": function (aoData) {
+								aoData.push({"name": "role_id", "value": $("#role_id").val()});
+								aoData.push({"name": "hierarchy", "value": $("#hierarchy").val()});
+							},
+							"columnDefs": [
+										    {
+										        "targets": [0],
+										        "visible": false
+										       
+										    }
+							],
+							"language":  {
+					    	    "emptyTable":     $("#emptyTable").html(),
+					    	    "lengthMenu":     $("#lengthMenu").html(),
+					    	    "loadingRecords": $("#loadingRecords").html(),
+					    	    "processing":     $("#processing").html(),
+					    	    "zeroRecords":    $("#zeroRecords").html(),
+					    	    "paginate": {
+					    	        "first":      $("#firstDatatable").html(),
+					    	        "last":       $("#lastDatatable").html(),
+					    	        "next":       $("#nextDatatable").html(),
+					    	        "previous":   $("#prevDatatable").html()
+					    	    }
+					    	}
+							
+						});
+						
+					}
+
+					
+				});

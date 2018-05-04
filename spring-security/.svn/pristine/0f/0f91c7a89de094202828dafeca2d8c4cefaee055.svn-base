@@ -1,0 +1,823 @@
+wilas.first.message=你好，欢迎使用WILAS登陆门户内容管理系统
+
+alert.sessionout=会话已过期。请点击“OK”重新登入。
+alert.organization.suspended=你的账户已被挂起。请联系管理员恢复你的账户。
+
+#Recover Form
+#screen.recoverform.instruction=在下方输入你的E-mail地址，系统将会发送重设密码的说明给你
+screen.recoverform.instruction=请输入你的E-mail地址
+screen.recoverform.placeholder.email=输入E-mail地址
+screen.recoverform.label.clicktologin=回到登入界面
+screen.recoverform.button.submit=提交
+
+#Header
+header.welcome=你好
+header.profile=账号
+header.usercatergory=用户类型
+
+#**********************************************
+#Left Navigation Menu Labels
+#**********************************************
+#Dashboard
+menu.dashboard=主界面
+
+#Account Management
+menu.am.am.main=账号管理
+menu.am.am.my=修改我的帐户
+menu.am.am.add=添加帐户
+menu.am.am.view=查看帐户
+
+#Role Management
+menu.am.role.main=角色管理
+menu.am.role.view=查看角色
+menu.am.role.add=添加角色
+
+#Organization
+menu.am.organization.main=组织
+menu.am.organization.view=查看组织
+menu.am.organization.add=添加组织
+menu.am.licenses.cp=查看WIFI登陆门户
+menu.am.assign.license=分配WIFI登陆门户
+
+#Licenses
+menu.am.licenses.main=许可证
+menu.am.licenses.quota=配额管理
+
+#Captive Portal
+menu.cp.cp.main=WIFI登录门户
+menu.cp.cp.view=查看门户
+
+#Theme
+menu.cp.themes.main=主题与布局
+menu.cp.themes.view=查看主题
+
+#Pages
+menu.cp.pages.main=门户页面
+menu.cp.pages.view=查看页面
+menu.cp.pages.add=添加页面
+
+#Content
+menu.cp.contents.main=页面内容
+menu.cp.contents.view=查看内容
+menu.cp.contents.add=添加内容
+menu.cp.contents.category=内容目录
+
+#Reports
+menu.cp.reports.main=报告
+menu.cp.reports.audit=新访客与回访报告
+menu.cp.reports.detail=登录用户详细报告
+menu.cp.reports.login=WIFI登录情况报告
+menu.cp.reports.transaction=WIFI登录细节报告
+menu.cp.reports.simpleformqanda=简易调查问卷报告
+menu.cp.reports.apengagement=访问点报告
+menu.cp.reports.dailyengagement=每日访问报告
+menu.cp.reports.countriesotp=前十OTP验证成功通过国家分析报告
+menu.cp.reports.scheduler=Report Scheduler
+menu.cp.reports.summary=摘要报告
+menu.cp.reports.unique=唯一身份访问者审核报告
+menu.cp.reports.activities=访客活动审核报告
+menu.cp.reports.profile=访客文件档案
+menu.cp.reports.quickdownloads=快速下载
+
+#Location Analytic
+menu.bi.location=定位分析
+menu.bi.location.dashboard=分析简介
+menu.bi.location.summary=详细位置分析
+menu.bi.location.zoneDetail=区域分析
+menu.bi.location.heatmap=热图
+menu.bi.location.movement=移动数据分析
+
+#Web Analytic
+menu.bi.web=Web 分析
+menu.bi.web.social_summary=访客登录简介
+menu.bi.web.dashboard=WIFI登录简介
+menu.bi.web.device=设备分析
+menu.bi.web.platform=设备平台分析
+menu.bi.web.engagement=WIFI登录报告
+menu.bi.web.action=页面访问报告
+menu.bi.web.subscriber=人口分析
+menu.bi.web.campaign=活动分析
+
+#Traffic Analytic
+menu.bi.traffic=流量分析
+menu.bi.traffic.traffic=数据采用分析
+
+#Sales Analytic
+menu.bi.3d=销售分析
+menu.bi.3d.sales=收入与访客分析
+menu.bi.3d.transaction=交易与访客分析
+menu.bi.3d.amount=物件销售与访客分析
+
+#Marketing Campaign
+menu.pm.campaign=活动
+menu.pm.campaign.list=活动列表
+menu.pm.campaign.create=创建活动
+
+#Marketing Content
+menu.pm.content=活动内容
+menu.pm.content.list=活动内容列表
+menu.pm.content.create=创建活动内容
+
+#Marketing App
+menu.pm.app = 应用设置
+menu.pm.app.list = 查看应用设置
+menu.pm.app.create = 创建应用设置
+
+#Marketing Policy
+menu.pm.policy=适用方案
+menu.pm.policy.create=创建适用方案
+menu.pm.policy.list=适用方案列表
+
+#Marketing Report
+menu.pm.report = 活动报告
+menu.pm.report.summary = 总结报告
+menu.pm.report.detail = 详细报告
+
+#License Management
+menu.lm.license.main=许可证管理
+menu.lm.license=许可证
+menu.lm.ap=AP
+menu.lm.group=AP组群
+
+#User Guide
+menu.userguide=用户手册(英文版)
+
+#Logout
+menu.logout=登出
+
+#**********************************************
+
+menu.resetpassword=重置密码
+
+#Breadcrumb Trail
+breadcrumb.home=主页
+breadcrumb.home.title=返回主页
+breadcrumb.account.main=帐户管理
+breadcrumb.account.edit=编辑帐户
+breadcrumb.account.add=添加帐户
+breadcrumb.account.view=帐户列表
+breadcrumb.account.resetpassword=重置密码
+breadcrumb.role=角色管理
+breadcrumb.organization.main=组织
+breadcrumb.organization.add=添加组织
+breadcrumb.organization.edit=修改组织
+breadcrumb.organization.view=组织列表
+breadcrumb.distributors.view=经销商列表
+breadcrumb.distributor.add=添加经销商
+breadcrumb.distributor.edit=编辑经销商
+breadcrumb.resellers.view=代理商列表
+breadcrumb.resellers.add=添加代理商
+breadcrumb.resellers.edit=编辑代理商
+breadcrumb.clients.view=客户列表
+breadcrumb.clients.add=添加客户
+breadcrumb.clients.edit=编辑客户
+breadcrumb.clients.cp=WIFI登陆门户URL管理
+breadcrumb.clients.piwik=Piwik管理
+breadcrumb.departments.view=部门列表
+breadcrumb.departments.add=添加部门
+breadcrumb.departments.edit=编辑部门
+breadcrumb.departments.cp=WIFI登陆门户URL管理
+breadcrumb.departments.piwik=Piwik管理
+
+#table column name
+table.columnname.owner=所属
+table.columnname.status=状态
+table.status.active=激活
+table.status.inactive=冻结
+table.status.suspend=挂起
+table.server.loading=正在从服务器加载数据...
+title.mandatoryfields=必填项目
+table.icon.help=单击可选择一条记录。点击'铅笔'图标可修改记录。
+table.columnname.detail=细节
+
+#filter placeholder
+filter.placeholder.SearchByFirstName=根据名字搜索
+filter.placeholder.SearchByContactEmail=根据联络邮箱搜索
+filter.placeholder.SearchByContactMobile=根据联络手机号码搜索
+filter.placeholder.SearchByCompanyName=根据公司名称搜索
+filter.placeholder.SearchByTechContactEmail=根据技术人员联络邮箱搜索
+filter.placeholder.SearchByPaymentDetail=根据支付细节搜索
+filter.placeholder.SelectAnOrganizationUnits=选择一个组织ID
+filter.placeholder.SelectAllOrganizationUnits=选择所有组织ID
+filter.placeholder.AllOrganizationIDs=所有
+filter.placeholder.AllUserTypes=所有
+filter.placeholder.SelectAllClient=选择所有客户
+filter.placeholder.SelectAllResellers=选择所有代理商
+filter.placeholder.SelectADepartmentName=选择一个部门名称
+filter.placeholder.SearchByDepartmentName=根据部门名称搜索
+filter.placeholder.AllStatus=所有
+filter.placeholder.active=激活
+filter.placeholder.suspend=挂起
+
+#popup window
+popupwindow.piwik.title=Piwik细节
+popupwindow.captiveportal.title=WIFI登陆门户细节
+popupwindow.account.title=账户细节
+popupwindow.distributor.title=经销商细节
+popupwindow.reseller.title=代理商细节
+popupwindow.client.title=客户细节
+popupwindow.department.title=部门细节
+
+#button
+button.add=添加
+button.save=保存
+button.send=发送
+button.cancel=取消
+button.edit=编辑
+button.search=搜索
+button.reset=重置
+button.generate=生成
+button.ok=确定
+button.yes=是的
+button.no=不，谢谢
+button.next=下一步
+button.back=后退
+
+button.confirm=确定
+
+#drowdown
+drowdown.active=激活
+drowdown.suspend=挂起
+
+#alert
+alert.error=错误
+alert.notification=WILAS系统通知
+alert.1atleast=请至少选择一条记录
+alert.1clientatleast=请至少选择一条客户记录
+alert.function.1atleast=请至少选择一个功能
+
+#pageType
+pagetype.normal=普通						
+pagetype.tandc=章程与条款
+pagetype.uandp=用户名和密码
+pagetype.sfq=小调查问卷
+pagetype.otp=短信一次性密码（OTP）
+pagetype.socialmedia=社交媒体
+pagetype.email=Email验证
+
+#Internal Respond
+crud.respond.add.successful=添加成功 
+crud.respond.add.unsuccessful=添加失败 
+
+crud.respond.edit.successful=编辑成功 
+crud.respond.edit.unsuccessful=编辑失败 
+
+crud.respond.delete.successful=移除成功 
+crud.respond.delete.unsuccessful=移除失败
+
+crud.respond.clearsession.successful=成功清除登陆会话时间  
+crud.respond.clearsession.unsuccessful=清除登陆会话时间失败
+
+#Account Management
+#My Account
+title.myAccount.big=编辑帐户
+myAccount.form.organization=组织
+myAccount.form.uid=用户ID
+myAccount.form.password=密码
+myAccount.form.confirmPw=确认密码
+
+#Add Account
+title.addAccount.big=添加帐户
+addAccount.form.email=电子邮件
+addAccount.form.first=名字
+addAccount.form.Mid=中间名
+addAccount.form.last=姓氏
+addAccount.form.mobile=手机号
+addAccount.form.belong=隶属于
+addAccount.form.roles=角色
+addAccount.form.status=状态
+addAccount.form.remark=备注
+addAccount.alert.title=系统通知
+addAccount.alert.message=请先创建一个国家管理员！
+addAccount.notification.resetpassword=用户账户成功创建,系统将会发送一封E-mail给用户设置账户。 请通知用户修改账户密码。
+
+#View Account
+filter.viewAccount.big=搜索
+filter.viewAccount.ou=组织
+filter.viewAccount.firstname=名字
+filter.viewAccount.lastname=姓
+filter.viewAccount.email=电子邮件
+filter.viewAccount.mobile=手机号
+filter.viewAccount.status=状态
+title.viewAccount.table=帐户列表
+table.viewAccount.columnname.id=帐号
+table.viewAccount.columnname.first=名字
+table.viewAccount.columnname.Mid=中间名
+table.viewAccount.columnname.last=姓
+table.viewAccount.columnname.email=联络邮件
+table.viewAccount.columnname.mobile=联络手机号
+table.viewAccount.columnname.ou=组织
+table.viewAccount.columnname.usercatergory=用户类型
+button.viewAccount.add=添加帐号
+button.viewAccount.delete=删除帐号
+
+#edit account
+title.editAccount.big=编辑帐户
+editAccount.form.email=电子邮件
+editAccount.form.first=名字
+editAccount.form.Mid=中间名
+editAccount.form.last=姓氏
+editAccount.form.mobile=手机号
+editAccount.form.belong=隶属于
+editAccount.form.roles=角色
+editAccount.form.status=状态
+editAccount.form.remark=备注
+editAccount.update.passwordpolicyfail=用户名和密码更新失败！密码不符合密码策略要求。
+editAccount.update.unknown=遇到一个未知错误，请联系你的管理员！ 
+
+#Resetpassword
+resetpassword.title=此页面用于用户重置账户登入密码。新的密码必须与之前三次使用过的密码不重复。
+resetpassword.notoken1=账户会话已过期或者已被使用。请点击
+resetpassword.notoken2=登入页面
+resetpassword.notoken3=的“忘记密码”重置你的账户。
+resetpassword.link.tryagain= 请重新试一遍。
+resetpassword.tokenexpired=令牌已过期，
+resetpassword.passwordpolicyfail=更新密码失败！密码不符合密码策略要求，
+resetpassword.password=有效的密码长度必须在8-16个字符之间并且不包含用户名的组成部分，可由大小写字母，数字和特殊字符组成，并且包含至少一个大写字母。
+
+#Account Auto-logout
+alertbox.title=WILAS系统通知
+alertbox.message=您的账户信息已更新，现在系统将会重定向您重新登入。
+alertbox.redirecttologinpage.message=您的账户信息已修改，系统会重定向您到登入页面，并要求您重新登入。
+
+#Role Management
+title.addRole.big=添加角色
+title.editRole.big=修改角色
+breadcrumb.role.management=角色管理
+breadcrumb.role.view=查看角色
+breadcrumb.role.add=添加角色
+breadcrumb.role.edit=修改角色
+title.role.table=角色列表
+table.role.columnname.id=角色帐号
+table.role.columnname.name=角色名
+table.role.columnname.ou=组织ID
+table.role.columnname.usertype=用户类型 
+button.role.add=添加角色
+button.role.delete=删除角色
+button.role.undo=撤销
+button.role.redo=重做
+rolemgt.label.organizationid=组织
+rolemgt.label.rolename=角色名称
+rolemgt.label.rolefunctions=角色功能
+rolemgt.alert.title=系统通知
+rolemgt.assign.alert=请先输入角色的名称！
+rolemgt.delete.alert=删除角色，确定吗?
+rolemgt.delete.success=角色已成功删除！
+rolemgt.delete.failed=由于某些账户正在使用这些角色，因此这些角色不能被删除。
+rolemgt.role.atleastonefunction=请赋予角色至少一个功能！
+
+#Organization List
+filter.organizationList.title=搜索
+filter.organizationList.companyName=公司名称
+filter.organizationList.organizationName=组织名称
+filter.organizationList.email=联络邮件
+filter.organizationList.contactName=联络人姓名
+filter.organizationList.mobile=联络号码
+filter.organizationList.techemail=技术人员联络手机号
+filter.organizationList.userType=用户类型
+filter.organizationList.ou=组织
+filter.OrganizationList.status=状态
+title.listOrganization.table=组织列表
+table.organizationList.columnname.id=组织 ID
+table.organizationList.columnname.company=公司名称
+table.organizationList.columnname.email=联络邮件
+table.organizationList.columnname.mobile=联络号码
+table.organizationList.columnname.techemail=技术人员联络邮件
+table.organizationList.columnname.contactName=联络人姓名
+table.organizationList.columnname.ou=组织ID
+table.organizationList.columnname.usercatergory=用户类型
+table.organizationList.columnname.payment=付款细节
+button.organizationList.add=添加组织
+button.organizationList.delete=删除组织
+
+#Add Organization
+title.addOrganization.big=添加组织
+organization.form.Name=组织名称
+organization.form.ou=组织
+organization.form.alias=组织别名
+organization.form.status=状态
+organization.form.company=公司名称
+organization.form.regnum=公司注册号
+organization.form.address=账单地址
+organization.form.contact=联络人姓名
+organization.form.email=联络邮件
+organization.form.DID=联络号码1
+organization.form.mobile=联络号码2
+organization.form.fax=传真号
+organization.form.techname=技术人员姓名
+organization.form.techemail=技术人员电子邮件
+organization.form.technumber=技术人员联络号码
+organization.form.territories=地区
+organization.form.remark=备注
+
+#Edit Organization
+title.editOrganization.big=编辑组织
+
+#View Distributors
+filter.viewDistributors.big=搜索
+filter.viewDistributors.company=公司名称
+filter.viewDistributors.email=联络邮件
+filter.viewDistributors.mobile=联络手机
+filter.viewDistributors.techemail=技术人员联络手机号
+filter.viewDistributors.ou=组织ID
+table.viewDistributors.columnname.id=经销商ID
+table.viewDistributors.columnname.company=公司名称
+table.viewDistributors.columnname.email=联络邮件
+table.viewDistributors.columnname.Mobile=联络手机号
+table.viewDistributors.columnname.techemail=技术人员联络邮件
+table.viewDistributors.columnname.ou=组织ID
+button.viewDistributors.add=添加经销商
+button.viewDistributors.delete=删除经销商
+
+#Add Distributor
+title.addDistributor.big=添加经销商
+addDistributor.form.Name=经销商名称
+addDistributor.form.ou=组织ID
+addDistributor.form.status=状态
+addDistributor.form.company=公司名称
+addDistributor.form.regnum=公司注册号
+addDistributor.form.address=账单地址
+addDistributor.form.contact=联络人姓名
+addDistributor.form.email=联络邮件
+addDistributor.form.DID=联络DID
+addDistributor.form.mobile=联络手机号
+addDistributor.form.fax=传真号
+addDistributor.form.techname=技术人员姓名
+addDistributor.form.techemail=技术人员电子邮件
+addDistributor.form.technumber=技术人员联络号码
+addDistributor.form.territories=地区
+addDistributor.form.remark=备注
+
+#edit Distributor
+title.editDistributor.big=编辑经销商
+editDistributor.form.Name=经销商名称
+editDistributor.form.ou=组织ID
+editDistributor.form.status=状态
+editDistributor.form.company=公司名称
+editDistributor.form.regnum=公司注册号
+editDistributor.form.address=账单地址
+editDistributor.form.contact=联络人姓名
+editDistributor.form.email=联络邮件
+editDistributor.form.DID=联络DID
+editDistributor.form.mobile=联络手机号
+editDistributor.form.fax=传真号
+editDistributor.form.techname=技术人员姓名
+editDistributor.form.techemail=技术人员电子邮件
+editDistributor.form.technumber=技术人员联络号码
+editDistributor.form.territories=地区
+editDistributor.form.remark=备注
+
+#View Resellers
+filter.viewResellers.big=搜索
+filter.viewResellers.company=公司名称
+filter.viewResellers.email=联络邮件
+filter.viewResellers.mobile=联络手机
+filter.viewResellers.techemail=技术人员联络手机号
+filter.viewResellers.ou=组织ID
+table.viewResellers.columnname.id=代理商ID
+table.viewResellers.columnname.company=公司名称
+table.viewResellers.columnname.email=联络邮件
+table.viewResellers.columnname.Mobile=联络手机号
+table.viewResellers.columnname.techemail=技术人员联络邮件
+table.viewResellers.columnname.ou=组织ID
+table.viewResellers.columnname.distributorou=经销商组织ID
+button.viewResellers.add=添加代理商
+button.viewResellers.delete=删除代理商
+
+#Add Reseller
+title.addReseller.big=添加代理商
+addReseller.form.Name=代理商名称
+addReseller.form.ou=组织ID
+addReseller.form.status=状态
+addReseller.form.company=公司名称
+addReseller.form.regnum=公司注册号
+addReseller.form.address=账单地址
+addReseller.form.contact=联络人姓名
+addReseller.form.email=联络邮件
+addReseller.form.DID=联络DID
+addReseller.form.mobile=联络手机号
+addReseller.form.fax=传真号
+addReseller.form.techname=技术人员姓名
+addReseller.form.techemail=技术人员电子邮件
+addReseller.form.technumber=技术人员联络号码
+addReseller.form.territories=地区
+addReseller.form.remark=备注
+
+#Edit Reseller
+title.editReseller.big=编辑代理商
+editReseller.form.Name=代理商名称
+editReseller.form.ou=组织ID
+editReseller.form.status=状态
+editReseller.form.company=公司名称
+editReseller.form.regnum=公司注册号
+editReseller.form.address=账单地址
+editReseller.form.contact=联络人名字
+editReseller.form.email=联络邮件
+editReseller.form.DID=联络DID
+editReseller.form.mobile=联络手机号
+editReseller.form.fax=传真号
+editReseller.form.techname=技术人员姓名
+editReseller.form.techemail=技术人员电子邮件
+editReseller.form.technumber=技术人员联络号码
+editReseller.form.territories=地区
+editReseller.form.remark=备注
+editAccount.update.passwordpolicyfail=用户名和密码更新失败！密码不符合密码策略要求。
+editAccount.update.unknown=遇到一个未知错误，请联系你的管理员！
+
+#View Clients
+filter.viewClients.big=搜素
+filter.viewClients.company=公司名称
+filter.viewClients.email=联络邮件
+filter.viewClients.mobile=联络手机号
+filter.viewClients.payment=支付细节
+filter.viewClients.ou=组织ID
+title.viewClient.table=客户列表
+table.viewClients.columnname.id=客户ID
+table.viewClients.columnname.company=公司名称
+table.viewClients.columnname.email=联络邮件
+table.viewClients.columnname.mobile=联络手机号
+table.viewClients.columnname.payment=支付细节
+table.viewClients.columnname.ou=组织ID
+table.viewClients.columnname.action=动作
+button.viewClients.add=添加客户
+button.viewClients.delete=删除客户
+
+#Client CP APPLICATION POPUP
+button.applyCp=申请门户许可
+popupwindow.client.application=门户许可申请表
+form.cpApplication.cpsever=CP服务器
+form.cpApplication.cpcloud=CP云
+form.cpApplication.cplite=轻量级CP
+form.cpApplication.cplitedomainname=轻量级CP域名
+form.cpApplication.termandcondition=Term And Condition
+form.cpApplication.usernameandpassword=Username And Password
+form.cpApplication.questionandform=Question And Form
+form.cpApplication.otp=OTP
+form.cpApplication.socialmedialogin=Social Media Login
+form.cpApplication.emailonetimelink=Email One Time Link
+form.cpApplication.analytic=分析功能
+form.cpApplication.quantity=数量 :
+form.cpApplication.message=申请已发送，请等待批准！
+
+#add clients
+title.addClient.big=添加客户
+addClient.form.ID=客户ID
+addClient.form.Name=客户名称
+addClient.form.ou=组织ID
+addClient.form.status=状态
+addClient.form.company=公司名称
+addClient.form.regnum=公司注册号
+addClient.form.address=账单地址
+addClient.form.payment=付款细节
+addClient.form.contact=联络人姓名
+addClient.form.email=联络邮件
+addClient.form.DID=联络DID
+addClient.form.mobile=联络手机号
+addClient.form.fax=传真号
+addClient.form.remark=备注
+addClient.form.paymode=付款模式
+addClient.form.server=OTP服务器ID
+
+#edit clients
+title.editClient.big=编辑客户
+editClient.form.Name=客户名称
+editClient.form.ou=组织ID
+editClient.form.status=状态
+editClient.form.company=公司名称
+editClient.form.regnum=公司注册号
+editClient.form.address=账单地址
+editClient.form.payment=付款细节
+editClient.form.contact=联络人姓名
+editClient.form.email=联络邮件
+editClient.form.DID=联络DID
+editClient.form.mobile=联络手机号
+editClient.form.fax=传真号
+editClient.form.remark=备注
+
+#CP management
+title.cpManagement.big=WIFI登陆门户列表
+title.cpManagement.viewCpQuota=查看WIFI登陆门户URL
+filter.cpManagement.big=搜索
+filter.cpManagement.organizationName=组织名称
+filter.cpManagement.email=联络邮件
+filter.cpManagement.ou=组织ID
+title.cpManagement.table=WIFI登陆门户列表
+table.cpManagement.columnname.id=WIFI登陆门户ID
+table.cpManagement.columnname.name=WIFI登陆门户名
+table.cpManagement.columnname.description=门户描述
+table.cpManagement.columnname.code=专用码
+table.cpManagement.columnname.server=服务器
+table.cpManagement.columnname.type=认证类型
+table.cpManagement.columnname.domain=域名
+table.cpManagement.columnname.status=状态
+table.cpManagement.columnname.startdate=开始日期
+table.cpManagement.columnname.enddate=结束日期
+table.cpManagement.columnname.remark=备注
+button.cpManagement.delete=删除WIFI登陆门户
+
+#piwik management
+title.piwikOrganizations.big=Piwik管理
+filter.piwikOrganizations.big=搜索
+title.piwikOrganizations.table=Piwik列表
+table.piwikOrganization.columnname.id=站点ID
+table.piwikOrganization.columnname.serverid=分析服务器ID
+table.piwikOrganization.columnname.servername=分析服务器名称
+table.piwikOrganization.columnname.serverurl=分析服务器URL
+table.piwikOrganization.columnname.owner=拥有者
+table.piwikOrganization.columnname.action=动作
+button.piwikOrganization.delete=删除Piwik
+
+#View Departments
+title.viewDepartments.big=部门列表
+filter.viewDepartments.big=搜索
+filter.viewDepartments.department=部门名称
+filter.viewDepartments.ou=组织ID
+table.viewDepartments.columnname.id=部门ID
+table.viewDepartments.columnname.name=部门名称
+table.viewDepartments.columnname.email=联络邮件
+table.viewDepartments.columnname.address=部门地址
+table.viewDepartments.columnname.ou=组织ID
+button.viewDepartments.add=添加部门
+button.viewDepartments.delete=删除部门
+
+#add Department
+title.addDepartment.big=添加部门
+addDepartment.form.Name=部门名称
+addDepartment.form.ou=组织ID
+addDepartment.form.status=状态
+addDepartment.form.address=部门地址
+addDepartment.form.email=联络邮件
+addDepartment.form.description=部门描述
+addDepartment.form.remark=备注
+
+#edit Department
+title.editDepartment.big=编辑部门
+editDepartment.form.Name=部门名称
+editDepartment.form.ou=组织ID
+editDepartment.form.status=状态
+editDepartment.form.address=部门地址
+editDepartment.form.email=联络邮件
+editDepartment.form.description=部门描述
+editDepartment.form.remark=备注
+
+#CP management
+title.captiveportal.assign=分配WIFI登陆门户
+filter.cpDepartment.big=搜索
+filter.cpDepartment.name=部门名称
+filter.cpDepartment.cp=WIFI登陆门户
+title.cpDepartment.table=WIFI登陆门户列表
+table.cpDepartment.columnname.id=WIFI登陆门户ID
+table.cpDepartment.columnname.name=门户名
+table.cpDepartment.columnname.description=门户描述
+table.cpDepartment.columnname.code=专用码
+table.cpDepartment.columnname.type=认证类型
+table.cpDepartment.columnname.domain=域名
+table.cpDepartment.columnname.status=状态
+table.cpDepartment.columnname.startdate=开始日期
+table.cpDepartment.columnname.enddate=结束日期
+table.cpDepartment.columnname.remark=备注
+cp.assign.alert=在赋予部门WiFi登入门户之前请先选择一个WiFi登入门户！
+
+#Piwik management
+title.piwikDepartment.big=Piwik管理
+filter.piwikDepartment.big=搜索
+filter.piwikDepartment.name=部门名称
+filter.piwikDepartment.piwik=Piwik名称
+title.piwikDepartment.table=Piwik列表
+table.piwikDepartment.columnname.id=站点ID
+table.piwikDepartment.columnname.serverid=分析服务器ID
+table.piwikDepartment.columnname.servername=分析服务器名称
+table.piwikDepartment.columnname.serverurl=分析服务器URL
+table.piwikDepartment.columnname.owner=拥有者
+button.piwikDepartment.delete=删除
+text.piwikDepartment.selectAll=选择所有
+
+#CP URL management
+title.cpUrlManagement.info=信息
+cpUrlManagement.info.ApQuota=AP配额：
+cpUrlManagement.info.CpUrlQuantity=CP URL数量:
+cp.url.create.fail=当前不能创建CP URL！ CP URL的数量已超过AP配额，请联系代理商。
+
+#Quota management
+breadcrumb.licenses.main=许可证
+title.quotaManagement.big=访问点配额管理
+title.quotaManagement.info=配额信息
+quotaManagement.info.ApQuota=AP配额：
+quotaManagement.info.ApAssigned=已分配AP：
+quotaManagement.info.deviceQuota=装置配额：
+quotaManagement.info.deviceAssigned=已分配装置：
+title.viewQuota.table=AP配额列表
+table.viewQuota.columnname.ou=组织
+table.viewQuota.columnname.apquota=AP配额数量
+table.viewQuota.columnname.apassigned=已分配到下一级的AP配额数量
+table.viewQuota.columnname.devicequota=装置配额
+table.viewQuota.columnname.deviceassigned=已分配装置
+table.viewQuota.columnname.action=分配AP配额
+popupwindow.quota.title=编辑AP配额
+quotapopup.inputfiled.ou=组织
+quotapopup.inputfiled.ApQuota=AP配额数量
+quotapopup.inputfiled.DeviceQuota=装置配额
+
+piwik.create.successful=创建网络分析ID成功!
+piwik.update.successful=更新网络分析ID成功!
+piwik.update.failed=更新网络分析ID失败!
+piwik.delete.successful=删除网络分析ID成功!
+piwik.delete.failed=删除网络分析ID失败!
+piwik.assign.alert=在赋予客户网络分析ID之前请先选择一个网络分析ID！
+piwik.relationship.cancel=撤销网络分析ID与部门间的关系!
+
+#validation messages
+resellerValidator.reseller_name.duplicateResellerName=Reseller Name already Existed!
+resellerValidator.reseller_name.duplicateResellerOu=Organization Unit already Existed!
+resellerValidator.reseller_name.wrongFormatResellerName=Do Not Create Reseller Name Contains '.' !
+resellerValidator.reseller_email.duplicateResellerEmail=Email already Existed!
+
+clientValidator.client_name.duplicateClientName=Client Name already Existed!
+clientValidator.client_name.duplicateClientOu=Organization Unit already Existed!
+clientValidator.client_name.wrongFormatClientName=Do Not Create Client Name Contains '.' !
+clientValidator.client_ou.wrongFormatClientOu=Do Not Create Organization Unit Contains '.' !
+clientValidator.client_email.duplicateClientEmail=Email already Existed!
+
+agentValidator.agent_name.duplicateAgentName=Department Name already Existed!
+agentValidator.agent_ou.duplicateAgentOu=Organization Unit already Existed!
+agentValidator.agent_name.wrongFormatAgentName=Do Not Create Department Name Contains '.' !
+agentValidator.agent_ou.wrongFormatAgentOu=Do Not Create Organization Unit Contains '.' !
+agentValidator.agent_email.duplicateAgentEmail=Email already Existed!
+
+#validation messages
+errormsg.email=请输入一个正确的E-mail地址
+errormsg.ou.required=请输入一个组织ID
+errormsg.rolename.exists=角色名称已存在
+errormsg.rolename.required=请输入一个角色名称
+errormsg.companyname.required=请输入一个公司名称
+errormsg.contractname.required=请输入一个联系人名字
+errormsg.email.required=请输入一个联系E-mail
+errormsg.email.exists=E-mail地址已经存在
+errormsg.organizationname.exists=组织ID已经存在
+errormsg.contractdid.required=请输入一个联系电话
+errormsg.maxlength=请勿输入多于148个字符
+errormsg.mobile.maxlength=请勿输入多于15个数字
+errormsg.maxlength.28=请勿输入多于28个字符
+errormsg.maxlength.43=请勿输入多于43个字符
+errormsg.maxlength.48=请勿输入多于48个字符
+errormsg.maxlength.98=请勿输入多于98个字符
+errormsg.maxlength.150=请勿输入多于150个字符
+errormsg.maxlength.250=请勿输入多于250个字符
+errormsg.digits=请只输入数字
+errormsg.password.required=请输入密码
+errormsg.password.minlength=请输入至少8个字符
+errormsg.password.maxlength=请勿输多于16个字符
+errormsg.password.equalto=请再次输入相同的密码
+errormsg.account.email.required=请输入一个邮箱地址
+errormsg.account.firstname.required=请输入一个名
+errormsg.account.lastname.required=请输入一个姓
+errormsg.account.uid.required=请输入一个UID
+errormsg.organization.name.required=请输入一个组织名
+errormsg.organization.name.invalid=组织名称只可以包含数字，字母或者下划线
+errormsg.distributor.name.required=请输入一个经销商名
+errormsg.reseller.name.required=请输入一个代理商名
+errormsg.client.name.required=请输入一个客户名
+errormsg.department.name.required=请输入一个部门名
+errormsg.cp.name.required=请输入一个WIFI登入门户名
+errormsg.startdate.required=请输入一个起始日期
+errormsg.enddate.required=请输入一个结束日期
+errormsg.cplitedomainname.required=请输入一个轻量级WIFI登陆门户域名
+errormsg.password.atleastonecapital=密码至少包含一个大写字母
+
+alert.redirectmessage=新组织已成功地创建，请继续创建一个新账户。
+alert.welcomemessage.firsthalf=欢迎您 
+alert.welcomemessage.secondhalf=！ 您当前登入为
+alert.welcomemessage.rootadmin=超级管理员
+alert.welcomemessage.distributor=经销商
+alert.welcomemessage.reseller=代理商
+alert.welcomemessage.client=客户
+alert.welcomemessage.department=部门管理员
+alert.welcomemessage.fullstop=。
+
+#CaptivePortal API CRUD
+cp.api.insertorupdate.success=门户已成功地创建或更新。
+cp.api.insertorupdate.fail=门户在门户管理平台创建或更新失败。
+cp.api.delete.success=门户已在门户管理平台成功删除。
+cp.api.delete.fail=门户在门户管理平台删除失败。
+api.unknownerror=未知错误，请联系你的管理员！
+cp.lite.notonline=轻量级WIFI登陆门户未上线！
+
+#Piwik API CRUD
+piwik.api.insert.success=数据分析已在门户管理平台成功创建。
+piwik.api.insert.fail=数据分析已在门户管理平台创建失败。
+piwik.api.update.success=数据分析已在门户管理平台成功更新。
+piwik.api.update.fail=数据分析已在门户管理平台更新失败。
+piwik.api.delete.success=数据分析已在门户管理平台成功删除。
+piwik.api.delete.fail=数据分析已在门户管理平台删除失败。
+
+#datatable option
+datatable.emptyTable=暂时没有数据
+datatable.info=显示 _START_ 到 _END_ of _TOTAL_ 个
+datatable.lengthMenu=显示 _MENU_ 个
+datatable.loadingRecords=读取中...
+datatable.processing=执行中...
+datatable.zeroRecords=没有找到匹配的数据
+datatable.first=第一页
+datatable.last=最后一页
+datatable.next=下一页
+datatable.previous=前一页

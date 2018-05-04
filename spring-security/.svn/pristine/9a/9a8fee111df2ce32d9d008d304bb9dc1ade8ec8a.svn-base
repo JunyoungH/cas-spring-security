@@ -1,0 +1,51 @@
+/**
+ * JS for Left Navigation Bar
+ */
+
+$(document).ready(function(){
+	
+	var dialog_buttons = {}; 
+	
+	dialog_buttons[$("#hiddenButYes").html()] = function(){
+		
+		location = '/am/home/restartserver.wilas';
+		restartDialogDiv.dialog("close");
+		
+	};
+	
+	dialog_buttons[$("#hiddenButCancel").html()] = function(){
+		
+		restartDialogDiv.dialog("close");
+		
+	};
+	
+	var restartDialogDiv = $("#restart-dialog-form").dialog({
+		autoOpen : false,
+		resizable: false,
+		height : 300,
+		width : $(window).width()*0.35,
+		modal : true,
+		position: ['center','center-20%'],
+		buttons : dialog_buttons,
+		close : function() {
+
+		},
+		show: {
+			effect: "puff",
+			duration: 250
+		},
+		hide: {
+			effect: "puff",
+			duration: 250
+		}
+	});
+	
+	$("#restartLink").click(function(){
+		$("#restart-dialog-form").show();
+		restartDialogDiv.dialog("open");
+
+	});
+	
+});
+	
+	

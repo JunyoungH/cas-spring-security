@@ -1,0 +1,161 @@
+/**
+ * JS for Role List
+ */
+
+$(document)
+		.ready(
+				function() {
+
+					var roleTable = $('#roleList').DataTable({
+						"bSort" : true,
+						"bServerSide" : true,
+						"sDom" : '<""l>t<"F"p>',
+						"bJQueryUI" : true,
+						"bSearchable" : false,
+						"bAutoWidth" : false,
+						"sPaginationType" : "full_numbers",
+						"sAjaxSource" : "ajax_role_list"+$("#SPRING_EXT").html(),
+						"columnDefs": [
+									    {
+									        "targets": [0],
+									        "visible": false,
+									        "class":"hide_column"
+									    },
+									    {
+									        "targets": [4],
+									        "visible": false,
+									        "class":"hide_column"
+									    },
+									    {
+											"targets": [5],
+											"orderable": false,
+										}
+						],
+						"language":  {
+				    	    "emptyTable":     $("#emptyTable").html(),
+				    	    "lengthMenu":     $("#lengthMenu").html(),
+				    	    "loadingRecords": $("#loadingRecords").html(),
+				    	    "processing":     $("#processing").html(),
+				    	    "zeroRecords":    $("#zeroRecords").html(),
+				    	    "paginate": {
+				    	        "first":      $("#firstDatatable").html(),
+				    	        "last":       $("#lastDatatable").html(),
+				    	        "next":       $("#nextDatatable").html(),
+				    	        "previous":   $("#prevDatatable").html()
+				    	    }
+				    	}
+					});
+					
+					if($('#errmsg').html().trim().length!=0 && $('#errmsg').html().trim()!="")
+					{
+						alertNotification($('#errmsg').html());
+						
+					}
+					
+					
+					/* ------------------------------------------------------ Edit Role-----------------------------------------------------------*/
+					
+					$('.data-table tbody').on('click','.editButton', function() {
+						
+						var rowData = roleTable.row($(this).parents('tr')).data();
+						window.location.href='edit'+$("#SPRING_EXT").html()+'?id='+rowData[0]+'&organizationId='+rowData[4]
+						
+					});
+					
+					/* ------------------------------------------------------ Edit Role-----------------------------------------------------------*/
+					
+					
+					
+					/* ------------------------------------------------------ Delete Role-----------------------------------------------------------*/
+					
+					$(document).on('click', '.data-table tbody tr', function() {
+						if ($(this).hasClass('checked')) {
+
+							$(this).removeClass('checked');
+
+						} else {
+							$(this).addClass('checked');
+						}
+					});
+					
+					$('#deleterow').click(function() {
+						
+						var idSting = listId(roleTable);
+						console.log(idSting);
+						if (idSting != null) {
+							bootbox.dialog({
+					            title: $('#title').html(),
+					            message: '<div class="modal-body" style="margin:5%; text-align:center; font-size:18px">'+
+					            $('#message').html()+'</div>',
+					            buttons: {
+					                success: {
+					                    label: $('#confirm').html(),
+					                    className: "btn-primary",
+					                    callback: function () {
+					                    	var ob = {
+												'id' : idSting
+											};
+				
+											$.ajax({
+												type : 'POST',
+												url : 'role_delete'+$("#SPRING_EXT").html(),
+												data : ob,
+												dataType : 'html',
+												success : function(data) {
+													alertNotification(data);
+													roleTable.ajax.reload();
+												}
+											});
+					                    }
+					                },
+									cancel: {
+					                    label: $('#cancel').html(),
+					                    className: "btn-primary"
+					                }
+					            }
+					        });
+						}
+							
+					});
+					
+					function listId(ObjectTable) {
+						var tmp = [];
+						var selectedRows = ObjectTable.$('tr.checked');
+						console.log("select rows: "+selectedRows);
+						var idList = "";
+
+						if (selectedRows.length <= 0) {
+							alertNotification($('#alert1least').html());
+							return null;
+						} else {
+
+							for (var j = 0; j < selectedRows.length; j++) {
+
+								tmp[j] = selectedRows[j].id;
+								console.log("select row id: "+tmp[j]);
+							}
+
+							for (var i = 0; i < tmp.length; i++) {
+
+								if (i == 0)
+									idList = tmp[0];
+
+								if (i > 0) {
+									idList = idList + "," + tmp[i];
+								}
+							}
+
+							console.log(idList);
+							return idList;
+
+						}
+					}
+					
+					/* ------------------------------------------------------ Delete Role-----------------------------------------------------------*/
+					
+					
+					
+					
+					
+					
+				});

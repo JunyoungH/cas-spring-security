@@ -1,0 +1,23 @@
+package com.techstudio.dao.am;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.techstudio.dao.BaseJPARepository;
+import com.techstudio.model.am.AuthenticationTypeDTO;
+
+
+@Repository
+public interface AuthenticationTypeDao extends BaseJPARepository<AuthenticationTypeDTO, Long>{
+
+	List<AuthenticationTypeDTO> findByAuthTypeNameNot(String normalPage);
+
+	AuthenticationTypeDTO findByAuthTypeId(Long authTypeId);
+
+	List<AuthenticationTypeDTO> findByAuthTypeIdBetween(Long startId, Long endId);
+	
+	List<AuthenticationTypeDTO> findByAuthTypeIdGreaterThanEqual(Long id);
+
+}

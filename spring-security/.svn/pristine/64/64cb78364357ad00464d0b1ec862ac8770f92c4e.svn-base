@@ -1,0 +1,84 @@
+/*Techstudio Inc Timeout Handler v1.0
+ * author:Charles Lee
+ * in 2016*/
+
+define(function(){
+	
+	var timeLimit;
+
+	function initTranslator(lanaugePara){
+		
+		
+		for(var i= 0; i<lanaugePara.length;i++){
+			if(i!= lanaugePara.length-1){
+				$("#footer").append("<a id='transA_"+i+"\' style='cursor:pointer'>"
+						+locateLan(lanaugePara[i])+"</a> |")
+			}else{
+				$("#footer").append("<a id='transA_"+i+"\' style='cursor:pointer'>"
+						+locateLan(lanaugePara[i])+"</a>")
+			}
+			
+			$("#transA_"+i).bind("click",{paraStr:lanaugePara[i]},aClickHandler);
+		}
+				
+	}
+	
+	function aClickHandler(e){
+		var sendPara = e.data.paraStr;
+		changelocale(sendPara);
+	}
+	
+	function locateLan(lanCode){
+		var lanuageReturn;
+		switch(lanCode)
+		{
+			case 'en':lanuageReturn = "English";break;
+			case 'zh_CN':lanuageReturn = "中文 (简体)";break;
+		
+		};
+		
+		return lanuageReturn;
+	}
+	
+	
+	function changelocale(locale){
+		
+		var recentURL = window.location.href;
+		
+		
+		console.log(recentURL)
+		
+		if(recentURL.indexOf("?")>0) {
+			
+			if(recentURL.indexOf("locale")>0) {
+				
+				var lastChar = window.location.href.substr(window.location.href.length - 1); 
+				console.log(lastChar)
+				if(lastChar=="#") recentURL = recentURL.substr(0, recentURL.length-1);
+				
+				var temp = recentURL.substring(0,recentURL.lastIndexOf("=")+1);
+				
+				window.location=temp+locale;
+				
+			}else
+			{
+				window.location=recentURL+'&locale='+locale;
+			}
+			
+			
+			
+		}else
+		{
+			window.location=recentURL+'?locale='+locale;
+			
+		}
+		
+	}
+	
+	return{
+			
+		initTranslator:initTranslator
+	};
+	
+
+});

@@ -1,0 +1,135 @@
+package com.techstudio.model.am;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+
+@Entity
+@Table(name="am_piwik_site" )
+public class PiwikSiteDTO implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3838235963327215276L;
+
+	@Id	
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name = "site_id", columnDefinition="bigint", unique = true, nullable=false)
+	private Long siteId;
+	
+	@Column(name = "site_name", columnDefinition="varchar(50)", unique = true, nullable=false)
+	private String siteName;
+	
+	@Column(name = "url", columnDefinition="varchar(255)", nullable=false)
+	private String url;
+	
+	@Column(name = "ou", columnDefinition="varchar(150)", nullable=false)
+	private String ou;
+	
+	@Column(name = "piwik_site_id", columnDefinition="bigint", unique = true, nullable=false)
+	private Long piwikSiteId;
+	
+	@Column(name = "cp_id", columnDefinition="bigint", unique = true)
+	private Long cpId;
+	
+//	@Transient
+//	private String ;
+
+/* Constructor (You can create an constructor for default value setting) */
+	
+	public PiwikSiteDTO(){
+		
+	}
+	
+	
+	public PiwikSiteDTO(String siteName, String url, String ou, Long piwikSiteId,
+			Long cpId, OrganizationDTO organizationDTO) {
+		super();
+		this.siteName = siteName;
+		this.url = url;
+		this.ou = ou;
+		this.piwikSiteId = piwikSiteId;
+		this.cpId = cpId;
+		this.organizationDTO = organizationDTO;
+	}
+
+
+/* Relationship */
+	
+	@JsonIgnore
+	@ManyToOne
+    @JoinColumn(name="organization_id")
+    private OrganizationDTO organizationDTO; 
+	
+/* Getter and Setter */
+	
+
+	public Long getSiteId() {
+		return siteId;
+	}
+
+	public void setSiteId(Long siteId) {
+		this.siteId = siteId;
+	}
+
+	public String getSiteName() {
+		return siteName;
+	}
+
+	public void setSiteName(String siteName) {
+		this.siteName = siteName;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getOu() {
+		return ou;
+	}
+
+	public void setOu(String ou) {
+		this.ou = ou;
+	}
+
+	public Long getPiwikSiteId() {
+		return piwikSiteId;
+	}
+
+	public void setPiwikSiteId(Long piwikSiteId) {
+		this.piwikSiteId = piwikSiteId;
+	}
+
+	public Long getCpId() {
+		return cpId;
+	}
+
+	public void setCpId(Long cpId) {
+		this.cpId = cpId;
+	}
+
+	public OrganizationDTO getOrganizationDTO() {
+		return organizationDTO;
+	}
+
+	public void setOrganizationDTO(OrganizationDTO organizationDTO) {
+		this.organizationDTO = organizationDTO;
+	}
+	
+	
+}

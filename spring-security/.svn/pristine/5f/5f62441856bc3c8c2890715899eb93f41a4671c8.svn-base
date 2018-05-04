@@ -1,0 +1,129 @@
+package com.techstudio.model.am.filter;
+
+import java.io.Serializable;
+
+
+public class OrganizationFilterObj implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2813838070610914042L;
+	
+	private Integer loginHierarchyLevel;
+	
+	private String loginOu;
+	
+	private String companyName;
+	
+	private String contactEmail;
+	
+	private String contactName;
+	
+	private String contactNumber;
+	
+	private String searchHierarchyLevel;
+	
+	private String searchOu;
+	
+	private String status;
+	
+/* Constructor */
+	
+	public OrganizationFilterObj(){
+		
+	}
+
+	public OrganizationFilterObj(Integer loginHierarchyLevel, String loginOu,
+			String companyName, String contactEmail, String contactName,
+			String contactNumber, String searchHierarchyLevel, String searchOu,
+			String status) {
+		super();
+		this.loginHierarchyLevel = loginHierarchyLevel;
+		this.loginOu = loginOu;
+		this.companyName = companyName;
+		this.contactEmail = contactEmail;
+		this.contactName = contactName;
+		this.contactNumber = contactNumber;
+		this.searchHierarchyLevel = searchHierarchyLevel;
+		this.searchOu = searchOu;
+		this.status = status;
+	}
+
+/* Getter and Setter */
+
+
+	public Integer getLoginHierarchyLevel() {
+		return loginHierarchyLevel;
+	}
+
+	public void setLoginHierarchyLevel(Integer loginHierarchyLevel) {
+		this.loginHierarchyLevel = loginHierarchyLevel;
+	}
+
+	public String getLoginOu() {
+		return loginOu;
+	}
+
+	public void setLoginOu(String loginOu) {
+		this.loginOu = loginOu;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	public String getContactEmail() {
+		return contactEmail;
+	}
+
+	public void setContactEmail(String contactEmail) {
+		this.contactEmail = contactEmail;
+	}
+
+	public String getContactName() {
+		return contactName;
+	}
+
+	public void setContactName(String contactName) {
+		this.contactName = contactName;
+	}
+
+	public String getContactNumber() {
+		return contactNumber;
+	}
+
+	public void setContactNumber(String contactNumber) {
+		this.contactNumber = contactNumber;
+	}
+
+	public String getSearchHierarchyLevel() {
+		return searchHierarchyLevel;
+	}
+
+	public void setSearchHierarchyLevel(String searchHierarchyLevel) {
+		this.searchHierarchyLevel = searchHierarchyLevel;
+	}
+
+	public String getSearchOu() {
+		return searchOu;
+	}
+
+	public void setSearchOu(String searchOu) {
+		this.searchOu = searchOu;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	
+}

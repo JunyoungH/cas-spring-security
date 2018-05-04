@@ -1,0 +1,219 @@
+<%@ page pageEncoding="UTF-8"%>
+<%@ include file="../include/import.jsp"%>
+<%@ include file="../home/header.jsp"%>
+<jsp:include page="../home/leftnav.jsp" />
+
+<!-- Attributes List -->
+
+<div id="SPRING_EXT" style="display: none">${ SPRING_EXT }</div>
+<div id="errmsg" style="display: none">${ errmsg }</div>
+<div id="organization_id" style="display: none">${ organizationId }</div>
+<div id="login_ou" style="display: none">${ loginOu }</div>
+
+<!-- Attributes List -->
+
+<div id="WEBAPPS" style="display: none;">${ WEBAPPS }</div>
+<div id="content">
+	<div id="content-header">
+		<h1><spring:message code="title.cpManagement.big" /></h1>
+		
+		<div class="btn-group">
+				<a id="addButton" href="#" class="btn btn-large tip-bottom" title="<spring:message code="button.add" />"><i class="fa fa-plus"></i></a>
+				<a id="deleterow" href="#" class="btn btn-large tip-bottom" title="<spring:message code="button.delete" />" ><i class="fa fa-times"></i></a>
+		</div>
+	</div>
+
+	<div id="breadcrumb">
+		<a href="${ WEBAPPS }/main${ SPRING_EXT }" title="<spring:message code="breadcrumb.home.title" />" class="tip-bottom"><i class="icon-home"></i><spring:message code="breadcrumb.home" /></a>
+		<a class="#"><spring:message code="breadcrumb.organization.main" /></a>
+		<a class="current"><spring:message code="title.cpManagement.big" /></a>
+	</div>
+	
+	<!-- ------------------------------------------------------------- SEARCH FILTER --------------------------------------------------------------- -->
+	<div class="container-fluid" >
+		<div class="row">
+			<div class="col-xs-12 center">
+				<div class="widget-box">
+					<div class="widget-title">
+						<span class="icon"><i class="fa fa-info"></i></span>
+						<h5><spring:message code="title.cpUrlManagement.info" /></h5>
+					</div>
+					
+					<div class="widget-content nopadding">
+						<div class="form-horizontal">
+						
+							<div class="form-group">
+								<label class="col-sm-3 col-md-3 col-lg-3 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="cpUrlManagement.info.ApQuota" /></label>
+                                <label id="client_ap_quota" class="col-sm-2 col-md-2 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666">${ apQuota }</label>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-3 col-md-3 col-lg-3 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="cpUrlManagement.info.CpUrlQuantity" /></label>
+                                <label id="client_cp_url_quantity" class="col-sm-2 col-md-2 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666">${ cpUrlQuantity }</label>
+							</div>
+							
+							
+						</div>						
+					</div>
+					<div class="widget-title">
+					</div>
+				</div>
+			</div>
+			
+			
+		</div>
+	</div>
+	
+	
+	<!-- --------------------------------------------------------------- SEARCH FILTER --------------------------------------------------------------- -->
+	
+	<!-- ----------------------------------------------------------- CAPTIVEPORTAL TABLE ------------------------------------------------------------- -->
+	<div id="viewCps" class="container-fluid" >
+		<div class="row">
+			<div class="col-xs-12 center">
+
+				<div class="widget-box">
+					<div class="widget-title">
+						<span class="icon"><i class="fa fa-table"></i></span>
+						<h5><spring:message code="title.cpManagement.table" /></h5>
+					</div>
+					<div class="widget-content nopadding">
+						<table id ="cpTable" class="table table-bordered table-striped table-hover data-table" style="text-align: center">
+							<thead>
+								<tr>
+									<th width="0%"><spring:message code="table.cpManagement.columnname.id" /></th>
+									<th style="background-color: #E2E2E2; border-radius: 0;" width="20%"><spring:message code="table.cpManagement.columnname.name" /></th>
+									<th style="background-color: #DEDEDE; border-radius: 0;" width="20%"><spring:message code="table.cpManagement.columnname.description" /></th>
+									<th style="background-color: #DEDEDE; border-radius: 0;" width="15%"><spring:message code="table.cpManagement.columnname.type" /></th>
+									<th style="background-color: #E2E2E2; border-radius: 0;" width="20%"><spring:message code="table.cpManagement.columnname.domain" /></th>
+									<th style="background-color: #DEDEDE; border-radius: 0;" width="10%"><spring:message code="table.cpManagement.columnname.status" /></th>
+									<th style="background-color: #E2E2E2; border-radius: 0;" width="0%"><spring:message code="table.cpManagement.columnname.startdate" /></th>
+									<th style="background-color: #DEDEDE; border-radius: 0;" width="0%"><spring:message code="table.cpManagement.columnname.enddate" /></th>
+									<th width="0%">specialcode</th>
+									<th style="background-color: #E2E2E2; border-radius: 0;" width="10%"><spring:message code="table.columnname.detail" /></th>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr>
+									<td colspan="10" class="dataTables_empty" ><spring:message code="table.server.loading" /></td>
+								</tr>
+							</tbody>
+						</table>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- ----------------------------------------------------------- CAPTIVEPORTAL TABLE ------------------------------------------------------------- -->
+</div>
+
+	<!-- -------------------------------------------------------- CAPTIVEPORTAL TABLE POPUP ---------------------------------------------------------- -->
+	
+<div class="widget-content" id="dialog-form" title='<spring:message code="popupwindow.captiveportal.title"/>' style="margin-top: 20px; display:none">
+	<span id="mandatoryFields" style="float:right; margin-top: 8px; padding-right:12px; color:red;"><b>*&nbsp;<spring:message code="title.mandatoryfields" /></b></span>
+	<div id="addCpAjaxLoading" style="margin-top: 15%; margin-left: 45%; display: none" ><img src="${ WEBAPPS }/img/ajax-processing.gif"/><br><br></div>
+	<form id="addCp">
+	<div id="addCpMainPanel" class="form-horizontal">
+	
+		<input id="cp_id" type="hidden" />
+		
+		<div class="form-group">
+			<label class="col-sm-3 col-md-3 col-lg-3 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="table.cpManagement.columnname.name" /></label>
+            <div class="col-sm-8 col-md-8 col-lg-7">
+                <input class="form-control input-sm" id="cp_name" name="cp_name" type="text" />
+            </div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-3 col-md-3 col-lg-3 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="table.cpManagement.columnname.description" /></label>
+            <div class="col-sm-8 col-md-8 col-lg-7">
+                <input class="form-control input-sm" id="cp_description" name="cp_description" type="text" />
+            </div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-3 col-md-3 col-lg-3 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="table.cpManagement.columnname.type" /></label>
+            <div class="col-sm-8 col-md-8 col-lg-7">
+                <select id="auth_type_id" style="width:100%">
+              		<c:forEach items="${AuthenticationTypeList}" var="a">									  				
+		  				<option value="${a.authTypeId}">${a.authTypeName}</option>
+	  				</c:forEach>
+				</select>
+            </div>
+		</div>
+		
+		<input type="hidden" id="domain_name" name="domain_name" value="${WILAS_DOMAIN_NAME}">
+		
+		<div class="form-group">
+			<label class="col-sm-3 col-md-3 col-lg-3 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="table.cpManagement.columnname.status" /></label>
+            <div class="col-sm-8 col-md-8 col-lg-7">
+                <select id="status" style="width:100%">
+                  	<option value="1"><spring:message code="drowdown.active"/></option>
+                  	<option value="0"><spring:message code="drowdown.suspend"/></option>
+				</select>
+            </div>
+		</div>
+		
+		<%-- <div class="form-group" >
+			<label class="col-sm-3 col-md-3 col-lg-3 control-label" style=" font-weight: bold; font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="table.cpManagement.columnname.startdate" /></label>
+			<div class="col-sm-9 col-md-9 col-lg-9">
+				<div class='input-group date' id='datetimePickerStartDate' style="width: 76.8%">
+<!-- Start Date Calendar --> <input id="startdate" name="startdate" type='text' style="width: 100%"/>
+						<span class="input-group-addon" style="width: 15%">
+							<span class="fa fa-calendar"></span>
+						</span>
+				</div>
+			</div>
+			<div id="startDateError" name="startDateError"  style="margin-left:28.5%"></div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-3 col-md-3 col-lg-3 control-label" style=" font-weight: bold; font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="table.cpManagement.columnname.enddate" /></label>
+			<div class="col-sm-9 col-md-9 col-lg-9">
+				<div class='input-group date' id='datetimePickerEndDate' style="width: 76.8%">
+<!--  End Date Calendar -->	<input id="enddate" name="enddate" type='text' style="width: 100%"/>
+						<span class="input-group-addon" style="width: 15%">
+							<span class="fa fa-calendar"></span>
+						</span>
+				</div>
+			</div>
+			<div id="endDateError" name="endDateError" style="margin-left:28.5%"></div>
+		</div> --%>
+		
+		<div class="form-group">
+			<label class="col-sm-3 col-md-3 col-lg-3 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="table.cpManagement.columnname.remark" /></label>
+            <div class="col-sm-8 col-md-8 col-lg-7">
+                <textarea class="form-control input-sm" id="remarks" name="remarks"  rows="6" cols="22"></textarea>
+            </div>
+		</div>
+		
+	</div>
+	</form>
+</div>
+
+	<!-- -------------------------------------------------------- CAPTIVEPORTAL TABLE POPUP ---------------------------------------------------------- -->
+
+	<!-- -------------------------------------------------------- CAPTIVEPORTAL NOTIFICATION POPUP ---------------------------------------------------------- -->
+	
+	<div class="widget-content" id="notAllowCreate" style="display:none" title='<spring:message code="alertbox.title"/>'>
+		<div class="form-horizontal" style="position: relative; top: 40%; text-align:center; font-size:18px">
+			<spring:message code="cp.url.create.fail"/>
+		</div>
+	</div>
+
+	<!-- -------------------------------------------------------- CAPTIVEPORTAL NOTIFICATION POPUP ---------------------------------------------------------- -->
+	<!-- -------------------------------------------------------- DELETE CONFIRMATION POPUP WINDOW --------------------------------------------------------------- -->
+	
+	<div class="widget-content" id="deleteConfirm" title='<spring:message code="alert.notification"/>' style="margin-top: 20px; display: none">
+		<div id="mainPanel" class="form-horizontal" style="position: relative; top: 40%; text-align:center; font-size:18px">
+			Do you want to delete the captive portal(s)?
+		</div>
+	</div>
+	
+	<!-- -------------------------------------------------------- DELETE CONFIRMATION POPUP WINDOW --------------------------------------------------------------- -->
+<script src="../js/custom/licenses_cp_url_management.js"></script>
+
+<%@ include file="../include/copyright.jsp"%>
+<%@ include file="../home/footer.jsp"%>

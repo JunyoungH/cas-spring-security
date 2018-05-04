@@ -1,0 +1,153 @@
+<%@ page pageEncoding="UTF-8"%>
+<%@ include file="../include/import.jsp"%>
+<%@ include file="../home/header.jsp"%>
+<jsp:include page="../home/leftnav.jsp" />
+
+
+<div id="WEBAPPS" style="display: none;">${ WEBAPPS }</div>
+<div id="content">
+	<div id="content-header">
+		<h1>Facebook Like</h1>
+	</div>
+ 
+
+	<div id="breadcrumb">
+		<a href="${ WEBAPPS }/main${ SPRING_EXT }" title="<spring:message code="breadcrumb.home.title" />" class="tip-bottom"><i class="icon-home"></i><spring:message code="breadcrumb.home" /></a> 
+		<a href="">Facebook Like</a> 
+		<a class="current">Facebook Like</a>
+	</div>
+	
+	<!-- ----------------------------------------------------------- ACCOUNT ADDING FORM ------------------------------------------------------------ -->
+	<div class="container-fluid" >
+		<div class="row">
+			<div class="col-xs-12 center">
+				
+				
+				<div class="widget-box">
+					<div class="widget-title">
+						<span class="icon"><i class="fa fa-plus-circle"></i></span>
+						<h5>Facebook Like</h5>
+					</div>
+					
+					<div class="widget-content nopadding">
+						<div class="form-horizontal">
+						
+							<div class="form-group">
+								<div class="fb-page" 
+								  data-href="https://www.facebook.com/TechStudioSolutions"
+								  data-width="380" 
+								  data-hide-cover="false"
+								  data-show-facepile="false" 
+								  data-show-posts="false"></div>
+							</div>
+							
+						</div>
+					</div>
+					
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- ----------------------------------------------------------- ACCOUNT ADDING FORM ------------------------------------------------------------ -->
+</div>
+<script>
+
+window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '869172546520662',
+	  status     : true,
+      xfbml      : true,
+	  cookie     : true,
+      version    : 'v2.7',
+	  scope      : 'user_likes'
+    });
+	FB.Event.subscribe('edge.create', function(response) {
+		window.location.href = "http://techstudio.com.sg/";
+	});
+	/*
+	FB.api({ method: 'pages.isFan', page_id: '10150094098045010' }, function(response) {
+		if (response) {
+			console.log(response);
+		  alert("user has liked the page");
+		} else {
+			console.log(response);
+		  alert("user has not liked the page");
+		}
+	});
+	*/
+  };
+
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+/*
+function facebook(){
+	
+	FB.getLoginStatus(function(response) {
+		if (response.status === 'connected') {
+			console.log('Logged in.');
+			isFunofTechstudio();
+		}else {
+			FB.login(function(){
+				isFunofTechstudio();
+			});
+		}
+	  
+	});
+}
+
+function isFunofTechstudio(){
+	var techstudio_page_id = '10150094098045010';
+	//var p_accessToken = FB.getAuthResponse()['accessToken'];
+	var p_accessToken = 'EAACEdEose0cBAIZCnaamcqBDdfEmZCZBj5hAqZBE1DkjHCZBg6ku0ZCZAaypZBDKA620d4SEapYM5gqeLzuPHShPZAQpriFQ7oZAqyrSYc1ESKFeppwXzgwl4tVgexIS5jey1qRDSKLyyRxpxu2ou2KkWYeJdHRgAvcbZCZCXcZBnuhhpbgZDZD';
+	console.log("Access Token: "+p_accessToken);
+	FB.api(
+			"/me/likes/"+techstudio_page_id,
+			{access_token: p_accessToken},
+			function (response) {
+			  if (response && !response.error) {
+				  if(response.data.length === 1){
+					 window.location.href = "http://techstudio.com.sg/";
+				  }else{
+					 alert("Please 'Like' our page!"); 
+				  }
+			  }else{
+				  console.log("Error!");
+			  }
+			}
+		);
+}
+
+
+var unlikeButtonInterval = setInterval(function(){
+	var unlikeButton = document.getElementsByClassName("pluginConnectButtonDisconnected");
+	console.log(unlikeButton);
+	if(typeof(unlikeButton) != 'undefined' && unlikeButton != null && unlikeButton.length > 0){
+		clearInterval(unlikeButtonInterval);
+		alert("ok");
+		unlikeButton[0].addEventListener("click",function(e){
+			alert("Please 'Like' our page!");
+		});
+	}
+}, 1000);
+
+var likeButtonInterval = setInterval(function(){
+	var likeButton = document.getElementsByClassName("pluginConnectButtonConnected");
+	if(typeof(likeButton) != 'undefined' && likeButton != null){
+		clearInterval(likeButtonInterval);
+		likeButton[0].addEventListener("click",function(e){
+			window.location.href = "http://techstudio.com.sg/";
+		});
+	}
+}, 1000);
+*/
+
+</script>
+<%@ include file="../include/copyright.jsp"%>
+<%@ include file="../home/footer.jsp"%>	

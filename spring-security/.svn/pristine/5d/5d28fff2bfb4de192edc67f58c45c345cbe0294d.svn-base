@@ -1,0 +1,14 @@
+/**
+ * JS for Select2 Patch
+ */
+
+$(document).ready(function(){
+	
+	$('#undo_redo').multiselect();
+	
+	$('#s2id_undo_redo').remove();
+	$('#s2id_undo_redo_to').remove();
+	$('#undo_redo').removeClass('select2-offscreen');
+	$('#undo_redo_to').removeClass('select2-offscreen');
+	
+});

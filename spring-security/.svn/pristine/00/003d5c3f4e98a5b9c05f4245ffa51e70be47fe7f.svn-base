@@ -1,0 +1,246 @@
+package com.techstudio.service.am;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.techstudio.common.AjaxListResponse;
+import com.techstudio.dao.am.OrganizationDao;
+import com.techstudio.dao.am.OrganizationSpecifications;
+import com.techstudio.dao.am.RoleDao;
+import com.techstudio.model.am.OrganizationDTO;
+import com.techstudio.model.am.filter.DataTableParameterObj;
+import com.techstudio.model.am.filter.OrganizationFilterObj;
+import com.techstudio.util.PrincipalUtils;
+
+@Service
+public class LicensesServiceImpl extends BaseService{
+	
+	private static final Logger log = Logger.getLogger(LicensesServiceImpl.class);
+	
+	private static final int ORGANIZATION_VIEW_LAYERS = 1;
+	
+	private static final String QUOTA_COLUMN_0 = "organizationId";
+	private static final String QUOTA_COLUMN_1 = "companyName";
+	private static final String QUOTA_COLUMN_2 = "contactEmail";
+	private static final String QUOTA_COLUMN_3 = "contactMobile";
+	private static final String QUOTA_COLUMN_4 = "techContactEmail";
+	
+	private static final int ORGANIZATION_DELETE_FLAG_NORMAL = 0;
+	private static final int ORGANIZATION_DELETE_FLAG_DELETED = 1;
+	
+	@Value("${total.ap.quota}")
+	private String TOTAL_AP_QUOTA;
+	
+	@Value("${total.device.quota}")
+	private String TOTAL_DEVICE_QUOTA;
+	
+	@Autowired  
+	private MessageSource messageSource;
+	
+	@Autowired
+	private OrganizationDao organizationDao;
+	
+	@Autowired
+	private RoleDao roleDao;
+	
+	
+	@Transactional
+	public AjaxListResponse getLicensesAjaxListResponse(
+			OrganizationFilterObj filter,
+			DataTableParameterObj dataTableParameters) {
+		
+		log.debug("LicensesServiceImpl | getOrganizationAjaxListResponse | entry");
+		
+		Specification<OrganizationDTO> searchSpec = OrganizationSpecifications.getOrganizationQuotaListByFilter(ORGANIZATION_VIEW_LAYERS, filter);
+        List<OrganizationDTO> searchResults = organizationDao.findAll(searchSpec);
+		Long totalRecords = (long)searchResults.size();
+		
+		Pageable pageRequest =  setUpPageRequest(dataTableParameters);
+		Page<OrganizationDTO> onePageSearchResults = organizationDao.findAll(searchSpec, pageRequest);
+		
+		AjaxListResponse resp = setUpAjaxListResponse(dataTableParameters.getsEcho(), totalRecords, onePageSearchResults, filter.getLoginHierarchyLevel());
+		
+		log.debug("LicensesServiceImpl | getOrganizationAjaxListResponse | exit");
+		return resp;
+	}
+
+	private Pageable setUpPageRequest(DataTableParameterObj dataTableParameters) {
+		
+		log.debug("LicensesServiceImpl | setUpPageRequest() | entry");
+		
+		String columnName = QUOTA_COLUMN_0;
+		switch(dataTableParameters.getiSortCol_0()) {
+			case 0: columnName=QUOTA_COLUMN_0;
+					break;
+			case 1: columnName=QUOTA_COLUMN_1;
+					break;
+			case 2: columnName=QUOTA_COLUMN_2;
+					break;
+			case 3: columnName=QUOTA_COLUMN_3;
+					break;
+			case 4: columnName=QUOTA_COLUMN_4;
+					break;
+			default: columnName=QUOTA_COLUMN_0;
+					break;
+		}
+		
+		int displayLength = dataTableParameters.getiDisplayLength();
+		int pageIndex = dataTableParameters.getiDisplayStart()/displayLength;
+		
+		Direction direction = Sort.Direction.ASC;
+		
+		if(StringUtils.equals(dataTableParameters.getsSortDir_0(), SORT_DIRECTION)) {
+			direction = Sort.Direction.ASC;
+		}else {
+			direction = Sort.Direction.DESC;
+		}
+		
+		log.debug("LicensesServiceImpl | setUpPageRequest() | exit");
+		return new PageRequest(pageIndex, displayLength, direction, columnName);
+	}
+	
+	private AjaxListResponse setUpAjaxListResponse(
+			String sEcho, Long totalRecords,
+			Page<OrganizationDTO> onePageSearchResults, int currentLoginHierarchyLevel) {
+		
+		log.debug("LicensesServiceImpl | AjaxListResponse() | entry");
+		
+		AjaxListResponse resp = new AjaxListResponse();
+		resp.setsEcho(sEcho);
+		resp.setiTotalRecords(totalRecords);
+		resp.setiTotalDisplayRecords(totalRecords);
+		List<Map<String, Object>> aaList = new LinkedList<Map<String, Object>>();
+		for (OrganizationDTO o : onePageSearchResults) {
+			String quotaString =o.getQuota();
+			String[] splitQuota = quotaString.split(",");
+			String assignedString =o.getAssigned();
+			String[] splitAssigned = assignedString.split(",");
+			Map<String, Object> m = new HashMap<String, Object>();
+			m.put("0", showOuFromCurrentHierarchy(currentLoginHierarchyLevel, o.getOu()));
+			m.put("1", splitQuota[0]);
+			m.put("2", splitAssigned[0]);
+			m.put("3", splitQuota[1]);
+			m.put("4", splitAssigned[1]);
+			m.put("5", o.getOu());
+			m.put("DT_RowId", o.getOrganizationId());
+			aaList.add(m);
+		}
+	
+		resp.setAaData(aaList);
+		log.debug("LicensesServiceImpl | AjaxListResponse() | exit");
+		return resp;
+	}
+	
+	
+	@Transactional
+	public Map<String, Object> getQuotaInfomationByOu(String currentLoginOu) {
+		
+		log.debug("LicensesServiceImpl | getQuotaInfomationByOu() | entry");
+		Map<String, Object> resp = new HashMap<String, Object>();
+		
+		Integer ap_assigned = 0;
+		Integer device_assigned = 0;
+		
+		if(StringUtils.isBlank(currentLoginOu)) {
+			
+			List<OrganizationDTO> organizationList = organizationDao.findByDeleteFlagNotAndHierarchyLevel(ORGANIZATION_DELETE_FLAG_DELETED, PrincipalUtils.getHierarchyLevelByOu(currentLoginOu)+1);
+			for (OrganizationDTO o : organizationList) {
+				String quotaString = o.getQuota();
+				String[] splitQuota = quotaString.split(",");
+				ap_assigned += Integer.valueOf(splitQuota[0]);
+				device_assigned += Integer.valueOf(splitQuota[1]);
+			}
+			
+			resp = setUpQuotaInfoRespond(TOTAL_AP_QUOTA, ap_assigned.toString(), TOTAL_DEVICE_QUOTA, device_assigned.toString());
+			
+		}else {
+			
+			OrganizationDTO organizationDTO = organizationDao.findByOu(currentLoginOu).get(0);
+			log.debug("LicensesServiceImpl | getQuotaInfomationByOu() | currentLoginOu: "+currentLoginOu);
+			log.debug("LicensesServiceImpl | getQuotaInfomationByOu() | OrganizationDTO: "+organizationDTO.toString());
+			String quotaString = organizationDTO.getQuota();
+			String[] splitQuota = quotaString.split(",");
+			
+			List<OrganizationDTO> organizationList = organizationDao.findByDeleteFlagAndSuperior_Ou(ORGANIZATION_DELETE_FLAG_NORMAL, currentLoginOu);
+			for (OrganizationDTO o : organizationList) {
+				String subOrgQuotaString = o.getQuota();
+				String[] subOrgSplitQuota = subOrgQuotaString.split(",");
+				ap_assigned += Integer.valueOf(subOrgSplitQuota[0]);
+				device_assigned += Integer.valueOf(subOrgSplitQuota[1]);
+			}
+			
+			resp = setUpQuotaInfoRespond(splitQuota[0], ap_assigned.toString(), splitQuota[1], device_assigned.toString());
+			
+		}
+		
+		log.debug("LicensesServiceImpl | getQuotaInfomationByOu() | exit");
+		return resp;
+	}
+	
+	private Map<String, Object> setUpQuotaInfoRespond(String apQuota, 
+			String apAssigned, String deviceQuota,
+			String deviceAssigned) {
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		map.put("ap_quota", apQuota);
+		map.put("ap_assigned", apAssigned);
+		map.put("device_quota", deviceQuota);
+		map.put("device_assigned", deviceAssigned);
+		
+		return map;
+	}
+	
+	@Transactional
+	public  void editQuota(String ou, String ap_quota, String device_quota,
+			String currentLoginOu) throws Exception{
+		
+		log.debug("LicensesServiceImpl | editQuota() | entry");
+		OrganizationDTO orginalSubodinate = organizationDao.findByOu(ou).get(0);
+		String orginalSubodinateQuotaString = orginalSubodinate.getQuota();
+		String[] splitOrginalSubodinateQuota = orginalSubodinateQuotaString.split(",");
+		String orginalSubodinateApQuota = splitOrginalSubodinateQuota[0];
+		String orginalSubodinateDeviceQuota = splitOrginalSubodinateQuota[1];
+		log.debug("LicensesServiceImpl | editQuota() | orginalSubodinateApQuota: "+orginalSubodinateApQuota);
+		orginalSubodinate.setQuota(ap_quota+","+device_quota);
+		organizationDao.save(orginalSubodinate);
+			
+		if(!StringUtils.isBlank(currentLoginOu)){
+			
+			OrganizationDTO currentLoginOrganizationDTO = organizationDao.findByOu(currentLoginOu).get(0);
+			
+			String parentAssignedString = currentLoginOrganizationDTO.getAssigned();
+			String[] splitParentAssigned = parentAssignedString.split(",");
+			String parentApAssigned = splitParentAssigned[0];
+			String parentDeviceAssigned = splitParentAssigned[1];
+			log.debug("LicensesServiceImpl | editQuota() | parentApAssigned: "+parentApAssigned);
+			
+			Integer apAssignedResult = Integer.valueOf(parentApAssigned)+Integer.valueOf(ap_quota)-Integer.valueOf(orginalSubodinateApQuota);
+			log.debug("LicensesServiceImpl | editQuota() | apAssignedResult: "+apAssignedResult);
+			Integer deviceAssignedResult = Integer.valueOf(parentDeviceAssigned)+Integer.valueOf(device_quota)-Integer.valueOf(orginalSubodinateDeviceQuota);
+			currentLoginOrganizationDTO.setAssigned(apAssignedResult.toString()+","+deviceAssignedResult.toString());
+			
+			organizationDao.save(currentLoginOrganizationDTO);
+			
+		}
+		log.debug("LicensesServiceImpl | editQuota() | exit");
+	}
+	
+	
+}

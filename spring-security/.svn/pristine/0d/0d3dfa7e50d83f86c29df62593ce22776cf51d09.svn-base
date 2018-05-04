@@ -1,0 +1,55 @@
+package com.techstudio.service.am;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.techstudio.dao.am.AuthenticationTypeDao;
+import com.techstudio.model.am.AuthenticationTypeDTO;
+
+@Service
+public class AuthenticationTypeServiceImpl extends BaseService{
+	
+	private static final Logger log = Logger.getLogger(AuthenticationTypeServiceImpl.class);
+	
+	@Autowired
+	private AuthenticationTypeDao authenticationTypeDao;
+	
+	@Transactional
+	public List<AuthenticationTypeDTO> getAuthenticationTypeListExcept(String authenticationName) {
+		
+		log.debug("AuthenticationTypeServiceImpl | getAuthenticationTypeListExcept | entry");
+		
+		List<AuthenticationTypeDTO> authenticationTypeList = authenticationTypeDao.findByAuthTypeNameNot(authenticationName);
+		
+		log.debug("AuthenticationTypeServiceImpl | getAuthenticationTypeListExcept | exit");
+		return authenticationTypeList;
+	}
+
+	@Transactional
+	public List<AuthenticationTypeDTO> getAuthenticationTypeListOnly() {
+		
+		log.debug("AuthenticationTypeServiceImpl | getAuthenticationTypeListOnly | entry");
+		//auth_type_id 1 to 1000 for Auth Type 
+		//auth_type_id 1000 and above for page_type
+		//auth_type_id 1 for Landing Page
+		List<AuthenticationTypeDTO> authenticationTypeList = authenticationTypeDao.findByAuthTypeIdBetween(2l,  1000l);
+		
+		log.debug("AuthenticationTypeServiceImpl | getAuthenticationTypeListOnly | exit");
+		return authenticationTypeList;
+	}
+	
+	@Transactional
+	public List<AuthenticationTypeDTO> getAllAuthTypeAndPageType() {
+		
+		log.debug("AuthenticationTypeServiceImpl | getAllAuthTypeAndPageType | entry");
+		
+		List<AuthenticationTypeDTO> authenticationTypeList = authenticationTypeDao.findByAuthTypeIdGreaterThanEqual(0l);
+		
+		log.debug("AuthenticationTypeServiceImpl | getAllAuthTypeAndPageType | exit");
+		return authenticationTypeList;
+	}
+}

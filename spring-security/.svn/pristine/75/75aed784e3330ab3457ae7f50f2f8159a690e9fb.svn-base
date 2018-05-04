@@ -1,0 +1,19 @@
+package com.techstudio.dao.am;
+
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.techstudio.dao.BaseJPARepository;
+import com.techstudio.model.am.RoleFunctionDTO;
+
+
+@Repository
+public interface RoleFunctionDao extends BaseJPARepository<RoleFunctionDTO, Long> {
+
+	List<RoleFunctionDTO> findByRoleDTO_RoleId(Long roleId)throws Exception;
+
+	void deleteByRoleDTO_RoleId(Long roleId)throws Exception;
+
+}

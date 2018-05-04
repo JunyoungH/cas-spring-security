@@ -1,0 +1,296 @@
+/**
+ * JS for Licenses Quota Management
+ */
+
+$(document)
+		.ready(
+				function() {
+					
+					get_quota_information();
+					
+					var organization_ap_quota;
+					var account_device_quota;
+					
+					var quotaTable = $('#quotaList').DataTable({
+						"bSort" : true,
+						"bServerSide" : true,
+						"sDom" : '<""l>t<"F"p>',
+						"bJQueryUI" : true,
+						"bSearchable" : false,
+						"sPaginationType" : "full_numbers",
+						"sAjaxSource" : "ajax_quota_list"+$("#SPRING_EXT").html(),
+						"columnDefs": [
+										
+										{
+										    "targets": [3],
+										    "visible": false,
+										    "class":"hide_column"
+										},
+										{
+										    "targets": [4],
+										    "visible": false,
+										    "class":"hide_column"
+										},
+										{
+										    "targets": [5],
+										    "visible": false,
+										    "class":"hide_column"
+										},
+										{
+											"targets": -1,
+											"data":null,
+											"orderable": false,
+											"defaultContent": "<button class='fa fa-pencil btn btn-success editQuota'></button>"
+										}
+						],
+						"language":  {
+				    	    "emptyTable":     $("#emptyTable").html(),
+				    	    "lengthMenu":     $("#lengthMenu").html(),
+				    	    "loadingRecords": $("#loadingRecords").html(),
+				    	    "processing":     $("#processing").html(),
+				    	    "zeroRecords":    $("#zeroRecords").html(),
+				    	    "paginate": {
+				    	        "first":      $("#firstDatatable").html(),
+				    	        "last":       $("#lastDatatable").html(),
+				    	        "next":       $("#nextDatatable").html(),
+				    	        "previous":   $("#prevDatatable").html()
+				    	    }
+				    	}
+					});
+					
+//					$("#resetButton").click(function(){
+//						
+//						 $("#ou").val("");
+//
+//					});
+//					
+//					$("#submitButton").click(function(){
+//						$( "#viewQuotas" ).show();
+//						quotaTable = null;
+//						quotaTable = $('#quotaList').DataTable({
+//							"bSort" : true,
+//							"bDestroy": true,
+//							"bServerSide" : true,
+//							"sDom" : '<""l>t<"F"p>',
+//							"bJQueryUI" : true,
+//							"bSearchable" : false,
+//							"sPaginationType" : "full_numbers",
+//							"sAjaxSource" : "ajax_quota_list"+$("#SPRING_EXT").html(),
+//							"fnServerParams": function (aoData) {
+//								aoData.push({"name": "ou", "value": $("#ou").val()});
+//							},
+//							"columnDefs": [
+//										    {
+//										        "targets": [0],
+//										        "visible": false
+//										       
+//										    },
+//											{
+//												"targets": -1,
+//												"data": null,
+//												"defaultContent": "<button class='btn btn-primary editQuota'><i class='fa fa-pencil-square-o'></i>&nbsp; Edit</button>"
+//											}
+//							],
+//							"language":  {
+//					    	    "emptyTable":     $("#emptyTable").html(),
+//					    	    "lengthMenu":     $("#lengthMenu").html(),
+//					    	    "loadingRecords": $("#loadingRecords").html(),
+//					    	    "processing":     $("#processing").html(),
+//					    	    "zeroRecords":    $("#zeroRecords").html(),
+//					    	    "paginate": {
+//					    	        "first":      $("#firstDatatable").html(),
+//					    	        "last":       $("#lastDatatable").html(),
+//					    	        "next":       $("#nextDatatable").html(),
+//					    	        "previous":   $("#prevDatatable").html()
+//					    	    }
+//					    	}
+//						});
+//						
+//					});
+					/* ------------------------------------------------Edit Quota Popup-----------------------------------------------------*/
+					var dialog_buttons = {}; 
+					
+					dialog_buttons[$("#hiddenButSave").html()] = function(){
+						
+						if(validator.valid()){
+							edit_quota();
+						}
+						
+					};
+					
+					dialog_buttons[$("#hiddenButCancel").html()] = function(){
+						dialogDiv.dialog("close");
+					};
+					
+					var dialogDiv = $("#dialog-form").dialog({
+						autoOpen : false,
+						resizable: false,
+						height : 270,
+						width : 600,
+						modal : true,
+						buttons : dialog_buttons,
+						close : function() {
+
+						},
+						show: {
+							effect: "puff",
+							duration: 500
+						},
+						hide: {
+							effect: "puff",
+							duration: 500
+						}
+					});
+					/* ------------------------------------------------Edit Quota Popup-----------------------------------------------------*/
+					
+					
+					/* ------------------------------------------------No Quota Popup-----------------------------------------------------*/
+					var no_quota_buttons = {}; 
+					
+					no_quota_buttons[$("#hiddenButOK").html()] = function(){
+						
+						noQuotaDiv.dialog("close");
+						
+					};
+					
+					var noQuotaDiv = $("#noQuota").dialog({
+						autoOpen : false,
+						resizable: false,
+						height : 270,
+						width : 600,
+						modal : true,
+						buttons : no_quota_buttons,
+						close : function() {
+
+						},
+						show: {
+							effect: "puff",
+							duration: 500
+						},
+						hide: {
+							effect: "puff",
+							duration: 500
+						}
+					});
+					/* ------------------------------------------------No Quota Popup-----------------------------------------------------*/
+					
+					
+					/* ------------------------------------------------Edit Quota------------------------------------------------------*/
+					
+					$('.data-table tbody').on('click','.editQuota', function() {
+						
+						if($("#organization_ap_quota").html()=="0"){
+							noQuotaDiv.dialog("open");
+						}else{
+							/*Clean the error message*/
+							validator.resetForm();
+							
+							var rowData = quotaTable.row( $(this).parents('tr') ).data();
+							$("#ou").val(rowData[5])
+							$("#readonly_ou").val(rowData[0])
+							$("#ap_quota").val(rowData[1]);
+							$("#has_ap_quota").val(rowData[1]);
+							organization_assigned_quota = rowData[2];
+							//$("#device_quota").val(rowData[3]);
+							//$("#has_device_quota").val(rowData[3]);
+							
+							dialogDiv.dialog("open");
+						}
+						
+						
+						
+					});
+					
+					/* ------------------------------------------------Edit Quota------------------------------------------------------*/
+					
+					
+					function edit_quota() {
+						
+						var ob = {
+							
+							'ou' : $("#ou").val(),
+							'ap_quota' : $("#ap_quota").val(),
+//							'device_quota' : $("#device_quota").val(),
+							'device_quota' : "0",
+							
+						};
+							
+						$.ajax({
+							
+							type : 'POST',
+							url : "ajax_edit_quota"+$("#SPRING_EXT").html(),
+							data : ob,
+							dataType : 'json',
+							success : function(data) {
+								
+								if(data){
+									alertNotification($("#quotaEditSuccess").html());
+								}else{
+									alertNotification($("#quotaEditFail").html());
+								}
+								
+								get_quota_information();
+								quotaTable.ajax.reload();
+								dialogDiv.dialog("close");
+								
+							}
+						});
+
+					 }
+					
+					function get_quota_information(){
+						
+						$.ajax({
+							type : 'GET',
+							url : "get_quota_info_by_ou"+$("#SPRING_EXT").html(),
+							dataType : 'json',
+							success : function(data) {
+								
+								$("#organization_ap_quota").html(data.ap_quota);
+								$("#organization_ap_assigned").html(data.ap_assigned);
+//								$("#account_device_quota").html(data.device_quota);
+//								$("#account_device_assigned").html(data.device_assigned);
+								
+							}
+						});
+						
+					}
+					
+				    var validator = $("#editQuota").validate({
+						rules:{
+							
+							ap_quota:{
+								required:true,
+								digits:true,
+								maxlength:10,
+								max:function(){ 
+									return parseInt($('#organization_ap_quota').html()) - parseInt($('#organization_ap_assigned').html()) + parseInt($('#has_ap_quota').val()) 
+								},
+							    min:function(){ 
+									return parseInt(organization_assigned_quota)
+								}
+							}
+//							device_quota:{
+//								required:true,
+//								digits:true,
+//								maxlength:10,
+//								max:function(){ 
+//									return parseInt($('#account_device_quota').html()) - parseInt($('#account_device_assigned').html()) + parseInt($('#has_device_quota').val())  
+//								}
+//							}
+							
+						},
+						errorClass: "help-inline",
+						errorElement: "span",
+						highlight:function(element, errorClass, validClass) {
+							$(element).parents('.form-group').removeClass('has-success').addClass('has-error');
+						},
+						unhighlight: function(element, errorClass, validClass) {
+							$(element).parents('.form-group').removeClass('has-error').addClass('has-success');
+						}
+					});
+				    
+					
+				});
+
+				

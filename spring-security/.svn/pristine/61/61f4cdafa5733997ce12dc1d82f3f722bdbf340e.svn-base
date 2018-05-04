@@ -1,0 +1,17 @@
+package com.techstudio.dao.am;
+
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.techstudio.dao.BaseJPARepository;
+import com.techstudio.model.am.HierarchyFunctionDTO;
+
+
+@Repository
+public interface HierarchyFunctionDao extends BaseJPARepository<HierarchyFunctionDTO, Long>{
+
+	List<HierarchyFunctionDTO> findByOrganizationAliasDTO_HierarchyLevel(Integer hierarchyLevel);
+
+}

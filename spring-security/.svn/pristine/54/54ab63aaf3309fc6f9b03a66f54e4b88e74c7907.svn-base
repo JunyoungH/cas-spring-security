@@ -1,0 +1,615 @@
+/**
+ * JS for Organization Captive Portal URL Management
+ */
+
+$(document)
+		.ready(
+				function() {
+					
+					var add_cp_ajax_success = false;
+					
+					var cpTable = $('#cpTable').DataTable({
+						"bSort" : true,
+						"bDestroy": true,
+						"bServerSide" : true,
+						"order": [[ 0, "desc" ]],
+						"sDom" : '<""l>t<"F"p>',
+						"bJQueryUI" : true,
+						"bSearchable" : false,
+						"sPaginationType" : "full_numbers",
+						"sAjaxSource" : "ajax_cp_list"+$("#SPRING_EXT").html(),
+						"fnServerParams": function (aoData) {
+							aoData.push({"name": "organization_id", "value": $("#organization_id").html()});
+						},
+						"columnDefs": [
+									    {
+									        "targets": [0],
+									        "visible": false
+									       
+									    },
+									    {
+									        "targets": [6],
+									        "visible": false
+									       
+									    },
+									    {
+									        "targets": [7],
+									        "visible": false
+									       
+									    },
+									    {
+									        "targets": [8],
+									        "visible": false
+									       
+									    },
+									    {
+											"targets": [9],
+											"orderable": false,
+										}
+						],
+						"language":  {
+				    	    "emptyTable":     $("#emptyTable").html(),
+				    	    "lengthMenu":     $("#lengthMenu").html(),
+				    	    "loadingRecords": $("#loadingRecords").html(),
+				    	    "processing":     $("#processing").html(),
+				    	    "zeroRecords":    $("#zeroRecords").html(),
+				    	    "paginate": {
+				    	        "first":      $("#firstDatatable").html(),
+				    	        "last":       $("#lastDatatable").html(),
+				    	        "next":       $("#nextDatatable").html(),
+				    	        "previous":   $("#prevDatatable").html()
+				    	    }
+				    	}
+					});
+					
+//					$("#datetimePickerStartDate").datetimepicker({
+//						format:'DD-MM-YYYY HH:mm:ss'
+//					});
+//					$("#datetimePickerEndDate").datetimepicker({
+//						format:'DD-MM-YYYY HH:mm:ss'
+//					});
+//					
+//					$("#datetimePickerStartDate").on("dp.change",function (e) {
+//						$('#datetimePickerEndDate').data("DateTimePicker").minDate(e.date);
+//						var rawtimestamp = $('#startdate').val();
+//						rawtimestamp = rawtimestamp.trim();
+//						var temp = rawtimestamp.split(' ');
+//						var rawdate = temp[0];
+//						var splitdate = rawdate.split('-');
+//						var year = splitdate[2];
+//						if(year != null){
+//							var intyear = parseInt(year, 10);
+//							intyear = intyear+2;
+//							year = intyear.toString();
+//							$('#enddate').val(splitdate[0]+'-'+splitdate[1]+'-'+year+' '+temp[1]);
+//						}
+//					});
+//					
+//					$("#datetimePickerEndDate").on("dp.change",function (e) {
+//						$('#datetimePickerStartDate').data("DateTimePicker").maxDate(e.date);
+//					});
+					
+					
+		/* ----------------------------------------------CP Management------------------------------------------------------*/			
+					
+					
+					var action="add";
+					
+					var dialog_buttons = {}; 
+					
+					dialog_buttons[$("#hiddenButSave").html()] = function(){
+						
+						if($("#addCp").valid()){
+							$('#addCpAjaxLoading').show();
+							$('#addCpMainPanel').hide();
+							$('#mandatoryFields').hide();
+							basic_validate();
+						}
+						
+					};
+					
+					dialog_buttons[$("#hiddenButCancel").html()] = function(){
+						$('#addCpAjaxLoading').hide();
+						$('#addCpMainPanel').show();
+						$('#mandatoryFields').show();
+						dialogDiv.dialog("close");
+						$("#status").select2("enable",true);
+						$("#remarks").attr("disabled", false);
+					};
+
+					var dialogDiv = $("#dialog-form").dialog({
+						autoOpen : false,
+						resizable: false,
+						height : 530,
+						width : 950,
+						modal : true,
+						buttons : dialog_buttons,
+						close : function() {
+
+						},
+						show: {
+							effect: "puff",
+							duration: 500
+						},
+						hide: {
+							effect: "puff",
+							duration: 500
+						}
+					});
+					
+					
+					$('.data-table tbody').on('click','.editButton', function() {
+						
+						var rowData = cpTable.row($(this).parents('tr')).data();
+						var parameters = {
+								'id' : rowData[0]
+						};
+						$.ajax({
+							type : 'POST',
+							url : "get_captive_portal_by_cp_id"+$("#SPRING_EXT").html(),
+							data : parameters,
+							dataType : 'json',
+							success : function(data) {
+								
+								$("#cp_id").val(data.cpId);
+								$("#cp_name").val(data.cpName);
+								$("#cp_description").val(data.cpDescription);
+								$("#auth_type_id").val(data.authTypeId).change();
+								$("#auth_type_id").select2("enable",false);
+								$("#domain_name").val(data.domainName);
+								$("#status").val(data.status).change();
+								$("#status").select2("enable",false);
+								$("#remarks").val(data.remarks);
+								
+							}
+							
+						});
+						
+						action = "edit";
+						dialogDiv.dialog("open");
+						
+					});
+
+
+					$(document).on('click', '.data-table tbody tr', function() {
+						if ($(this).hasClass('checked')) {
+
+							$(this).removeClass('checked');
+
+						} else {
+							$(this).addClass('checked');
+						}
+					});
+					
+					/* ------------------------------------------------Not Allow Create Popup-----------------------------------------------------*/
+					var not_allow_create_buttons = {}; 
+					
+					not_allow_create_buttons[$("#hiddenButOK").html()] = function(){
+						
+						notAllowCreateDiv.dialog("close");
+						
+					};
+					
+					var notAllowCreateDiv = $("#notAllowCreate").dialog({
+						autoOpen : false,
+						resizable: false,
+						height : 270,
+						width : 600,
+						modal : true,
+						buttons : not_allow_create_buttons,
+						close : function() {
+
+						},
+						show: {
+							effect: "puff",
+							duration: 500
+						},
+						hide: {
+							effect: "puff",
+							duration: 500
+						}
+					});
+					/* ------------------------------------------------Not Allow Create Popup-----------------------------------------------------*/
+
+					$('#addButton').click(function() {
+						action = "add";
+						if(parseInt($("#client_cp_url_quantity").html(), 10)>=parseInt($("#client_ap_quota").html(), 10)){
+							$("#notAllowCreate").show();
+							notAllowCreateDiv.dialog("open");
+						}else{
+							cleanApplicationForm();
+							$("#dialog-form").show();
+							dialogDiv.dialog("open");
+						}
+						
+					});
+					
+					var delete_confirm_buttons = {}; 
+					
+					delete_confirm_buttons[$("#hiddenButYes").html()] = function(){
+						
+						var idSting = null;
+						var specialCodeString = null;
+						var idarr = [];
+						var spcialcodearr = [];
+						var selectedRows = cpTable.$('tr.checked');
+						
+						for (var j = 0; j < selectedRows.length; j++) {
+
+							idarr[j] = cpTable.row(selectedRows[j]).data()[0];
+							
+							spcialcodearr[j] = cpTable.row(selectedRows[j]).data()[8];
+							
+						}
+						
+						for (var i = 0; i < idarr.length; i++) {
+
+							if (i == 0){
+								idSting = idarr[0];
+								specialCodeString = spcialcodearr[0];
+							}else if (i > 0) {
+								idSting = idSting + "," + idarr[i];
+								specialCodeString = specialCodeString + "," + spcialcodearr[i];
+							}
+						}
+						
+						console.log(idSting);
+						console.log(specialCodeString);
+							
+						
+						if (idSting != null) {
+							var ob = {
+								'id' : idSting,
+								'special_code': specialCodeString
+							};
+
+							$.ajax({
+								type : 'POST',
+								url : 'cp_delete'+$("#SPRING_EXT").html(),
+								data : ob,
+								dataType : 'json',
+								success : function(data) {
+									console.log(data);
+									if(data){
+										alertNotification($("#cpDeleteSuccess").html());
+									}else {
+										alertNotification($("#cpDeletefail").html());
+									}
+								},
+								complete : function(xhr, status) {
+									getCpUrlQuantityByOu();
+									cpTable.ajax.reload();
+								}
+							});
+						}
+						deleteConfirmDiv.dialog("close");
+						
+					};
+					
+					delete_confirm_buttons[$("#hiddenButCancel").html()] = function(){
+						
+						deleteConfirmDiv.dialog("close");
+						
+					};
+					
+					var deleteConfirmDiv = $("#deleteConfirm").dialog({
+						autoOpen : false,
+						resizable: false,
+						height : 300,
+						width : $(window).width()*0.35,
+						modal : true,
+						position: ['center','center-20%'],
+						buttons : delete_confirm_buttons,
+						close : function() {
+
+						},
+						show: {
+							effect: "puff",
+							duration: 250
+						},
+						hide: {
+							effect: "puff",
+							duration: 250
+						}
+					});
+
+
+					$('#deleterow').click(function() {
+						
+						var selectedRows = cpTable.$('tr.checked');
+
+						if (selectedRows.length <= 0) {
+							
+							alertNotification($("#alert1least").html());
+							
+						} else {
+							
+							$("#deleteConfirm").show();
+							deleteConfirmDiv.dialog("open");
+							
+						}
+
+					});
+					 
+					function listCaptivePortal() {
+						
+						 cpTable = null;
+							cpTable = $('#cpTable').DataTable({
+								"bSort" : true,
+								"bDestroy": true,
+								"bServerSide" : true,
+								"order": [[ 0, "desc" ]],
+								"sDom" : '<""l>t<"F"p>',
+								"bJQueryUI" : true,
+								"bSearchable" : false,
+								"sPaginationType" : "full_numbers",
+								"sAjaxSource" : "ajax_cp_list"+$("#SPRING_EXT").html(),
+								"fnServerParams": function (aoData) {
+									aoData.push({"name": "organization_id", "value": $("#organization_id").html()});
+								},
+								"columnDefs": [
+											    {
+											        "targets": [0],
+											        "visible": false
+											       
+											    },
+											    {
+											        "targets": [6],
+											        "visible": false
+											       
+											    },
+											    {
+											        "targets": [7],
+											        "visible": false
+											       
+											    },
+											    {
+											        "targets": [8],
+											        "visible": false
+											       
+											    },
+											    {
+													"targets": [9],
+													"orderable": false,
+												}
+								],
+								"language":  {
+						    	    "emptyTable":     $("#emptyTable").html(),
+						    	    "lengthMenu":     $("#lengthMenu").html(),
+						    	    "loadingRecords": $("#loadingRecords").html(),
+						    	    "processing":     $("#processing").html(),
+						    	    "zeroRecords":    $("#zeroRecords").html(),
+						    	    "paginate": {
+						    	        "first":      $("#firstDatatable").html(),
+						    	        "last":       $("#lastDatatable").html(),
+						    	        "next":       $("#nextDatatable").html(),
+						    	        "previous":   $("#prevDatatable").html()
+						    	    }
+						    	}
+							});
+							$('select[name=dataTable_length]').select2();
+					}
+					
+
+					function basic_validate() {
+						
+						var ajax_run=false;
+						var ob;
+						var url;
+						
+						if (action == "add") {
+							ob = {
+									
+								'organization_id' : $("#organization_id").html(),
+								'cp_name' : $("#cp_name").val(),
+								'cp_description' : $("#cp_description").val(),
+								'cp_special_code' : $("#cp_special_code").val(),
+								'auth_type_id' : $("#auth_type_id").val(),
+								'domain_name' : $("#domain_name").val(),
+								'status' : $("#status").val(),
+//								'startdate' : $("#startdate").val(),
+//								'enddate' : $("#enddate").val(),
+								'remarks' : $("#remarks").val()
+								
+							};
+
+							url = "cp_add"+$("#SPRING_EXT").html();
+						} else {
+							ob = {
+									
+								'organization_id' : $("#organization_id").html(),
+								'cp_id' : $("#cp_id").val(),
+								'cp_name' : $("#cp_name").val(),
+								'cp_description' : $("#cp_description").val(),
+								'domain_name' : $("#domain_name").val(),
+								'status' : $("#status").val(),
+								'remarks' : $("#remarks").val()
+
+							};
+							url = "cp_edit"+$("#SPRING_EXT").html();
+						}
+						
+						$.ajax({
+							type : 'POST',
+							url : url,
+							data : ob,
+							dataType : 'html',
+							statusCode : {
+                                502: function(){
+                                	$('#addCpAjaxLoading').hide();
+									$('#addCpMainPanel').show();
+									$('#mandatoryFields').show();
+                                	alertNotification($("#cpLiteNotOnline").html());
+                                }
+                            },
+							success : function(data) {
+								
+								console.log("return by cp: "+data);
+								if(data=="true"){
+									add_cp_ajax_success = true;
+									alertNotification($("#cpUpdateSuccess").html());
+								}else if(data=="false"){
+									alertNotification($("#cpUpdatefail").html());
+								}else{
+									alertNotification($("#apiUnknownError").html());
+								}
+								
+								$('#addCpAjaxLoading').hide();
+								$('#addCpMainPanel').show();
+								$('#mandatoryFields').show();
+								if(add_cp_ajax_success){
+									getCpUrlQuantityByOu();
+									cpTable.ajax.reload();
+								}
+								dialogDiv.dialog("close");
+								
+							}
+							
+						});
+
+					}
+
+					function listId(ObjectTable) {
+						var artmp = [];
+						var selectedRows = ObjectTable.$('tr.checked');
+
+						var url = "";
+
+						if (selectedRows.length <= 0) {
+							
+							alertNotification($("#alert1least").html());
+							return null;
+							
+						} else {
+
+							for (var j = 0; j < selectedRows.length; j++) {
+
+								artmp[j] = ObjectTable.row(selectedRows[j]).data()[9];
+								
+							}
+
+							for (var i = 0; i < artmp.length; i++) {
+
+								if (i == 0)
+									url = artmp[0];
+
+								if (i > 0) {
+									url = url + "," + artmp[i];
+								}
+							}
+
+							console.log(url);
+							return url;
+
+						}
+					}
+					
+					function getCpUrlQuantityByOu(){
+						
+						var parameters = {
+								
+								'ou' : $("#login_ou").html(),
+								
+						};
+						
+						$.ajax({
+							type : 'POST',
+							url : 'get_cp_url_quantity_by_ou'+$("#SPRING_EXT").html(),
+							data : parameters,
+							dataType : 'json',
+							success : function(data) {
+								
+								$("#client_cp_url_quantity").html(data);
+								
+							}
+							
+						});
+					}
+					
+					function cleanApplicationForm(){
+						
+						$("#cp_name").val("");
+						$("#cp_description").val("");
+						$("#auth_type_id").select2("enable",true);
+						$("#auth_type_id").val("2").change();
+//						$("#domain_name").val($("#WILAS_DOMAIN_NAME").html()).change();
+						$("#status").val("1").change();
+//						$("#startdate").attr("disabled", false);
+//						$("#enddate").attr("disabled", false);
+//						$("#startdate").val("");
+//						$("#enddate").val("");
+						$("#remarks").val("");
+						$("#auth_type_id").show();
+						validator.resetForm();
+						
+					}
+					
+					var validator = $("#addCp").validate({
+						rules:{
+							
+							cp_name:{
+								required:true,
+								maxlength:98
+							},
+							cp_description:{
+								maxlength:250
+							},
+//							startdate:{
+//								required:true
+//							},
+//							enddate:{
+//								required:true
+//							},
+							remarks:{
+								maxlength:250
+							}
+							
+						},
+						messages: {
+							
+							cp_name:{
+								required:$("#errormsgCpNameRequired").html(),
+								maxlength:$("#errormsgMaxlength98").html()
+							},
+							cp_description:{
+								maxlength:$("#errormsgMaxlength250").html()
+							},
+//							startdate:{
+//								required:$("#errormsgStartdateRequired").html(),
+//								maxlength:$("#errormsgMaxlength10").html()
+//							},
+//							enddate:{
+//								required:$("#errormsgEnddateRequired").html(),
+//								maxlength:$("#errormsgMaxlength10").html()
+//							},
+							remarks:{
+								maxlength:$("#errormsgMaxlength250").html()
+							}
+							
+						},
+						errorClass: "help-inline",
+						errorElement: "span",
+						errorPlacement: function (error, element) {
+							
+							if (element.attr("name") == "startdate" ){
+								
+								$("#startDateError").html( error );
+								
+							}else if (element.attr("name") == "enddate" ){
+								
+								$("#endDateError").html( error );
+								
+							}else{
+								error.insertAfter(element);
+							}
+								
+						},
+						highlight:function(element, errorClass, validClass) {
+							$(element).parents('.form-group').removeClass('has-success').addClass('has-error');
+						},
+						unhighlight: function(element, errorClass, validClass) {
+							$(element).parents('.form-group').removeClass('has-error').addClass('has-success');
+						}
+					});
+					
+				});

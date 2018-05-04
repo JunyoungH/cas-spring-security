@@ -1,0 +1,88 @@
+package com.techstudio.model.am;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+
+@Entity
+@Table(name="am_token" )
+public class TokenDTO implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2095104425032001063L;
+
+	@Id	
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name = "token_id", columnDefinition="bigint", unique = true, nullable=false)
+	private Long tokenId;
+	
+	@Column(name = "email", columnDefinition="varchar(150)", nullable=true)
+	private String email;
+	
+	@Column(name = "token", columnDefinition="varchar(50)", nullable=true)
+	private String token;
+	
+	@DateTimeFormat(pattern="dd-MM-yyyy HH:mm:ss")
+	@Column(name = "generated_date", columnDefinition="datetime")
+	private Date generatedDate;
+	
+//	@Transient
+//	private String ;
+
+/* Constructor (You can create an constructor for default value setting) */
+	
+	public TokenDTO(){
+		
+	}
+	
+/* Relationship */
+	
+	
+/* Getter and Setter */
+	
+
+	public Long getTokenId() {
+		return tokenId;
+	}
+
+	public void setTokenId(Long tokenId) {
+		this.tokenId = tokenId;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public Date getGeneratedDate() {
+		return generatedDate;
+	}
+
+	public void setGeneratedDate(Date generatedDate) {
+		this.generatedDate = generatedDate;
+	}
+
+	
+}

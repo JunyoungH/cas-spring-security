@@ -1,0 +1,394 @@
+package com.techstudio.form.controller.am;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.HttpSessionRequiredException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.techstudio.common.AjaxListResponse;
+import com.techstudio.common.StatusCode;
+import com.techstudio.form.controller.BaseController;
+import com.techstudio.model.am.RoleDTO;
+import com.techstudio.model.am.filter.DataTableParameterObj;
+import com.techstudio.service.am.HierarchyFunctionServiceImpl;
+import com.techstudio.service.am.OrganizationRoleServiceImpl;
+import com.techstudio.service.am.OrganizationServiceImpl;
+import com.techstudio.service.am.RoleFunctionServiceImpl;
+import com.techstudio.service.am.RoleServiceImpl;
+import com.techstudio.util.PrincipalUtils;
+
+@Controller
+public class RoleController extends BaseController{
+	
+	private static final Logger log = Logger.getLogger(RoleController.class);
+	
+	private static final boolean CONTAINING_SUPERIOR_OU = true;
+	private static final boolean ACTION_MANIPULATE = false;
+	
+	@Autowired  
+	private MessageSource messageSource;
+	
+	@Autowired
+	private OrganizationServiceImpl organizationService;
+	
+	@Autowired
+	private OrganizationRoleServiceImpl organizationRoleService;
+	
+	@Autowired
+	private RoleServiceImpl roleService;
+	
+	@Autowired
+	private RoleFunctionServiceImpl roleFunctionService;
+	
+	@Autowired
+	private HierarchyFunctionServiceImpl hierarchyFunctionService;
+
+	@Override
+	protected String getModuleFolder() {
+		return "role/";
+	}
+	
+	@ExceptionHandler(HttpSessionRequiredException.class)
+	public String handleTimeout() {
+		return getRedirectedLoginPath();
+	}
+	
+	
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ROLE_READ')")
+	@RequestMapping(value = {"role/index" + SPRING_EXT, "role/list" + SPRING_EXT}, method = RequestMethod.GET)
+	public String list_role(
+			) 
+	{
+		log.debug("RoleController | role/list | POST | entry");
+		log.debug("RoleController | role/list | POST | exit");
+		return goToPageJsp("list");
+            
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ROLE_CREATE', 'ROLE_AM_ROLE_READ', 'ROLE_AM_ROLE_UPDATE', 'ROLE_AM_ROLE_DELETE')")
+	@ResponseBody
+	@RequestMapping(value = "role/ajax_role_list" + SPRING_EXT, headers = "Accept=application/json")
+	public AjaxListResponse ajax_role_list(
+			String sEcho, 
+			int iDisplayStart, 
+			int iDisplayLength,
+			int iSortCol_0,
+			String sSortDir_0,
+			String sSearch,
+			Authentication principal
+			) 
+	{
+		
+		log.debug("RoleController | role/ajax_role_list | POST | entry");
+		
+		log.debug("RoleController | role/ajax_role_list | POST | iDisplayStart: "+ iDisplayStart);
+		log.debug("RoleController | role/ajax_role_list | POST | iDisplayLength: "+ iDisplayLength);
+		
+		DataTableParameterObj dataTableParameters = new DataTableParameterObj(sEcho, iDisplayStart, 
+				iDisplayLength, iSortCol_0, sSortDir_0, sSearch);
+		
+		String loginOu = getCurrentLoginOu(principal);
+		int loginHierarchyLevel = getCurrentLoginHierarchyLevel(loginOu);
+		AjaxListResponse resp = roleService.getRoleAjaxListResponse(loginOu, loginHierarchyLevel, dataTableParameters);
+		
+		log.info("|listRole()|"+StatusCode.READ_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|NO PARAMETER|List successfully.");
+		log.debug("RoleController | role/ajax_role_list | exit");
+		return resp;
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ROLE_CREATE')")
+	@RequestMapping(value = "role/add" + SPRING_EXT, method = RequestMethod.GET)
+	public String add_role(
+			Model model
+			, Authentication principal
+			) 
+	{
+		log.debug("RoleController | role/add | POST | entry");
+		
+		model.addAttribute("RoleDTO", new RoleDTO());	
+		String loginOu = getCurrentLoginOu(principal);
+		int loginHierarchyLevel = getCurrentLoginHierarchyLevel(loginOu);
+		model.addAttribute("ouList", organizationService.getSubodinatesOuList(loginHierarchyLevel, loginOu, CONTAINING_SUPERIOR_OU, ACTION_MANIPULATE));
+		
+		log.debug("RoleController | role/add | POST | exit");
+		return goToPageJsp("add");
+            
+	}
+	
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ROLE_CREATE')")
+	@RequestMapping(value = "role/add" + SPRING_EXT, method = RequestMethod.POST)
+	public String add_role_submit(
+			Model model,
+			@ModelAttribute("RoleDTO") RoleDTO roleDTO,
+			@RequestParam("function_ids") String assign_function_ids_list,
+			@RequestParam("ou") String ou,
+			HttpServletRequest req,
+			Authentication principal,
+			RedirectAttributes redirectAttrs,
+			Locale loc
+			) 
+	{
+		log.debug("RoleController | role/add | POST | entry");
+		try {
+			
+			roleService.saveRole(roleDTO);
+			log.debug("RoleController | role/add | new role "+roleDTO.getName()+" has created.");
+			
+			roleFunctionService.createRoleFunctionRelationship(assign_function_ids_list, roleDTO.getRoleId());
+			log.debug("RoleController | role/add | role-functions relationship has created.");
+			
+			organizationRoleService.createOrganizationRoleRelationship(organizationService.getOrganzationByOu(ou), roleDTO);
+			log.debug("RoleController | role/add | organization-role relationship has created.");
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|assignFunctions()|"+StatusCode.ASSIGN_FAILED+"|"+PrincipalUtils.getLoginUid(principal)+"|role_name: "+roleDTO.getName()+"|Assign failed.");
+			redirectAttrs.addFlashAttribute("errmsg", messageSource.getMessage("crud.respond.add.unsuccessful", null, loc));
+			return redirect("/role/add"+ SPRING_EXT);
+		}
+
+		log.debug("RoleController | role/add | POST | exit");
+		redirectAttrs.addFlashAttribute("errmsg", messageSource.getMessage("crud.respond.add.successful", null, loc));
+		return redirect("/role/list"+ SPRING_EXT);
+            
+	}
+
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ROLE_UPDATE')")
+	@RequestMapping(value = "role/edit" + SPRING_EXT, method = RequestMethod.GET)
+	public String edit_role(
+			Model model
+			, @RequestParam(required = true) Long id
+			, @RequestParam("organizationId") Long organizationId
+			, Authentication principal
+			) 
+	{
+		
+		log.debug("RoleController | role/edit | POST | entry");
+		
+		RoleDTO roleDTO = roleService.getRoleByRoleId(id);
+		String loginOu = getCurrentLoginOu(principal);
+		int loginHierarchyLevel = getCurrentLoginHierarchyLevel(loginOu);
+		model.addAttribute("ouList", organizationService.getSubodinatesOuList(loginHierarchyLevel, loginOu, CONTAINING_SUPERIOR_OU, ACTION_MANIPULATE));
+		model.addAttribute("RoleDTO", roleDTO);
+		model.addAttribute("currentOu", organizationService.findOne(organizationId).getOu());
+		
+		log.debug("RoleController | role/edit | POST | exit");
+		return goToPageJsp("edit");
+            
+	}
+	
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ROLE_UPDATE')")
+	@RequestMapping(value = "role/edit" + SPRING_EXT, method = RequestMethod.POST)
+	public String edit_role_submit(
+			Model model,
+			@ModelAttribute("RoleDTO") RoleDTO roleDTO,
+			@RequestParam("function_ids") String assign_function_ids_list,
+			@RequestParam("ou") String ou,
+			HttpServletRequest req,
+			Authentication principal,
+			RedirectAttributes redirectAttrs,
+			Locale loc
+			) 
+	{
+		/* Assign or update functions to role */
+		log.debug("RoleController | role/edit | POST | entry");
+		try {
+			
+			roleService.saveRole(roleDTO);
+			log.debug("RoleController | role/edit | role name: "+roleDTO.getName()+" has updated.");
+			
+			/* Remove functions in this role */
+			roleFunctionService.removeRoleFunctionRelationshipByRoleId(roleDTO.getRoleId());
+			log.debug("RoleController | role/edit | all records that role_id = "+roleDTO.getRoleId()+" have deleted from am_role_function table.");
+			
+			roleFunctionService.createRoleFunctionRelationship(assign_function_ids_list, roleDTO.getRoleId());
+			log.debug("RoleController | role/edit | role_id = "+roleDTO.getRoleId()+" role-functions relationship has created.");
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|assignFunctions()|NO ERRORCODE|"+PrincipalUtils.getLoginUid(principal)+"|role_id: "+roleDTO.getRoleId()+", role_name: "+roleDTO.getName()+"|Assign failed.");
+			redirectAttrs.addFlashAttribute("errmsg", messageSource.getMessage("crud.respond.edit.unsuccessful", null, loc));
+			return redirect("/role/edit"+ SPRING_EXT);
+		}
+
+		log.debug("RoleController | role/edit | POST | exit");
+		redirectAttrs.addFlashAttribute("errmsg", messageSource.getMessage("crud.respond.edit.successful", null, loc));
+		return redirect("/role/list"+ SPRING_EXT);
+            
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "role/get_available_functions" + SPRING_EXT, method = RequestMethod.POST)
+	public List<Map<String, Object>> get_available_functions(
+			Authentication principal
+			, @RequestParam("ou") String ou
+		)
+	{
+		
+		log.debug("RoleController | role/get_available_functions | POST | entry");
+		
+		/*Get functions only available for certain hierarchy*/
+		List<Map<String, Object>> availableFunctionsList = null;
+		Integer hierarchyLevel = null;
+		try {
+			hierarchyLevel = organizationService.getHierarchyLevelByOu(ou);
+			availableFunctionsList = hierarchyFunctionService.getHierarchyAvailabaleFunctionsByHierarchyLevel(hierarchyLevel);
+		
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|getAvailableFunctions()|"+StatusCode.READ_FAILED+"|"+PrincipalUtils.getLoginUid(principal)+"|hierarchy_level: "+hierarchyLevel+"|Get available functions failed.");
+		}
+		
+		log.info("|getAvailableFunctions()|"+StatusCode.READ_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|hierarchy_level: "+hierarchyLevel+"|Get available functions success.");
+		log.debug("RoleController | role/get_available_functions | POST | exit");
+		return availableFunctionsList;
+		
+	}
+
+	
+	@ResponseBody
+	@RequestMapping(value = "role/get_assigned_functions" + SPRING_EXT, method = RequestMethod.POST)
+	public List<Map<String, Object>> get_assigned_functions(
+			Authentication principal,
+			@RequestParam("role_id") Long roleId
+		)
+	{
+		
+		log.debug("RoleController | role/get_assigned_functions | POST | entry");
+		log.debug("RoleController | role/get_assigned_functions | POST | Role_id: "+ roleId);
+		
+		List<Map<String, Object>> assignedFunctionsList = null;
+		try {
+			assignedFunctionsList = roleFunctionService.getAssignedFunctionsInRoleByRoleId(roleId);
+		
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|getAssignedFunctions()|"+StatusCode.READ_FAILED+"|"+PrincipalUtils.getLoginUid(principal)+"|role_id: "+roleId+"|Get assigned functions failed.");
+		}
+		
+		log.info("|getAssignedFunctions()|"+StatusCode.READ_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|role_id: "+roleId+"|Get assigned functions success.");
+		log.debug("RoleController | role/get_assigned_functions | POST | exit");
+		return assignedFunctionsList;
+		
+	}
+
+	
+	@ResponseBody
+	@RequestMapping(value = "role/get_assignable_functions" + SPRING_EXT, method = RequestMethod.POST)
+	public List<Map<String, Object>> get_assignable_functions(
+			Authentication principal,
+			@RequestParam("role_id") Long roleId,
+			@RequestParam("ou") String ou
+		)
+	{
+		
+		log.debug("RoleController | role/get_assignable_functions | POST | entry");
+		log.debug("RoleController | role/get_assignable_functions | POST | Role_id: "+ roleId);
+		
+		/* Get functions only assignable for certain user category */
+		/* Assignable Functions = Available Functions - Assigned Functions */
+		List<Map<String, Object>> assignableFunctionsList = null;
+		Integer hierarchyLevel = null;
+		try {
+			hierarchyLevel = organizationService.getHierarchyLevelByOu(ou);
+			assignableFunctionsList = hierarchyFunctionService.getAssignableFunctionsByRoleIdAndHierarchyLevel(roleId, Integer.valueOf(hierarchyLevel));
+		
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|getAssignableFunctions()|"+StatusCode.READ_FAILED+"|"+PrincipalUtils.getLoginUid(principal)+"|role_id: "+roleId+", hierarchy_level: "+hierarchyLevel+"|Get assignable functions failed.");
+		}
+		
+		log.info("|getAssignableFunctions()|"+StatusCode.READ_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|role_id: "+roleId+", hierarchy_level: "+hierarchyLevel+"|Get assignable functions success.");
+		log.debug("RoleController | role/get_assignable_functions | POST | exit");
+		return assignableFunctionsList;
+		
+	}
+
+
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ROLE_DELETE')")
+	@ResponseBody
+	@RequestMapping(value = "role/role_delete" + SPRING_EXT, method = RequestMethod.POST, produces="application/json;charset=utf-8")
+	public String  role_delete(
+			@RequestParam("id") String idList,
+			HttpServletResponse rep,
+			Authentication principal,
+			Locale loc
+			)
+			
+	{
+		log.debug("RoleController | role/delete | POST | entry");
+		
+		String roleIsUsedByAccount = roleService.batchDeleteByRoleIdList(idList);
+		
+		if(StringUtils.isBlank(roleIsUsedByAccount)) {
+			log.debug("RoleController | role/delete | POST | These(This) role_id never used by user");
+			log.info("|deleteRole()|"+StatusCode.DELETE_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|role_id = "+idList + "|Delete successfully.");
+			log.debug("RoleController | role/delete | POST | exit");
+			return messageSource.getMessage("rolemgt.delete.success", null, loc);
+		}else {
+			log.debug("RoleController | role/delete | POST | These(This) role already used by user: "+ roleIsUsedByAccount);
+			log.info("|deleteRole()|"+StatusCode.DELETE_FAILED+"|"+PrincipalUtils.getLoginUid(principal)+"|role_id = "+idList + "|Delete failed.");
+			log.debug("RoleController | role/delete | POST | exit");
+			return messageSource.getMessage("rolemgt.delete.failed", null, loc);
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "role/check_unique_role_name" + SPRING_EXT, method = RequestMethod.POST)
+	public boolean checkUniqueRoleName(
+			@RequestParam("ou") String ou,
+			@RequestParam("roleName") String roleName
+		)
+	{
+		
+		log.debug("RoleController | account/check_unique_role_name | POST | entry");
+		
+		boolean isUniqueRoleName = roleService.isUniqueRoleName(ou, roleName);
+		
+		log.debug("RoleController | account/check_unique_role_name | POST | exit");
+		return isUniqueRoleName;
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "role/check_unique_role_name_exclude_role_name_is_being_editing" + SPRING_EXT, method = RequestMethod.POST)
+	public boolean checkUniqueRoleNameExcludeRoleNameIsBeingEditing(
+			@RequestParam("roleId") Long roleId,
+			@RequestParam("ou") String ou,
+			@RequestParam("roleName") String roleName
+		)
+	{
+		
+		log.debug("RoleController | role/check_unique_role_name_exclude_role_name_is_being_editing | POST | entry");
+		
+		boolean isUniqueRoleName = roleService.checkUniqueRoleNameExcludeRoleNameIsBeingEditing(roleId, ou, roleName);
+		
+		log.debug("RoleController | role/check_unique_role_name_exclude_role_name_is_being_editing | POST | exit");
+		return isUniqueRoleName;
+		
+	}
+
+
+}

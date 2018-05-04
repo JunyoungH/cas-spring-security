@@ -1,0 +1,471 @@
+<%@ include file="../include/import.jsp"%>
+
+
+<div id="sidebar">
+	<ul>
+	
+		<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("dashboard")>=0){ %> class="active" <%}else { %>  <% }  %> >
+			<a href="${ MODULE_ROOT_DASHBOARD }"><i class="fa fa-home"></i><span><spring:message code="menu.dashboard" /></span></a>
+		</li>
+		
+<!-- -------------------------------------------------------------------------------------------------------------- AM START ------------------------------------------------------------------------------------------------------ -->
+	
+		<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT','ROLE_AM_ACCOUNT_VIEW', 'ROLE_AM_ACCOUNT_MANAGE', 'ROLE_AM_EDIT_MY_ACCOUNT')">
+			<li id="amSwitch" <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("account")>=0 ){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+				<a href="#"><i class="fa fa-group"></i><span><spring:message code="menu.am.am.main" /></span><i class="arrow fa fa-chevron-right"></i></a>
+				<ul>
+				
+					<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ACCOUNT_MANAGE', 'ROLE_AM_EDIT_MY_ACCOUNT')">
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("account/edit_confidential.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_AM }/account/editConfidential${ SPRING_EXT }"><spring:message code="menu.am.am.my" /></a></li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ACCOUNT_VIEW', 'ROLE_AM_ACCOUNT_MANAGE')">
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("account/list.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_AM }/account/index${ SPRING_EXT }"><spring:message code="menu.am.am.view" /></a></li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT','ROLE_AM_ACCOUNT_MANAGE')">
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("account/add.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_AM }/account/add${ SPRING_EXT }"><spring:message code="menu.am.am.add" /></a></li>
+					</sec:authorize>
+					
+				</ul>
+			</li>
+		</sec:authorize>
+		
+		<c:if test="${WILAS_LABEL == 'standard'}">
+			<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT')">
+				<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("role")>=0 ){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+					<a href="#"><i class="fa fa-tags"></i><span><spring:message code="menu.am.role.main" /></span><i class="arrow fa fa-chevron-right"></i></a>
+					<ul>
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("role/list.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_AM }/role/index${ SPRING_EXT }"><spring:message code="menu.am.role.view" /></a></li>
+						
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("role/add.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_AM }/role/add${ SPRING_EXT }"><spring:message code="menu.am.role.add" /></a></li>
+					</ul>
+				</li>
+			</sec:authorize>
+		</c:if>
+		
+		<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_ORGANIZATION_VIEW', 'ROLE_AM_ORGANIZATION_MANAGE', 'ROLE_AM_LICENSE_DISTRIBUTOR_VIEW', 'ROLE_AM_LICENSE_RESELLER_VIEW', 'ROLE_AM_LICENSE_CP', 'ROLE_AM_LICENSE_ASSIGN', 'ROLE_AM_LICENSE_PIWIK', 'ROLE_AM_MANAGE_CP_URL')">
+			<li id="organizationSwitch" <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("organization")>=0 ){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+				<a href="#"><i class="fa fa-building-o"></i><span><spring:message code="menu.am.organization.main" /></span><i class="arrow fa fa-chevron-right"></i></a>
+				<ul>
+				
+					<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_ORGANIZATION_VIEW', 'ROLE_AM_ORGANIZATION_MANAGE')">
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("organization/list.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_AM }/organization/index${ SPRING_EXT }"><spring:message code="menu.am.organization.view" /></a></li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_ORGANIZATION_MANAGE')">
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("organization/add.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_AM }/organization/add${ SPRING_EXT }"><spring:message code="menu.am.organization.add" /></a></li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_AM_LICENSE_DISTRIBUTOR_VIEW', 'ROLE_AM_LICENSE_RESELLER_VIEW')">
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("organization/view_license.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_AM }/organization/view_license${ SPRING_EXT }"><spring:message code="menu.am.licenses.cp" /></a></li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_AM_MANAGE_CP_URL')">
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("organization/cp_url_manage.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_AM }/organization/cp_url_manage${ SPRING_EXT }"><spring:message code="menu.am.licenses.cp" /></a></li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_AM_LICENSE_ASSIGN')">
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("organization/assign_license.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_AM }/organization/assign_license${ SPRING_EXT }"><spring:message code="menu.am.assign.license" /></a></li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_LICENSE_CP')">
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("organization/cp_manage.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_AM }/organization/cp_manage${ SPRING_EXT }"><spring:message code="menu.am.licenses.cp" /></a></li>
+					</sec:authorize>
+					
+				</ul>
+			</li>
+		</sec:authorize>
+		
+		<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_LICENSE_QUOTA')">
+			<li id="licensesSwitch" <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("licenses")>=0 ){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+				<a href="#"><i class="fa fa-legal"></i><span><spring:message code="menu.am.licenses.main" /></span><i class="arrow fa fa-chevron-right"></i></a>
+				<ul>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_LICENSE_QUOTA')">
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("licenses/quota_manage.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_AM }/licenses/quota_manage${ SPRING_EXT }"><spring:message code="menu.am.licenses.quota" /></a></li>
+					</sec:authorize>
+					
+				</ul>
+			</li>
+		</sec:authorize>
+<!-- -------------------------------------------------------------------------------------------------------------- AM END ------------------------------------------------------------------------------------------------------ -->
+	
+		
+<!-- -------------------------------------------------------------------------------------------------------------- CP START ------------------------------------------------------------------------------------------------------ -->
+	
+		<sec:authorize access="hasAnyRole('ROLE_WS_CP_CP_VIEW', 'ROLE_WS_CP_CP_MANAGE','ROLE_WS_CP_MODULE')">
+			<li id="cpSwitch" data-step="1" data-intro="<spring:message code="guide.main.step1" />" data-position="right" <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("captiveportal")>=0){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+				<a><i class="fa fa-wifi"></i><span><spring:message code="menu.cp.cp.main" /></span><i class="arrow fa fa-chevron-right"></i></a>
+				<ul>
+		 
+					<li id="cpSubList" <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("captiveportal")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_CP }/captiveportal/index${ SPRING_EXT }"><spring:message code="menu.cp.cp.view" /></a>
+					</li>
+		
+				</ul>
+			</li>
+		</sec:authorize>
+		
+		<!-- theme function -->
+		<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN')">
+			<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("layout/list")>=0){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+				<a href="#"><i class="fa fa-tablet"></i><span><spring:message code="menu.cp.themes.main" /></span><i class="arrow fa fa-chevron-right"></i></a>
+				<ul>
+				
+					<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("layout/list.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_CP }/layout/index${ SPRING_EXT }"><spring:message code="menu.cp.themes.view" /></a>
+					</li>
+					
+				</ul>
+			</li>
+		</sec:authorize>
+		
+		<!-- Page -->
+		<sec:authorize access="hasAnyRole('ROLE_WS_CP_PAGE_VIEW', 'ROLE_WS_CP_PAGE_MANAGE','ROLE_WS_CP_MODULE')">
+			<li id="pageSwitch" data-step="2" data-intro="<spring:message code="guide.main.step2" />" data-position="right" <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("page")>=0 || String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("layout/chooseLayout")>=0 ){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+				<a href="#"><i class="fa fa-file"></i><span><spring:message code="menu.cp.pages.main" /></span><i class="arrow fa fa-chevron-right"></i></a>
+				<ul>
+					<sec:authorize access="hasAnyRole('ROLE_WS_CP_PAGE_VIEW','ROLE_WS_CP_MODULE')">
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("page/list.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_CP }/page/index${ SPRING_EXT }"><spring:message code="menu.cp.pages.view" /></a></li>
+					</sec:authorize>
+				
+					<sec:authorize access="hasAnyRole('ROLE_WS_CP_PAGE_MANAGE','ROLE_WS_CP_MODULE')">
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("layout/chooseLayout.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_CP }/layout/choose${ SPRING_EXT }"><spring:message code="menu.cp.pages.add" /></a></li>
+					</sec:authorize>
+				</ul>
+			</li>
+		</sec:authorize>
+		
+		<!-- contents -->
+		<sec:authorize access="hasAnyRole('ROLE_WS_CP_CONTENT_VIEW', 'ROLE_WS_CP_CONTENT_MANAGE','ROLE_WS_CP_CONTENT_CAMPAIGN_VIEW','ROLE_WS_CP_CONTENT_CAMPAIGN_MANAGE','ROLE_WS_CP_MODULE')">
+			<li id="contentSwitch" data-step="3" data-intro="<spring:message code="guide.main.step3" />" data-position="right" <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("content")>=0 || String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("category/list.jsp")>=0 ){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+				<a href="#"><i class="fa fa-inbox"></i><span><spring:message code="menu.cp.contents.main" /></span><i class="arrow fa fa-chevron-right"></i></a>
+				<ul>
+					<sec:authorize access="hasAnyRole('ROLE_WS_CP_CONTENT_VIEW','ROLE_WS_CP_MODULE')">
+				
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("content/list.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_CP }/content/index${ SPRING_EXT }"><spring:message code="menu.cp.contents.view" /></a></li>
+				
+					</sec:authorize>
+			
+					<sec:authorize access="hasAnyRole('ROLE_WS_CP_CONTENT_MANAGE','ROLE_WS_CP_MODULE')">
+			
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("content/add.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_CP }/content/add${ SPRING_EXT }"><spring:message code="menu.cp.contents.add" /></a></li>
+					
+					</sec:authorize>
+					<c:if test="${WILAS_LABEL == 'standard'}">
+						<sec:authorize access="hasAnyRole('ROLE_WS_CP_CONTENT_CAMPAIGN_VIEW','ROLE_WS_CP_CONTENT_CAMPAIGN_MANAGE','ROLE_WS_CP_MODULE')">
+						
+							<li id="categoryMenu" <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("category/list.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+							<a href="${ MODULE_ROOT_CP }/category/index${ SPRING_EXT }"><spring:message code="menu.cp.contents.category" /></a></li>
+						
+						</sec:authorize>
+					</c:if>
+				</ul>
+			</li>
+		</sec:authorize>
+		<!-- contents end-->
+		
+		<!-- reports -->
+		<sec:authorize access="hasAnyRole('ROLE_WS_CP_SM_AUDIT_REPORT', 'ROLE_WS_CP_SM_SUBSCRIBER_REPORT','ROLE_WS_CP_SM_LOGIN_REPORT','ROLE_WS_CP_SM_TRANSACTION_REPORT','ROLE_WS_CP_SM_SIMPLE_QUESTION_REPORT','ROLE_WS_CP_MODULE')">
+			<li id="reportSwitch" <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("report")>=0 ){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+			<a href="${ MODULE_ROOT_CP }/report/audit_report${ SPRING_EXT }"><i class="fa fa-print"></i><span><spring:message code="menu.cp.reports.main" /></span><i class="arrow fa fa-chevron-right"></i></a>
+				<ul>
+					<sec:authorize access="hasAnyRole('ROLE_WS_CP_SM_AUDIT_REPORT','ROLE_WS_CP_MODULE')">
+					
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("report/audit_report.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_CP }/report/audit_report${ SPRING_EXT }"><spring:message code="menu.cp.reports.audit" /></a></li>
+					
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_CP_SM_SUBSCRIBER_REPORT','ROLE_WS_CP_MODULE')">
+					
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("report/detail_report.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_CP }/report/detail_report${ SPRING_EXT }"><spring:message code="menu.cp.reports.detail" /></a></li>
+					
+					</sec:authorize>
+		
+					<sec:authorize access="hasAnyRole('ROLE_WS_CP_SM_LOGIN_REPORT','ROLE_WS_CP_MODULE')">
+					
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("report/sub_report.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_CP }/report/sub_report${ SPRING_EXT }"><spring:message code="menu.cp.reports.login" /></a></li>
+					
+					</sec:authorize>
+		
+					<sec:authorize access="hasAnyRole('ROLE_WS_CP_SM_TRANSACTION_REPORT','ROLE_WS_CP_MODULE')">
+					
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("report/transaction_report.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_CP }/report/transaction_report${ SPRING_EXT }"><spring:message code="menu.cp.reports.transaction" /></a></li>
+					
+					</sec:authorize>
+		
+					<sec:authorize access="hasAnyRole('ROLE_WS_CP_SM_SIMPLE_QUESTION_REPORT','ROLE_WS_CP_MODULE')">
+					
+						<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("report/answer_report.jsp")>=0){ %> class="active" <% } else { %> class="" <% } %> >
+						<a href="${ MODULE_ROOT_CP }/report/answer_report${ SPRING_EXT }"><spring:message code="menu.cp.reports.simpleformqanda" /></a></li>
+					
+					</sec:authorize>
+				</ul>
+			</li>
+		</sec:authorize>
+		<!-- reports end -->
+<!-- -------------------------------------------------------------------------------------------------------------- CP END ------------------------------------------------------------------------------------------------------ -->
+	
+		
+<!-- -------------------------------------------------------------------------------------------------------------- BI START ------------------------------------------------------------------------------------------------------ -->
+		
+		
+		<c:if test="${WILAS_LABEL == 'standard'}">
+		
+			<!-- Location Analytic -->
+			<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_LOCATION_MODULE', 'ROLE_WS_BI_ANALYTIC_VIEW', 'ROLE_WS_BI_DETAIL_VIEW', 'ROLE_WS_BI_ZONE_VIEW', 'ROLE_WS_BI_HEATMAP_VIEW', 'ROLE_WS_BI_MOVEMENT_VIEW')">
+				<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("analytics/")>=0){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+					<a href="${ MODULE_ROOT_BI }"><i class="fa fa-calculator"></i><span><spring:message code="menu.bi.location" /></span><i class="arrow fa fa-chevron-right"></i></a>
+					<ul>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_LOCATION_MODULE', 'ROLE_WS_BI_ANALYTIC_VIEW')">
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("da-sh-board")>=0){ %> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/dashboard.wilas"><spring:message code="menu.bi.location.dashboard"/></a>
+						</li>
+					 </sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_LOCATION_MODULE', 'ROLE_WS_BI_DETAIL_VIEW')">
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("summary")>=0){%> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/summary.wilas"><spring:message code="menu.bi.location.summary"/></a>
+						</li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_LOCATION_MODULE', 'ROLE_WS_BI_ZONE_VIEW')">
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("zoneDetail")>=0){ %> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/zoneDetail.wilas"><spring:message code="menu.bi.location.zoneDetail"/></a>
+						</li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_LOCATION_MODULE', 'ROLE_WS_BI_HEATMAP_VIEW')">
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("heatmap")>=0){%> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/heatmap.wilas"><spring:message code="menu.bi.location.heatmap"/></a>
+						</li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_LOCATION_MODULE', 'ROLE_WS_BI_MOVEMENT_VIEW')">
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("movement")>=0){ %> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/movement.wilas"><spring:message code="menu.bi.location.movement"/></a>
+						</li>
+					</sec:authorize>
+						
+					</ul>
+				</li>
+			</sec:authorize> 
+			
+			<!-- Web Analytic -->
+			<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_WEB_MODULE', 'ROLE_WS_BI_WEB_VIEW', 'ROLE_WS_BI_DEVICE_VIEW', 'ROLE_WS_BI_PLATFORM_VIEW', 'ROLE_WS_BI_ENGAGEMENT_VIEW', 'ROLE_WS_BI_ACTION_VIEW', 'ROLE_WS_BI_SUBSCRIBER_VIEW', 'ROLE_WS_BI_CAMPAIGN_VIEW')">
+				<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("piwik")>=0){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+					<a href="${ MODULE_ROOT_BI }/web/device_analytics.wilas"><i class="fa fa-globe"></i><span><spring:message code="menu.bi.web" /></span><i class="arrow fa fa-chevron-right"></i></a>
+					<ul>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_WEB_MODULE', 'ROLE_WS_BI_WEB_VIEW')">
+						<li<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("piwik/piwik_dashboard")>=0){%> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/web/dashboard.wilas"><spring:message code="menu.bi.web.dashboard"/></a>
+						</li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_WEB_MODULE', 'ROLE_WS_BI_DEVICE_VIEW')">
+						<li<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("piwik/piwik_device")>=0){%> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/web/device.wilas"><spring:message code="menu.bi.web.device"/></a>
+						</li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_WEB_MODULE', 'ROLE_WS_BI_PLATFORM_VIEW')">
+						<li<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("piwik/piwik_platform")>=0){%> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/web/platform.wilas"><spring:message code="menu.bi.web.platform"/></a>
+						</li>
+					</sec:authorize>
+						
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_WEB_MODULE', 'ROLE_WS_BI_ENGAGEMENT_VIEW')">
+						<li<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("piwik/piwik_engagement")>=0){%> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/web/engagement.wilas"><spring:message code="menu.bi.web.engagement"/></a>
+						</li>
+					</sec:authorize>
+						
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_WEB_MODULE', 'ROLE_WS_BI_ACTION_VIEW')">
+						<li<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("piwik/piwik_action")>=0){%> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/web/action.wilas"><spring:message code="menu.bi.web.action"/></a>
+						</li>
+					</sec:authorize>
+						 	
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_WEB_MODULE', 'ROLE_WS_BI_SUBSCRIBER_VIEW')">	 
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("subscriber_analytics")>=0){ %> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/web/subscriber_analytics.wilas"><spring:message code="menu.bi.web.subscriber"/></a>
+						</li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_WEB_MODULE', 'ROLE_WS_BI_CAMPAIGN_VIEW')">
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("piwik_campaign")>=0){%> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/web/campaign_analytics.wilas"><spring:message code="menu.bi.web.campaign"/></a>
+						</li>
+					</sec:authorize>
+					
+					<%-- <sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_WEB_MODULE', 'ROLE_WS_BI_WEB_VIEW')">
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("website_summary")>=0){%> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/website_summary.wilas"><spring:message code="menu.bi.web.websitetraffic"/></a>
+						</li>
+					</sec:authorize>
+					
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE', 'ROLE_WS_BI_WEB_MODULE', 'ROLE_WS_BI_WEB_VIEW')">
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("app_usage")>=0){%> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/app_usage.wilas"><spring:message code="menu.bi.web.appusage"/></a>
+						</li>
+					</sec:authorize> --%>
+					
+					
+					</ul>
+				</li>
+			</sec:authorize>
+			
+			<!-- Traffic Analytic -->
+			<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE','ROLE_WS_BI_TRAFFIC_MODULE', 'ROLE_WS_BI_TRAFFIC_VIEW')">
+				<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("traffic")>=0){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+					<a href="${ MODULE_ROOT_BI }/traffic_analytics.wilas"><i class="fa fa-download"></i><span><spring:message code="menu.bi.traffic" /></span><i class="arrow fa fa-chevron-right"></i></a>
+					<ul>	
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE','ROLE_WS_BI_TRAFFIC_MODULE', 'ROLE_WS_BI_TRAFFIC_VIEW')">
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("traffic_static")>=0){ %> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/traffic_analytics.wilas"><spring:message code="menu.bi.traffic.traffic"/></a>
+						</li>
+					</sec:authorize>
+					</ul>
+				</li>
+			</sec:authorize>
+			
+			<!-- Sales Analytic -->
+			<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE','ROLE_WS_BI_SALES_MODULE', 'ROLE_WS_BI_SALES_VIEW', 'ROLE_WS_BI_TRANSACTION_VIEW', 'ROLE_WS_BI_AMOUNT_VIEW')">
+				<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("3D/")>=0){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+					<a href="${ MODULE_ROOT_BI }/traffic_analytics.wilas"><i class="fa fa-line-chart"></i><span><spring:message code="menu.bi.3d" /></span><i class="arrow fa fa-chevron-right"></i></a>
+					<ul>	
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE','ROLE_WS_BI_SALES_MODULE', 'ROLE_WS_BI_SALES_VIEW')">
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("sales")>=0 && String.valueOf(request.getAttribute( "chart_type" ) ) == "sales" ){ %> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/salesAnalytics.wilas"><spring:message code="menu.bi.3d.sales"/></a>
+						</li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE','ROLE_WS_BI_SALES_MODULE', 'ROLE_WS_BI_TRANSACTION_VIEW')">
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("sales")>=0 && String.valueOf(request.getAttribute( "chart_type" ) ) == "transaction"){ %> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/transactionAnalytics.wilas"><spring:message code="menu.bi.3d.transaction"/></a>
+						</li>
+					</sec:authorize>
+					
+					<sec:authorize access="hasAnyRole('ROLE_WS_BI_MODULE','ROLE_WS_BI_SALES_MODULE', 'ROLE_WS_BI_AMOUNT_VIEW')">
+						<li <% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("sales")>=0 && String.valueOf(request.getAttribute( "chart_type" ) ) == "amount"){ %> class="active" <%}else {%>  <%}  %> >
+							<a href="${ MODULE_ROOT_BI }/amountAnalytics.wilas"><spring:message code="menu.bi.3d.amount"/></a>
+						</li>
+					</sec:authorize>
+					</ul>
+				</li>
+			</sec:authorize>
+		</c:if>
+<!-- -------------------------------------------------------------------------------------------------------------- BI END ------------------------------------------------------------------------------------------------------ -->
+			
+			
+			
+<!-- -------------------------------------------------------------------------------------------------------------- PM START ------------------------------------------------------------------------------------------------------ -->
+	
+		<c:if test="${WILAS_LABEL == 'standard'}">
+			<sec:authorize access="hasAnyRole('ROLE_WS_PM_MODULE')">
+			<!-- campaign -->
+			<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("campaign/")>=0 || String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("pm_re_port/")>=0)
+			{ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+				<a href="${ MODULE_ROOT_PM }"><i class="fa fa-calculator"></i><span><spring:message code="menu.pm.campaign" /></span><i class="arrow fa fa-chevron-right"></i></a>
+				<ul>
+					<li	<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("campaign/list")>=0){
+						%> class="active" <%}else {%>  <%}  %> >
+						<a href="${ MODULE_ROOT_PM }/campaign/list${ SPRING_EXT }"><spring:message code="menu.pm.campaign.list"/></a>
+					</li>
+					
+					<li	<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("campaign/create")>=0){
+						%> class="active" <%}else {%>  <%}  %>>
+						<a href="${ MODULE_ROOT_PM }/campaign/create${ SPRING_EXT }"><spring:message code="menu.pm.campaign.create"/></a>
+					</li>
+					
+									<li	<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("pm_re_port/summaryReport")>=0){
+						%> class="active" <%}else {%>  <%}  %> >
+						<a href="${ MODULE_ROOT_PM }/report/summaryReport${ SPRING_EXT }"><spring:message code="menu.pm.report.summary"/></a>
+					</li>
+					<li	<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("pm_re_port/detailReport")>=0){
+						%> class="active" <%}else {%>  <%}  %>>
+						<a href="${ MODULE_ROOT_PM }/report/detailReport${ SPRING_EXT }"><spring:message code="menu.pm.report.detail"/></a>
+					</li>
+				</ul>
+			</li>
+			
+			<!-- content -->
+			<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("message/")>=0){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+				<a href="${ MODULE_ROOT_PM }"><i class="fa fa-calculator"></i><span><spring:message code="menu.pm.content" /></span><i class="arrow fa fa-chevron-right"></i></a>
+				<ul>
+					<li	<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("message/list")>=0){
+						%> class="active" <%}else {%>  <%}  %> >
+						<a href="${ MODULE_ROOT_PM }/content/list${ SPRING_EXT }"><spring:message code="menu.pm.content.list"/></a>
+					</li>
+					<li	<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("message/create")>=0){
+						%> class="active" <%}else {%>  <%}  %>>
+						<a href="${ MODULE_ROOT_PM }/content/create${ SPRING_EXT }"><spring:message code="menu.pm.content.create"/></a>
+					</li>
+				</ul>
+			</li>
+			<!-- policy -->
+	<%-- 		<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("policy/")>=0){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+				<a href="${ MODULE_ROOT_PM }"><i class="fa fa-calculator"></i><span><spring:message code="menu.pm.policy" /></span><i class="arrow fa fa-chevron-right"></i></a>
+				<ul>
+					<li	<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("policy/list")>=0){
+						%> class="active" <%}else {%>  <%}  %> >
+						<a href="${ MODULE_ROOT_PM }/policy/list${ SPRING_EXT }"><spring:message code="menu.pm.policy.list"/></a>
+					</li>
+					<li	<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("policy/create")>=0){
+						%> class="active" <%}else {%>  <%}  %>>
+						<a href="${ MODULE_ROOT_PM }/policy/create${ SPRING_EXT }"><spring:message code="menu.pm.policy.create"/></a>
+					</li>
+				</ul>
+			</li> --%>
+			<!-- app -->
+	<%-- 		<li <% if( String.valueOf( request.getAttribute( "MYPAGE" ) ).indexOf("app/")>=0){ %> class="active submenu open" <% } else { %> class="submenu" <% } %> >
+				<a href="${ MODULE_ROOT_PM }"><i class="fa fa-calculator"></i><span><spring:message code="menu.pm.app" /></span><i class="arrow fa fa-chevron-right"></i></a>
+				<ul>
+					<li	<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("app/list")>=0){
+						%> class="active" <%}else {%>  <%}  %> >
+						<a href="${ MODULE_ROOT_PM }/app/list${ SPRING_EXT }"><spring:message code="menu.pm.app.list"/></a>
+					</li>
+					<li	<% if( String.valueOf(request.getAttribute( "MYPAGE" ) ).indexOf("app/create")>=0){
+						%> class="active" <%}else {%>  <%}  %>>
+						<a href="${ MODULE_ROOT_PM }/app/create${ SPRING_EXT }"><spring:message code="menu.pm.app.create"/></a>
+					</li>
+				</ul>
+			</li> --%>
+			</sec:authorize>
+		</c:if>
+		
+<!-- -------------------------------------------------------------------------------------------------------------- PM END------------------------------------------------------------------------------------------------------ -->
+	
+		
+ 		<li><a href="${ WEBAPPS }/home/userguide${ SPRING_EXT }" target="_blank"><i class="fa fa-book"></i><span><spring:message code="menu.userguide" /></span></a></li>
+		<li><a href="${ WEBAPPS }/home/logout.wilas"><i class="fa fa-share"></i><span><spring:message code="menu.logout" /></span></a></li>
+		 
+	</ul>
+
+</div>

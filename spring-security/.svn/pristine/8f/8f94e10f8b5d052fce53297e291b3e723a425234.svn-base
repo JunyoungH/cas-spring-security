@@ -1,0 +1,55 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"%>
+<%@ page import="java.util.*"%>
+<%@ page import="java.sql.*"%>
+<%@ page import="java.text.*"%>
+<%@ page import="java.net.*"%>
+<%@ page import="com.techstudio.util.*"%>
+<%@ page import="com.techstudio.form.*"%>
+<%@ page import="com.techstudio.form.controller.*"%>
+
+<%--<%@ page import="org.apache.log4j.*"%>--%>
+
+<%
+	request.setAttribute("WEBAPPS", ConnConfig.getWebAppRoot());
+
+	request.setAttribute("STYLE_JS_ROOT", ConnConfig.getCSSRoot());
+
+	request.setAttribute("ANALYTIC_SERVER_URL", ConnConfig.getAnalyticServerURL());
+	
+	request.setAttribute("TOKEN_AUTH", ConnConfig.getTokenAuth());
+	
+	request.setAttribute("MYPAGE", request.getServletPath());
+
+	request.setAttribute("WILAS_AM_URL", ConnConfig.getWilasAmUrl());
+	
+	request.setAttribute("WILAS_DOMAIN_NAME", ConnConfig.getWilasDomainName());
+	
+	request.setAttribute("MODULE_ROOT_DASHBOARD", ConnConfig.getModuleRootDashboard());
+	
+	request.setAttribute("MODULE_ROOT_AM", ConnConfig.getModuleRootAm());
+	
+	request.setAttribute("MODULE_ROOT_CAS", ConnConfig.getModuleRootCas());
+	
+	request.setAttribute("MODULE_ROOT_CP", ConnConfig.getModuleRootCp());
+	
+	request.setAttribute("MODULE_ROOT_BI", ConnConfig.getModuleRootBi());
+	
+	request.setAttribute("MODULE_ROOT_PM", ConnConfig.getModuleRootPm());
+	
+	request.setAttribute("MODULE_NAME_AM", ConnConfig.getModuleNameAm());
+	
+	request.setAttribute("WILAS_LABEL", ConnConfig.getWilasLabel());
+	
+	request.setAttribute("SPRING_EXT", BaseController.SPRING_EXT);
+	
+%>
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form"%>
+<%-- <%@ taglib prefix="tss" uri="http://www.techstudio.com.sg"%> --%>
+
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ include file="../include/timeout_alert.jsp"%>

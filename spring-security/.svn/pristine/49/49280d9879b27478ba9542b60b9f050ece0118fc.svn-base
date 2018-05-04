@@ -1,0 +1,686 @@
+package com.techstudio.form.controller.am;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.jsoup.helper.StringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.HttpSessionRequiredException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+import com.techstudio.common.AjaxListResponse;
+import com.techstudio.common.EasyClient;
+import com.techstudio.common.StatusCode;
+import com.techstudio.dao.am.AccountDao;
+import com.techstudio.dao.am.TokenDao;
+import com.techstudio.form.controller.BaseController;
+import com.techstudio.model.am.AccountDTO;
+import com.techstudio.model.am.OrganizationAliasDTO;
+import com.techstudio.model.am.TokenDTO;
+import com.techstudio.model.am.filter.AccountFilterObj;
+import com.techstudio.model.am.filter.DataTableParameterObj;
+import com.techstudio.service.am.AccountServiceImpl;
+import com.techstudio.service.am.BaseService;
+import com.techstudio.service.am.OrganizationAliasServiceImpl;
+import com.techstudio.service.am.OrganizationServiceImpl;
+import com.techstudio.service.am.RoleServiceImpl;
+import com.techstudio.util.PrincipalUtils;
+
+
+@Controller
+public class AccountController extends BaseController{
+	
+	private static final Logger log = Logger.getLogger(AccountController.class);
+	private static final int MANIPULATE_LAYER = 1;
+	
+	private static final boolean CONTAINING_LOGIN_OU = true;
+	private static final boolean CONTAINING_LOGIN_HIERARCHY = true;
+	
+	private static final boolean ACTION_VIEW = true;
+	private static final boolean ACTION_MANIPULATE = false;
+	
+	private static final int ACCOUNT_DELETE_FLAG_DELETED = 1;
+	
+	@Value("${ROOT_ADMIN}")
+	private String ROOT_ADMIN;
+	
+	@Value("${wilasam.resetpasswordemail.url}")
+	private String WILAS_AM_RESET_PASSWORD_EMAIL_URL;
+	
+	@Value("${wilasam.resetpassword.url}")
+	private String WILAS_AM_RESET_PASSWORD_URL;
+	
+	@Autowired
+	private MessageSource messageSource;
+	
+	/*========================= Plz delete after refactoring ========================*/
+	@Autowired
+	private AccountDao accountDao;
+	
+	@Autowired
+	private TokenDao tokenDao;
+	/*========================= Plz delete after refactoring ========================*/
+	
+	@Autowired
+	private OrganizationServiceImpl organizationService;
+	
+	@Autowired
+	private OrganizationAliasServiceImpl organizationAliasService;
+	
+	@Autowired
+	private AccountServiceImpl accountService;
+	
+	@Autowired
+	private RoleServiceImpl roleService;
+	
+	
+	@Override
+	protected String getModuleFolder() {
+		return "account/";
+	}
+	
+	@ExceptionHandler(HttpSessionRequiredException.class)
+	public String handleTimeout() {
+		return getRedirectedLoginPath();
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "account/whoAmI" + SPRING_EXT, method = RequestMethod.GET)
+	public Authentication whoAmI(
+			Authentication principal
+		)
+	{
+		log.debug("AccountController | account/whoAmI | GET | entry");
+		log.debug("AccountController | account/whoAmI | GET | exit");
+		return principal;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "account/checkAccountExist" + SPRING_EXT, method = RequestMethod.POST)
+	public boolean check_account_exist(
+			@RequestParam("email") String email
+		)
+	{
+		
+		log.debug("AccountController | account/check_account_exist | POST | entry");
+		
+		boolean checkingResult = accountService.hasAccountExisted(email);
+		
+		log.debug("AccountController | account/check_account_exist | POST | exit");
+		return checkingResult;
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "account/checkAccountStatus" + SPRING_EXT, method = RequestMethod.GET)
+	public int check_account_status(
+			Authentication principal
+		)
+	{
+		
+		log.debug("AccountController | account/check_account_status | GET | entry");
+		
+		int accountStatus = accountService.getAccountStatusByLoginUid(PrincipalUtils.getLdapUid(principal));
+		
+		log.debug("AccountController | account/check_account_status | GET | exit");
+		return accountStatus;
+		
+	}
+	
+	@RequestMapping(value = "account/forgotpassword" + SPRING_EXT, method = RequestMethod.GET)
+	public String forgot_password(
+			) 
+	{
+		log.debug("AccountController | account/forgotpassword | GET | entry");
+		log.debug("AccountController | account/forgotpassword | GET | exit");
+		return goToPageJsp("forgot_password");
+            
+	}
+	
+	
+	// TODO: Need to refacting
+	@RequestMapping(value = "account/resetpassword" + SPRING_EXT, method = RequestMethod.GET)
+	public String reset_password(
+			Model model
+			,HttpServletRequest req
+			, Authentication principal
+			) 
+	{
+		log.debug("AccountController | account/resetpassword | GET | entry");
+		
+		Map<String,Object> map = model.asMap();
+		String popup = (String) map.get("popup");
+		if(StringUtils.isBlank(popup)) {
+		
+			String pageDestination = null;
+			try {
+				pageDestination = accountService.getPageDestinationByTokenChecking(req.getParameter("token"));
+			} catch (Exception ex) {
+				log.info(ex,ex);
+				log.debug("AccountServiceImpl | getPageDestinationByTokenChecking() | exit");
+				return goToPageJsp("no_token");
+			}
+			if(!StringUtil.isBlank(pageDestination)) {
+				
+				return goToPageJsp(pageDestination);
+				
+			}else {
+				AccountDTO accountDTO = new AccountDTO();
+				TokenDTO tokenDTO = new TokenDTO();
+				String LdapUid = null;
+				try {
+					tokenDTO = tokenDao.findByToken(req.getParameter("token")).get(0);
+					LdapUid = tokenDTO.getEmail();
+					log.debug("AccountController | account/resetpassword | GET | LdapUid: " + LdapUid);
+				
+					accountDTO = accountDao.findByDeleteFlagNotAndLoginUid(ACCOUNT_DELETE_FLAG_DELETED, LdapUid).get(0);
+					log.debug("AccountController | account/resetpassword | GET | Get accountDTO which account_id = "+accountDTO.getAccountId());
+				} catch (Exception e) {
+					log.info(e,e);
+					log.debug("AccountController | account/resetpassword | GET | This Uid: "+ LdapUid+" don't have record in am_account table.");
+				}
+				
+		        model.addAttribute("AccountDTO", accountDTO); // adding in model
+		        model.addAttribute("token", tokenDTO.getToken());
+			}
+	        
+		}
+		
+		if(!StringUtils.isBlank(PrincipalUtils.getLdapUid(principal))) {
+			model.addAttribute("checkPrincipalIsNull", "true");
+		}
+		
+		log.debug("AccountController | account/resetpassword | GET | exit");
+		return goToPageJsp("reset_password");
+            
+	}
+	
+	
+	// TODO: Need to refacting
+	@RequestMapping(value = "account/resetpassword" + SPRING_EXT, method = RequestMethod.POST)
+	public String reset_password_submit(
+			Model model,
+			@ModelAttribute("AccountDTO") AccountDTO accountDTO
+			, HttpServletRequest req
+			, Authentication principal
+			, Locale loc
+			)
+	{
+		
+		log.debug("AccountController | account/resetpassword | POST | entry");
+		
+		try {
+			
+			String pageDestination = accountService.getPageDestinationByTokenChecking(req.getParameter("token"));
+			if(!StringUtil.isBlank(pageDestination)) {
+				
+				return goToPageJsp(pageDestination);
+				
+			}
+			
+		} catch (Exception e) {
+			
+			model.addAttribute("errmsg", messageSource.getMessage("crud.respond.edit.unsuccessful", null, loc));
+			log.info(e,e);
+			log.info("|editAccount()|"+StatusCode.UPDATE_FAILED+"|"+PrincipalUtils.getLoginUid(principal)+"|account_id = "+ accountDTO.getAccountId()+"|Edit failed.");
+			log.debug("AccountController | account/resetpassword | POST | exit");
+			return goToPageJsp("password_policy_fail");
+			
+		}
+		
+		try {
+			
+			accountService.updateAccountInfoAndDeleteToken(accountDTO.getAccountId(), accountDTO.getLoginUid(), req.getParameter("token"), req.getParameter("password"));
+			log.debug("AccountController | account/resetpassword | POST | Inserted into table am_account(Database).");
+			model.addAttribute("errmsg", messageSource.getMessage("crud.respond.edit.successful", null, loc));
+			model.addAttribute("popup", "true");
+			log.info("|editAccount()|"+StatusCode.UPDATE_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|account_id = "+ accountDTO.getAccountId()+"|Edit successfully.");
+			log.debug("AccountController | account/resetpassword | POST | exit");
+			return reset_password( model, req, principal);
+			
+		} catch (Exception e) {
+			
+			model.addAttribute("errmsg", messageSource.getMessage("crud.respond.edit.unsuccessful", null, loc));
+			log.info(e,e);
+			log.info("|editAccount()|"+StatusCode.UPDATE_FAILED+"|"+PrincipalUtils.getLoginUid(principal)+"|account_id = "+ accountDTO.getAccountId()+"|Edit failed.");
+			log.debug("AccountController | account/resetpassword | POST | exit");
+			return reset_password( model, req, principal);
+			
+		}
+		
+	}
+
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ACCOUNT_MANAGE')")
+	@RequestMapping(value = "account/add" + SPRING_EXT, method = RequestMethod.GET)
+	public String account_add(
+			Model model
+			, Authentication principal
+			) 
+	{
+		
+		log.debug("AccountController | account/add | GET | entry");
+		
+        AccountDTO accountDTO = new AccountDTO();
+		model.addAttribute("AccountDTO", accountDTO); // adding in model
+		
+		String loginOu = getCurrentLoginOu(principal);
+		int loginHierarchyLevel = getCurrentLoginHierarchyLevel(loginOu);
+		log.debug("AccountController | account/add | GET | LoginOu: "+ loginOu);
+		log.debug("AccountController | account/add | GET | LoginHierarchyLevel: "+ loginHierarchyLevel);
+		
+		Map<String, String> ouList = organizationService.getSubodinatesOuList(loginHierarchyLevel, loginOu, CONTAINING_LOGIN_OU, ACTION_MANIPULATE);
+		model.addAttribute("ouList", ouList);
+		
+		log.debug("AccountController | account/add | GET | exit");
+		return goToPageJsp("add");
+            
+	}
+
+	
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ACCOUNT_MANAGE')")
+	@RequestMapping(value = "account/add" + SPRING_EXT, method = RequestMethod.POST)
+	public String account_add_submit(
+			Model model,
+			HttpServletRequest req,
+			@ModelAttribute("AccountDTO") AccountDTO accountDTO,
+			Authentication principal,
+			RedirectAttributes redirectAttrs,
+			Locale loc
+			) 
+	{
+		
+		log.debug("AccountController | account/add | POST | entry");
+		
+		try {
+			log.debug(PrincipalUtils.getLoginUid(principal)+" is trying to add a new account");
+			
+			accountService.saveAccount(accountDTO, Long.valueOf(req.getParameter("role_id")));
+			log.debug("AccountController | account/add | POST | Inserted into table am_account(Local Database)");
+			
+			redirectAttrs.addFlashAttribute("errmsg", messageSource.getMessage("crud.respond.add.successful", null, loc));
+			log.info("|addAccount()|"+StatusCode.CREATE_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|New Account|Add successfully.");
+			log.debug("AccountController | account/add | POST | exit");
+			sendResetPasswordEmail(accountDTO.getLoginUid());
+			return "redirect:/account/index"+SPRING_EXT;
+			
+		} catch (Exception e) {
+			
+			log.info(e,e);
+			log.info("|addAccount()|"+StatusCode.CREATE_FAILED+"|"+PrincipalUtils.getLoginUid(principal)+"|New Account|Add failed.");
+			model.addAttribute("errmsg", messageSource.getMessage("crud.respond.add.unsuccessful", null, loc));
+			return account_add(model, principal);
+			
+		}
+            
+	}
+
+	private void sendResetPasswordEmail(String recipientEmail) throws Exception{
+		
+		log.debug(" | AccountController | sendResetPasswordEmail() | POST | entry");
+		log.debug(" | AccountController | sendResetPasswordEmail() | POST | Recipient Email: "+recipientEmail);
+		
+		String resetPasswordEmailPost = WILAS_AM_RESET_PASSWORD_EMAIL_URL+SPRING_EXT;      // Please config url in config file	
+		log.debug(" | AccountController | sendResetPasswordEmail() | POST | call URL: "+resetPasswordEmailPost);
+		
+		MultivaluedMap<String, String> parameter = new MultivaluedMapImpl();
+		parameter.add("email", recipientEmail);
+		
+		EasyClient clientresetPasswordEmail = new EasyClient();
+		Client smallClient = clientresetPasswordEmail.getClient();
+		WebResource webRes = smallClient.resource(resetPasswordEmailPost);
+		webRes.type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, parameter);
+		log.debug(" | AccountController | sendResetPasswordEmail() | POST | exit");
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ACCOUNT_MANAGE', 'ROLE_AM_EDIT_MY_ACCOUNT')")
+	@RequestMapping(value = "account/editConfidential" + SPRING_EXT, method = RequestMethod.GET)
+	public String account_confidential_edit(
+			Model model
+			, Authentication principal
+			)
+	{
+		log.debug("AccountController | account/editConfidential | GET | entry");
+		try {
+			
+			log.debug("AccountController | account/editConfidential | GET | LdapUid: " + PrincipalUtils.getLdapUid(principal));
+			log.debug("AccountController | account/editConfidential | GET | AccountOu: " + getCurrentLoginOu(principal));
+			AccountDTO accountDTO = accountService.getAccountByLdapUid(PrincipalUtils.getLdapUid(principal));
+			log.debug("AccountController | account/editConfidential | GET | AccountDTO: " + accountDTO.toString());
+			model.addAttribute("AccountDTO", accountDTO); // adding in model
+			model.addAttribute("shortFormatOu", BaseService.showOuFromCurrentHierarchy(getCurrentLoginHierarchyLevel(getCurrentLoginOu(principal)), accountDTO.getOrganizationDTO().getOu()));
+		} catch (Exception e) {
+			log.info(e,e);
+		}
+		
+		log.debug("AccountController | account/editConfidential | GET | exit");
+		return goToPageJsp("edit_confidential");
+            
+	}
+
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ACCOUNT_MANAGE', 'ROLE_AM_EDIT_MY_ACCOUNT')")
+	@RequestMapping(value = "account/editConfidential" + SPRING_EXT, method = RequestMethod.POST)
+	public String account_confidential_edit_submit(
+			Model model,
+			@ModelAttribute("AccountDTO") AccountDTO accountDTO
+			, HttpServletRequest req
+			, Authentication principal
+			, Locale loc
+			
+			)
+	{
+		log.debug("AccountController | account/edit | POST | entry");
+		log.debug("AccountController | account/edit | POST | update Account_id: "+accountDTO.getAccountId());
+		try {
+			
+			accountService.updateAccountConfidential(accountDTO.getAccountId(), accountDTO.getLoginUid(), req.getParameter("password"));
+			log.debug("AccountController | account/edit | POST | Inserted into table am_account(Database).");
+			
+			model.addAttribute("errmsg", messageSource.getMessage("crud.respond.edit.successful", null, loc));
+			model.addAttribute("popup", "true");
+			log.info("|editAccount()|"+StatusCode.UPDATE_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|accountId = "+ accountDTO.getAccountId()+"|Edit successfully.");
+			log.debug("AccountController | account/edit | POST | exit");
+			return redirect("../home/logout"+SPRING_EXT);
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			model.addAttribute("errmsg", messageSource.getMessage("crud.respond.edit.unsuccessful", null, loc));
+			log.info("|editAccount()|"+StatusCode.UPDATE_FAILED+"|"+PrincipalUtils.getLoginUid(principal)+"|accountId = "+ accountDTO.getAccountId()+"|Edit failed.");
+			log.debug("AccountController | account/edit | POST | exit");
+			return account_confidential_edit(
+					model
+					, principal);
+		}
+		
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ACCOUNT_VIEW', 'ROLE_AM_ACCOUNT_MANAGE')")
+	@RequestMapping(value = "account/readOnlyInfo" + SPRING_EXT, method = RequestMethod.GET)
+	public String account_info_read_only(
+			Model model
+			, @RequestParam(required = true) Long id
+			, Authentication principal
+			) 
+	{
+		
+		log.debug("AccountController | account/editInfo | GET | entry");
+		
+		AccountDTO accountDTO =  accountService.getAccountById(id);
+		
+		model.addAttribute("AccountDTO", accountDTO); // adding in model
+		model.addAttribute("shortFormatOu", BaseService.showOuFromCurrentHierarchy(getCurrentLoginHierarchyLevel(getCurrentLoginOu(principal)), accountDTO.getOu()));
+		model.addAttribute("roleId", accountDTO.getRoleDTO().getRoleId());
+		model.addAttribute("rolesList", roleService.getRoleListByOrganization(accountDTO.getOrganizationDTO()));
+		model.addAttribute("editable", false);
+		
+		log.debug("AccountController | account/editInfo | GET | editable: " + (accountDTO.getOrganizationDTO().getHierarchyLevel()-getCurrentLoginHierarchyLevel(PrincipalUtils.getOrganizationUnit(principal))<=MANIPULATE_LAYER));
+		log.debug("AccountController | account/editInfo | GET | accountid: " + accountDTO.getAccountId());
+		log.debug("AccountController | account/editInfo | GET | account_uid: " + accountDTO.getLoginUid());
+		log.debug("AccountController | account/editInfo | GET | role_id: " + accountDTO.getRoleDTO().getRoleId());
+		
+		log.debug("AccountController | account/editInfo | GET | exit");
+		return goToPageJsp("readonly_account_info");
+            
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ACCOUNT_MANAGE')")
+	@RequestMapping(value = "account/editInfo" + SPRING_EXT, method = RequestMethod.GET)
+	public String account_info_edit(
+			Model model
+			, @RequestParam(required = true) Long id
+			, Authentication principal
+			) 
+	{
+		
+		log.debug("AccountController | account/editInfo | GET | entry");
+		
+		AccountDTO accountDTO =  accountService.getAccountById(id);
+		
+		model.addAttribute("AccountDTO", accountDTO); // adding in model
+		model.addAttribute("shortFormatOu", BaseService.showOuFromCurrentHierarchy(getCurrentLoginHierarchyLevel(getCurrentLoginOu(principal)), accountDTO.getOu()));
+		model.addAttribute("roleId", accountDTO.getRoleDTO().getRoleId());
+		model.addAttribute("rolesList", roleService.getRoleListByOrganization(accountDTO.getOrganizationDTO()));
+		model.addAttribute("editable", accountDTO.getOrganizationDTO().getHierarchyLevel()-getCurrentLoginHierarchyLevel(PrincipalUtils.getOrganizationUnit(principal))<=MANIPULATE_LAYER);
+		
+		log.debug("AccountController | account/editInfo | GET | editable: " + (accountDTO.getOrganizationDTO().getHierarchyLevel()-getCurrentLoginHierarchyLevel(PrincipalUtils.getOrganizationUnit(principal))<=MANIPULATE_LAYER));
+		log.debug("AccountController | account/editInfo | GET | accountid: " + accountDTO.getAccountId());
+		log.debug("AccountController | account/editInfo | GET | account_uid: " + accountDTO.getLoginUid());
+		log.debug("AccountController | account/editInfo | GET | role_id: " + accountDTO.getRoleDTO().getRoleId());
+		
+		log.debug("AccountController | account/editInfo | GET | exit");
+		return goToPageJsp("edit_account_info");
+            
+	}
+
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ACCOUNT_MANAGE')")
+	@RequestMapping(value = "account/editInfo" + SPRING_EXT, method = RequestMethod.POST)
+	public String account_info_edit_submit(
+			Model model,
+			HttpServletRequest req,
+			@ModelAttribute("AccountDTO") AccountDTO accountDTO,
+			Authentication principal,
+			RedirectAttributes redirectAttrs,
+			Locale loc
+			) throws Exception
+	{
+		
+		log.debug("AccountController | account/editInfo | POST | entry");
+		
+		try {
+			log.debug(PrincipalUtils.getLoginUid(principal)+" try to edit account which accountId = " + accountDTO.getAccountId());
+			log.debug("AccountController | account/editAccount | POST | accountOu: " + accountDTO.getOu());
+			log.debug("AccountController | account/editAccount | POST | roleId: " + req.getParameter("roleId"));
+			
+			accountService.updateAccountInfo(accountDTO, Long.valueOf(req.getParameter("roleId")));
+			log.debug("AccountController | account/editInfo | POST | table am_account updated");
+			
+			redirectAttrs.addFlashAttribute("errmsg", messageSource.getMessage("crud.respond.edit.successful", null, loc));
+			log.info("|editAccountInfo()|"+StatusCode.UPDATE_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|accountId = "+accountDTO.getAccountId()+ "|Edit successfully.");
+			log.debug("AccountController | account/editInfo | POST | exit");
+			return "redirect:/account/index"+SPRING_EXT;
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			model.addAttribute("errmsg", messageSource.getMessage("crud.respond.edit.unsuccessful", null, loc));
+			log.info("|editAccountInfo()|NO ERRORCODE|"+PrincipalUtils.getLoginUid(principal)+"|accountId = "+accountDTO.getAccountId()+ "|Edit failed.");
+			log.debug("AccountController | account/editInfo | POST | exit");
+			return account_info_edit(
+					model
+					, accountDTO.getAccountId()
+					, principal);
+		}
+		
+	}
+
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ACCOUNT_MANAGE')")
+	@ResponseBody
+	@RequestMapping(value = "account/delete" + SPRING_EXT, method = RequestMethod.POST)
+	public void delete_account(
+			Model model
+			, @RequestParam("id") String idList
+			, Authentication principal
+			)
+			
+	{
+		log.debug("AccountController | account/delete | POST | entry");
+		try {
+			
+			accountService.changeAccountDeleteFlagByIdList(idList, PrincipalUtils.getLoginUid(principal), ACCOUNT_DELETE_FLAG_DELETED);
+			log.info("|deleteAccount()|"+StatusCode.DELETE_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|Deleted successfully.");
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|deleteAccount()|"+StatusCode.DELETE_FAILED+"|"+PrincipalUtils.getLoginUid(principal)+"|Delete failed.");
+		}
+		
+		log.debug("AccountController | account/delete | POST | exit");
+	}
+	
+
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ACCOUNT_VIEW', 'ROLE_AM_ACCOUNT_MANAGE')")
+	@RequestMapping(value = { "account/index" + SPRING_EXT, "account/list" + SPRING_EXT })
+	public String index(
+			Model model, 
+			Authentication principal
+			) {
+		log.debug("AccountController | account/index | POST | entry");
+		
+		String loginOu = getCurrentLoginOu(principal);
+		int loginHierarchyLevel = getCurrentLoginHierarchyLevel(loginOu);
+		Map<String, String> ouList = organizationService.getSubodinatesOuList(loginHierarchyLevel, loginOu, CONTAINING_LOGIN_OU, ACTION_VIEW);
+		List<OrganizationAliasDTO> userTypeList = organizationAliasService.getLowerLevelUserTypeList(loginHierarchyLevel, CONTAINING_LOGIN_HIERARCHY);
+		model.addAttribute("OuList", ouList);
+		model.addAttribute("UserTypeList", userTypeList);
+		model.addAttribute("LoginHierarchyLevel", loginHierarchyLevel);
+		
+		log.debug("AccountController | account/index | POST | exit");
+		return goToPageJsp("list");
+
+	}
+	
+	
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ACCOUNT_VIEW', 'ROLE_AM_ACCOUNT_MANAGE')")
+	@ResponseBody
+	@RequestMapping(value = "account/ajax_list" + SPRING_EXT, headers = "Accept=application/json")
+	public AjaxListResponse ajax_list(
+			Model model, 
+			String sEcho, 
+			int iDisplayStart, 
+			int iDisplayLength,
+			int iSortCol_0,
+			String sSortDir_0,
+			String sSearch,
+			HttpServletRequest req, 
+			HttpServletResponse rep,
+			Locale loc,
+			HttpSession ses,
+			Authentication principal
+			) 
+	{
+
+		log.debug("AccountController | account/ajax_list | POST | entry");
+		log.debug("AccountController | account/ajax_list | POST | Hierarchy Level: " + getCurrentLoginHierarchyLevel(PrincipalUtils.getOrganizationUnit(principal)));
+		log.debug("AccountController | account/ajax_list | POST | login ou: " + PrincipalUtils.getOrganizationUnit(principal));
+		AccountFilterObj filter = new AccountFilterObj(getCurrentLoginHierarchyLevel(PrincipalUtils.getOrganizationUnit(principal)),
+				getCurrentLoginOu(principal), req.getParameter("first_name"), req.getParameter("last_name"), 
+				req.getParameter("contact_email"), req.getParameter("hierarchy_level") , req.getParameter("ou"), req.getParameter("status"));
+				
+		DataTableParameterObj dataTableParameters = new DataTableParameterObj(sEcho, iDisplayStart, 
+				iDisplayLength, iSortCol_0, sSortDir_0, sSearch);
+		
+		AjaxListResponse resp = accountService.getAccountAjaxListResponse(filter, dataTableParameters, req.getParameter("isAdmin"), req.getParameter("isReadOnly"), req.getParameter("isManage"), PrincipalUtils.getLdapUid(principal));
+		log.info("|listAccount()|"+StatusCode.READ_SUCCESS+"|"+PrincipalUtils.getLoginUid(principal)+"|NO PARAMETER|List successfully.");
+		log.debug("AccountController | account/ajax_list | POST | exit");
+		return resp;
+
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "account/reload_role_list" + SPRING_EXT, method = RequestMethod.GET)
+	public List<Map<String, Object>> account_reload_select2(
+			Authentication principal
+			, @RequestParam("ou") String ouBelongsTo
+		)
+	{
+		
+		log.debug("AccountController | account/reload_role_list | GET | entry");
+		
+		List<Map<String, Object>> resultList = roleService.getReloadRoleList(ouBelongsTo);
+		
+		log.debug("AccountController | account/reload_role_list | GET | exit");
+		return resultList;
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "account/check_unique_loginuid" + SPRING_EXT, method = RequestMethod.POST)
+	public boolean checkUniqueLdapUid(
+			@RequestParam("loginUid") String loginUid
+		)
+	{
+		
+		log.debug("AccountController | account/check_unique_loginuid | POST | entry");
+		
+		boolean isUniqueLoginUid = accountService.checkUniqueLoginUid(loginUid);
+		
+		log.debug("AccountController | account/check_unique_loginuid | POST | exit");
+		return isUniqueLoginUid;
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "account/check_unique_loginuid_exclude_loginuid_is_being_editing" + SPRING_EXT, method = RequestMethod.POST)
+	public boolean checkUniqueLdapUidExcludeLdapUidIsBeingEditing(
+			@RequestParam("accountId") String accountId,
+			@RequestParam("loginUid") String loginUid
+		)
+	{
+		
+		log.debug("AccountController | account/check_unique_loginuid | POST | entry");
+		
+		boolean isUniqueLdapUid = accountService.checkUniqueLoginUidExcludeLoginUidIsBeingEditing(Long.valueOf(accountId), loginUid);
+		
+		log.debug("AccountController | account/check_unique_loginuid | POST | exit");
+		return isUniqueLdapUid;
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "account/reload_organization_id_dropdown" + SPRING_EXT, method = RequestMethod.GET)
+	public Map<String, String> reloadOrganizationIdDropdown(
+			@RequestParam("hierarchyLevel") String hierarchyLevel, 
+			Authentication principal
+		)
+	{
+		
+		log.debug("AccountController | organization/reload_organization_id_dropdown | POST | entry");
+		
+		String loginOu = getCurrentLoginOu(principal);
+		int loginHierarchyLevel = getCurrentLoginHierarchyLevel(loginOu);
+		Map<String, String> ouList = new HashMap<String, String>();
+		
+		if(hierarchyLevel.equals("all")) {
+			
+			ouList = organizationService.getSubodinatesOuList(loginHierarchyLevel, loginOu, CONTAINING_LOGIN_OU, ACTION_VIEW);
+			
+		}else {
+			
+			ouList = organizationService.getSubodinatesOuListByHierarchyLevel(Integer.valueOf(hierarchyLevel), loginOu);
+			
+		}
+		
+		log.debug("AccountController | organization/reload_organization_id_dropdown | POST | exit");
+		return ouList;
+		
+	}
+	
+}

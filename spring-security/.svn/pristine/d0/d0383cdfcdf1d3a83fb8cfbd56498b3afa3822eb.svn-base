@@ -1,0 +1,97 @@
+/**
+ * JS for reset_password
+ */
+
+$(document).ready(function(){
+			
+	if($('#errmsg').html().trim().length!=0 && $('#errmsg').html().trim()!="")
+	{
+		alertNotification($('#errmsg').html());
+		
+	}
+	
+	if($('#popup').html()=="true"){
+		
+		bootbox.dialog({
+			closeButton: false,
+            title: $('#alertBoxTitle').html(),
+            message: '<div class="modal-body" style="margin:5%; text-align:center; font-size:18px">'+
+            $('#redirectToLoginPageMessage').html()+'</div>',
+            buttons: {
+                success: {
+                    label: $('#hiddenButConfirm').html(),
+                    className: "btn-primary",
+                    callback: function () {
+                    	location = $("#WILAS_AM_URL").html()+"/home/logout"+$("#SPRING_EXT").html();
+                    }
+                }
+            }
+        });
+		
+	}
+	
+	$('#readonly_ou').val($('#ou').val());
+	
+	$.validator.addMethod('atLeastOneCapital', function(value) {
+		
+		var atLeastOneCapital =new RegExp(/[A-Z]+/);
+		return atLeastOneCapital.test(value);
+		
+    }, $("#errormsgPasswordAtLeastOneCapital").html());
+			
+	// Form Validation
+    $("#basic_validate").validate({
+		rules:{
+			loginUid:{
+				required:true,
+				email:true,
+				minlength:1,
+				maxlength:148
+			},
+			password:{
+				required: false,
+				minlength:8,
+				maxlength:16,
+				atLeastOneCapital:true
+			},
+			confirmPassword:{
+				required:false,
+				minlength:8,
+				maxlength:16,
+				equalTo:"#password"
+			}
+			
+		},
+		messages: {
+			
+			loginUid:{
+				required:$("#errormsgAccountUIDRequired").html(),
+				email:$("#errormsgEmail").html(),
+				maxlength:$("#errormsgMaxlength").html()
+			},
+			password:{
+				required:$("#errormsgPasswordRequired").html(),
+				minlength:$("#errormsgPasswordMinlength").html(),
+				maxlength:$("#errormsgPasswordMaxlength").html()
+			},
+			confirmPassword:{
+				minlength:$("#errormsgPasswordMinlength").html(),
+				maxlength:$("#errormsgPasswordMaxlength").html(),
+				equalTo:$("#errormsgPasswordEqualto").html()
+			}
+			
+			
+		},
+		errorClass: "help-inline",
+		errorElement: "span",
+		highlight:function(element, errorClass, validClass) {
+			$(element).parents('.form-group').removeClass('has-success').addClass('has-error');
+		},
+		unhighlight: function(element, errorClass, validClass) {
+			$(element).parents('.form-group').removeClass('has-error').addClass('has-success');
+		}
+	});
+	
+});
+		
+		

@@ -1,0 +1,117 @@
+<%@ page pageEncoding="UTF-8"%>
+<%@ include file="../include/import.jsp"%>
+<%@ include file="../home/header.jsp"%>
+<jsp:include page="../home/leftnav.jsp" />
+
+<!-- Attributes List -->
+		
+<div id="SPRING_EXT" style="display: none">${ SPRING_EXT }</div>
+<div id="errmsg" style="display: none">${ errmsg }</div>
+<div id="title" style="display: none"><spring:message code="addAccount.alert.title"/></div>
+<div id="message" style="display: none"><spring:message code="addAccount.alert.message"/></div>
+<div id="buttonOk" style="display: none"><spring:message code="button.ok"/></div>
+
+<!-- Attributes List -->
+
+<div id="WEBAPPS" style="display: none;">${ WEBAPPS }</div>
+<div id="content">
+	<div id="content-header">
+		<h1><spring:message code="title.addRole.big" /></h1>
+	</div>
+ 
+
+	<div id="breadcrumb">
+		<a href="${ WEBAPPS }/main${ SPRING_EXT }" title="<spring:message code="breadcrumb.home.title" />" class="tip-bottom"><i class="icon-home"></i><spring:message code="breadcrumb.home" /></a> 
+		<a href="list${ SPRING_EXT }"><spring:message code="breadcrumb.role.management" /></a> 
+		<a class="current"><spring:message code="breadcrumb.role.add" /></a>
+	</div>
+	
+	<!-- ----------------------------------------------------------- ROLE ADDING FORM ------------------------------------------------------------ -->
+	<div class="container-fluid" >
+		<div class="row">
+			<div class="col-xs-12 center">
+				
+				
+				<div class="widget-box">
+					<div class="widget-title">
+						<span class="icon"><i class="fa fa-plus-circle"></i></span>
+						<h5><spring:message code="title.addRole.big" /></h5>
+						<span style="float:right; margin-top: 8px; padding-right:12px; color:red;"><b>*&nbsp;<spring:message code="title.mandatoryfields" /></b></span>
+					</div>
+					
+					<div class="widget-content nopadding">
+						<sf:form class="form-horizontal" modelAttribute="RoleDTO" method="post" name="basic_validate" id="basic_validate" autocomplete="off">
+						
+							<input id="function_ids" name="function_ids" type="hidden"/>
+							
+							<div id="hierarchy_div" class="form-group">
+								<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="rolemgt.label.organizationid"/></label>
+					            <div class="col-sm-9 col-md-9 col-lg-10">
+					             	<select id="ou" name="ou" style="text-align: center; width: 37%">
+				             			<c:forEach var="ou" items="${ ouList }">
+											<option value="${ ou.key }">${ ou.value }</option>
+										</c:forEach>
+									</select>
+					            </div>
+							</div>
+							
+							<div id="role_name_div" class="form-group">
+								<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="rolemgt.label.rolename"/></label>
+					            <div class="col-sm-9 col-md-9 col-lg-10">
+					                <sf:input path="name" name="name" class="form-control input-sm" style="width: 37%;" type="text" />
+					            </div>
+							</div>
+							
+							<div class="form-group">
+								<div class="col-sm-3 col-md-3 col-lg-3"></div>
+					            <label class="col-sm-3 col-md-3 col-lg-3" style=" font-weight: bold;  font-size: 12px; color:#666666">ASSIGNED&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FUNCTIONS</label>
+					            <div class="col-sm-3 col-md-3 col-lg-3"></div>
+					            <label class="col-sm-3 col-md-3 col-lg-3" style=" font-weight: bold;  font-size: 12px; color:#666666">AVAILABLE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FUNCTIONS</label>
+							</div>
+							
+						</sf:form>
+						
+						<div class="form-horizontal">
+							<div class="form-group">
+								<div class="row">
+									<label class="col-xs-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="rolemgt.label.rolefunctions"/></label>
+									<div class="col-xs-4">
+										<select name="from" id="undo_redo" class="form-control" style="height: 230px" multiple="multiple">
+										</select>
+									</div>
+										<div class="col-xs-2">
+											<button type="button" id="undo_redo_undo" class="btn btn-primary btn-block"><spring:message code="button.role.undo"/></button>
+											<button type="button" id="undo_redo_rightAll" class="btn btn-block"><i class="glyphicon glyphicon-forward"></i></button>
+											<button type="button" id="undo_redo_rightSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-right"></i></button>
+											<button type="button" id="undo_redo_leftSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-left"></i></button>
+											<button type="button" id="undo_redo_leftAll" class="btn btn-block"><i class="glyphicon glyphicon-backward"></i></button>
+											<button type="button" id="undo_redo_redo" class="btn btn-warning btn-block"><spring:message code="button.role.redo"/></button>
+										</div>
+									<div class="col-xs-4">
+										<select name="to" id="undo_redo_to" class="form-control" style="height: 230px" multiple="multiple">
+										</select>
+									</div>
+								</div>
+							</div>
+							
+							<div class="form-actions">
+								<input id="submitButton" type="button" style="margin-left:0%" value='<spring:message code="button.save" />' class="btn btn-primary">
+								<input onclick="history.go(-1);" type="button" style="margin-left:3%" value='<spring:message code="button.cancel" />' class="btn btn-primary">
+							</div>
+						</div>
+						
+					</div>
+					
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- ----------------------------------------------------------- ROLE ADDING FORM ------------------------------------------------------------ -->
+</div>
+
+<script src="../js/multiselect.js"></script>
+<script src="../js/custom/role_add.js"></script>
+<%@ include file="../include/copyright.jsp"%>
+<%@ include file="../home/footer.jsp"%>
+<script src="../js/custom/role_select2_patch.js"></script>

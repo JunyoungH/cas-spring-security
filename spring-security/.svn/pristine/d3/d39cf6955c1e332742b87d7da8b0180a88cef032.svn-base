@@ -1,0 +1,32 @@
+<%@ page pageEncoding="UTF-8"%>
+<%@ include file="../include/import.jsp"%>
+<%@ include file="../home/header.jsp"%>
+<jsp:include page="../home/leftnav.jsp" />
+
+<sec:authorize access="hasAnyRole('ROLE_AM_ACCOUNT_MANAGE')" var="isAccountManage"></sec:authorize>
+<sec:authorize access="hasAnyRole('ROLE_AM_ORGANIZATION_MANAGE')" var="isOrganizationManage"></sec:authorize>
+<sec:authorize access="hasAnyRole('ROLE_AM_ACCOUNT_VIEW')" var="isAccountReadOnly"></sec:authorize>
+<sec:authorize access="hasAnyRole('ROLE_AM_ORGANIZATION_VIEW')" var="isOrganizationReadOnly"></sec:authorize>
+<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT')" var="isAdmin"></sec:authorize>
+<sec:authorize access="hasAnyRole('ROLE_AM_EDIT_MY_ACCOUNT')" var="isEditMyAccount"></sec:authorize>
+
+<script>
+if('${ isAdmin }'=='true'){
+	location.href=$("#WEBAPPS").html()+"/account/index"+$("#SPRING_EXT").html();
+}else if('${ isAccountManage }'=='true' || '${ isAccountReadOnly }'=='true'){
+	location.href=$("#WEBAPPS").html()+"/account/index"+$("#SPRING_EXT").html();
+}else if('${ isOrganizationReadOnly }'=='true' || '${ isOrganizationManage }'=='true'){
+	location.href=$("#WEBAPPS").html()+"/organization/index"+$("#SPRING_EXT").html();
+}else if('${ isEditMyAccount }'=='true'){
+	location.href=$("#WEBAPPS").html()+"/account/editConfidential"+$("#SPRING_EXT").html();
+}
+</script>
+
+<%@ include file="../include/copyright.jsp"%>
+<%@ include file="../home/footer.jsp"%>
+
+
+
+
+
+

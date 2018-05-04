@@ -1,0 +1,117 @@
+/**
+ * JS for Role Add
+ */
+
+$(document).ready(function(){
+	
+//	$('#undo_redo').multiselect();
+//	
+//	$('#s2id_undo_redo').remove();
+//	$('#s2id_undo_redo_to').remove();
+//	$('#undo_redo').removeClass('select2-offscreen');
+//	$('#undo_redo_to').removeClass('select2-offscreen');
+	
+	
+		
+	/* Prepare available functions for a new role */
+	getAvailableFunctions($('#ou').val());
+	
+	
+	
+	$('#ou').change(function() {
+		
+		getAvailableFunctions($('#ou').val());
+//		$('#name').val("");
+		
+    });
+	
+	function getAvailableFunctions(ou) {
+		
+		var parameter = {
+				'ou' : ou
+		};
+		
+		$.ajax({
+			type : 'POST',
+			url : 'get_available_functions'+$("#SPRING_EXT").html(),
+			data : parameter,
+			dataType : 'json',
+			success : function(data) {
+				
+				$('#undo_redo').empty();
+				$('#undo_redo_to').empty();
+				$.each(data, function (i, data) {
+				    $('#undo_redo_to').append($('<option>', { 
+				        value: data.function_id,
+				        text : data.function_name 
+				    }));
+				});
+				
+			}
+		});
+		
+	}
+	
+	$("#submitButton").click(function(){
+		if($( "#basic_validate" ).valid()){
+			var function_ids='';
+			$("#undo_redo > option").each(function(index, value){
+			   if(index == 0){
+				   function_ids += this.value;			   
+			   }else{
+				   function_ids += ','+this.value;
+			   }
+			});
+			$('#function_ids').val(function_ids);
+			if(function_ids==''){
+				alertNotification($("#alert1FunctionAtLeast").html());
+			}else{
+				$( "#basic_validate" ).submit();
+			}
+		}
+	});
+			
+	// Form Validation
+    $("#basic_validate").validate({
+		rules:{
+			
+			name:{
+				required:true,
+				remote:{
+					type : 'POST',
+		            url : 'check_unique_role_name.wilas',
+		            data : {
+		            	'ou': function(){
+		            		return $('#ou').val();
+		            	},
+		            	'roleName': function(){
+		            		return $('#name').val();
+		            	}
+		            },
+		            dataType : 'json',
+				},
+				maxlength:150
+			}
+			
+		},
+		messages: {
+			
+			name:{
+				required:$("#errormsgRoleNameRequired").html(),
+				remote:$("#errormsgRoleNameExists").html(),
+				maxlength:$("#errormsgMaxlength150").html()
+			}
+			
+			
+		},
+		errorClass: "help-inline",
+		errorElement: "span",
+		highlight:function(element, errorClass, validClass) {
+			$(element).parents('.form-group').removeClass('has-success').addClass('has-error');
+		},
+		unhighlight: function(element, errorClass, validClass) {
+			$(element).parents('.form-group').removeClass('has-error').addClass('has-success');
+		}
+	});
+	
+});

@@ -1,0 +1,34 @@
+package com.techstudio.dao.am;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+
+import com.techstudio.dao.BaseJPARepository;
+import com.techstudio.model.am.CaptivePortalDTO;
+
+
+@Repository
+public interface CaptivePortalDao extends BaseJPARepository<CaptivePortalDTO, Long>{
+
+	List<CaptivePortalDTO> findByOrganizationDTO_OrganizationId(Long organizationId);
+
+	Page<CaptivePortalDTO> findByOrganizationDTO_OrganizationId(Long organizationId, Pageable pageRequest);
+
+	List<CaptivePortalDTO> findByCpSpecialCode(String specialCode);
+
+	CaptivePortalDTO findByCpId(Long cpId);
+
+	List<CaptivePortalDTO> findByOrganizationDTO_DeleteFlagNotAndOrganizationDTO_Ou(int deleteFlag, String ou);
+
+	List<CaptivePortalDTO> findByOuOrOuLike(String currentLoginOu, String ouPattern);
+
+	Page<CaptivePortalDTO> findByOrganizationDTO_OrganizationIdIn(
+			List<Long> organizationIdList, Pageable pageRequest);
+
+	List<CaptivePortalDTO> findByOrganizationDTO_DeleteFlagNotAndOrganizationDTO_OuLike(
+			int deleteFlag, String ouPattern);
+
+}

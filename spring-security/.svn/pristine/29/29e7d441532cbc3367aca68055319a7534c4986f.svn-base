@@ -1,0 +1,51 @@
+package com.techstudio.service.am;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.techstudio.dao.am.OrganizationAliasDao;
+import com.techstudio.model.am.OrganizationAliasDTO;
+
+@Service
+public class OrganizationAliasServiceImpl extends BaseService{
+	
+	private static final Logger log = Logger.getLogger(OrganizationAliasServiceImpl.class);
+	
+	@Autowired
+	private OrganizationAliasDao organizationAliasDao;
+	
+	@Transactional
+	public String getUserCatergoryByHierarchyLevel(
+			int heirarchyLevel){
+		
+		log.debug("OrganizationAliasServiceImpl | getOrganizationAliasListByHierarchyLevel | entry");
+		log.debug("OrganizationAliasServiceImpl | getOrganizationAliasListByHierarchyLevel | HeirarchyLevel: "+ heirarchyLevel);
+		
+		List<OrganizationAliasDTO> organizationAliasList = organizationAliasDao.findByHierarchyLevel(heirarchyLevel);
+		OrganizationAliasDTO organizationAliasDTO = organizationAliasList.get(0);
+		String userCatergory = organizationAliasDTO.getAliasName();
+		
+		log.debug("OrganizationAliasServiceImpl | getOrganizationAliasListByHierarchyLevel | UserCatergory: "+ userCatergory);
+		log.debug("OrganizationAliasServiceImpl | getOrganizationAliasListByHierarchyLevel | exit");
+		return userCatergory;
+	}
+	
+	@Transactional
+	public List<OrganizationAliasDTO> getLowerLevelUserTypeList(int loginHierarchyLevel, boolean containingLoginHierarchy) {
+		
+		log.debug("OrganizationAliasServiceImpl | getLowerLevelUserTypeList | entry");
+		log.debug("OrganizationAliasServiceImpl | getLowerLevelUserTypeList | HeirarchyLevel: "+ loginHierarchyLevel);
+		
+		List<OrganizationAliasDTO> organizationAliasList = organizationAliasDao.findByHierarchyLevelBetween(containingLoginHierarchy ? loginHierarchyLevel : loginHierarchyLevel+1, loginHierarchyLevel+VIEW_LAYERS);
+		
+		log.debug("OrganizationAliasServiceImpl | getLowerLevelUserTypeList | size: "+ organizationAliasList.size());
+		log.debug("OrganizationAliasServiceImpl | getLowerLevelUserTypeList | exit");
+		return organizationAliasList;
+	}
+	
+	
+}

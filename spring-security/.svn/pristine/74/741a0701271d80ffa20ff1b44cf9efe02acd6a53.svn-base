@@ -1,0 +1,94 @@
+package com.techstudio.form.controller.am;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.techstudio.common.StatusCode;
+import com.techstudio.common.am.EasyMail;
+import com.techstudio.form.controller.BaseController;
+import com.techstudio.service.am.EmailReportServiceImpl;
+
+@Controller
+public class EmailReportController extends BaseController{
+
+	@Autowired
+	private EasyMail easyMail;
+	
+	@Autowired
+	private EmailReportServiceImpl emailReportService;
+
+	@Value("${EMAIL_RECEIVER}")
+	private String emailReceiver;
+	
+	@Value("${wilasam.resetpassword.url}")
+	private String WILAS_AM_RESET_PASSWORD_URL;
+
+	private static final Logger log = Logger.getLogger(EmailReportController.class);
+	
+	@Override
+	protected String getModuleFolder() {
+		return null;
+	}
+
+	// TODO: Need to refactoring
+	@RequestMapping("application-email" + SPRING_EXT)
+	public void applicationEmail(
+			HttpServletRequest req,
+			HttpServletResponse rep
+			) throws IOException {
+		
+		
+		String client_ou_list = req.getParameter("client_ou");
+		/*String domain_name = req.getParameter("domain_name");*/
+		String term_and_condition = req.getParameter("term_and_condition");
+		String username_and_password = req.getParameter("username_and_password");
+		String question_and_form = req.getParameter("question_and_form");
+		/*String otp = req.getParameter("otp");
+		String social_media_login = req.getParameter("social_media_login");
+		String email_one_time_link = req.getParameter("email_one_time_link");
+		String analyticCheck = req.getParameter("analyticCheck");*/
+		
+		String receiversList[] = new String[]{emailReceiver};
+		
+		easyMail.sendMeMail(receiversList, emailReceiver, client_ou_list,/* cp_server, domain_name,*/ term_and_condition, username_and_password, question_and_form/*,
+				otp, social_media_login, email_one_time_link, analyticCheck*/);
+		log.info("|applicationEmail()|"+StatusCode.EMAIL_SENT+"|Email sent.");
+		rep.getWriter().append("Emails Sent to "+emailReceiver+".");
+
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "resetpasswordemail" + SPRING_EXT)
+	public boolean reset_password_email(
+			@RequestParam("email") String email
+		)
+	{
+		
+		log.debug("AccountController | account/resetpasswordemail | GET | entry");
+		
+		try {
+			emailReportService.generateTokenAndSendEmail(email);
+		} catch (Exception e) {
+			log.info(e,e);
+			return false;
+		}
+		
+		log.debug("AccountController | account/resetpasswordemail | GET | exit");
+		return true;
+		
+	}
+
+	
+
+
+}

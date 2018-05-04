@@ -1,0 +1,184 @@
+/**
+ * JS for Account Add
+ */
+
+$(document).ready(function(){
+	
+	/*It is not allowed to create an account before create an organization*/
+	if($("#ou").val()==null){
+		
+		bootbox.dialog({
+			closeButton: false,
+            title: $('#title').html(),
+            message: '<div class="modal-body" style="margin:5%; text-align:center; font-size:18px">'+
+            $('#message').html()+'</div>',
+            buttons: {
+                success: {
+                    label: $('#buttonOk').html(),
+                    className: "btn-primary",
+                    callback: function () {
+                    	location = "../";
+                    }
+                }
+            }
+        });
+		
+	}
+	/*It is not allowed to create an account before create an organization*/
+	
+	reload_role_list();
+	
+	if($('#errmsg').html().trim().length!=0 && $('#errmsg').html().trim()!="")
+	{
+		alertNotification($('#errmsg').html());
+		
+	}
+	
+	$('#ou').change(function() {
+		
+		reload_role_list();
+		
+    });
+	
+	function reload_role_list(){
+		
+		var ob = {
+				'ou' : $('#ou').val()
+			};
+		$.ajax({
+			type : 'GET',
+			url : 'reload_role_list'+$("#SPRING_EXT").html(),
+			data : ob,
+			dataType : 'json',
+			success : function(data) {
+				
+				$('#role_id').empty();
+				$.each(data, function (i, data) {
+				    $('#role_id').append($('<option>', { 
+				        value: data.id,
+				        text : data.name 
+				    }));
+				});
+				
+				$("#role_id option:first").prop("selected", "selected").change();
+				
+			}
+		});
+		
+	}
+	
+	var dialog_buttons = {};
+	
+	dialog_buttons[$("#hiddenButConfirm").html()] = function(e){
+		e.preventDefault(); //To prevent the browser from refreshing the page
+		dialogDiv.dialog("close");
+		$("#basic_validate").submit();
+		
+	};
+	
+	var dialogDiv = $("#dialog-form").dialog({
+		autoOpen : false,
+		resizable: false,
+		height : 300,
+		width : $(window).width()*0.3,
+		modal : true,
+		position: ['center','center-20%'],
+		buttons : dialog_buttons,
+		close : function() {
+
+		},
+		show: {
+			effect: "puff",
+			duration: 500
+		},
+		hide: {
+			effect: "puff",
+			duration: 500
+		}
+	});
+	
+	$("#submitButton").click(function(){
+		
+		if($("#basic_validate").valid()){
+			$("#mainPanel").css("margin-top", "5%");
+			dialogDiv.dialog("open");
+		}
+		
+	});
+	
+	// Form Validation
+    var basic_validate = $("#basic_validate").validate({
+		rules:{
+			
+			loginUid:{
+				required:true,
+				email:true,
+				remote:{
+					type : 'POST',
+		            url : 'check_unique_loginuid.wilas',
+		            data : {
+		            	'loginUid': function(){
+		            		return $('#loginUid').val();
+		            	}
+		            },
+		            dataType : 'json',
+				},
+				maxlength:148
+			},
+			firstName:{
+				required:true,
+				maxlength:148
+			},
+			midName:{
+				maxlength:148
+			},
+			lastName:{
+				required:true,
+				maxlength:148
+			},
+			contractNum:{
+				digits:true,
+				maxlength:15
+			},
+			remarks:{
+				maxlength:150
+			}
+			
+		},
+		messages: {
+			
+			loginUid:{
+				required:$("#errormsgAccountEmailRequired").html(),
+				email:$("#errormsgEmail").html(),
+				remote:$("#errormsgEmailExists").html(),
+				maxlength:$("#errormsgMaxlength").html()
+			},
+			firstName:{
+				required:$("#errormsgAccountFirstNameRequired").html(),
+				maxlength:$("#errormsgMaxlength").html()
+			},
+			lastName:{
+				required:$("#errormsgAccountLastNameRequired").html(),
+				maxlength:$("#errormsgMaxlength").html()
+			},
+			contractNum:{
+				digits: $("#errormsgDigits").html(),
+				maxlength:$("#errormsgMobileMaxlength").html()
+			},
+			remarks:{
+				maxlength:$("#errormsgMaxlength250").html()
+			},
+			
+			
+		},
+		errorClass: "help-inline",
+		errorElement: "span",
+		highlight:function(element, errorClass, validClass) {
+			$(element).parents('.form-group').removeClass('has-success').addClass('has-error');
+		},
+		unhighlight: function(element, errorClass, validClass) {
+			$(element).parents('.form-group').removeClass('has-error').addClass('has-success');
+		}
+	});
+	
+});

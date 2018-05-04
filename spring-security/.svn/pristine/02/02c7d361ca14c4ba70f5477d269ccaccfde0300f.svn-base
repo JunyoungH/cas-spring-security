@@ -1,0 +1,83 @@
+<%@ page pageEncoding="UTF-8"%>
+<%@ include file="../include/import.jsp"%>
+<%@ include file="../home/header.jsp"%>
+<jsp:include page="../home/leftnav.jsp" />
+
+<!-- Attributes List -->
+		
+<div id="SPRING_EXT" style="display: none">${ SPRING_EXT }</div>
+<div id="errmsg" style="display: none">${ errmsg }</div>
+<div id="title" style="display: none"><spring:message code="rolemgt.alert.title" /></div>
+<div id="message" style="display: none"><spring:message code="rolemgt.delete.alert" /></div>
+<div id="confirm" style="display: none"><spring:message code="button.confirm" /></div>
+<div id="cancel" style="display: none"><spring:message code="button.cancel" /></div>
+
+<!-- Attributes List -->
+
+<div id="WEBAPPS" style="display: none;">${ WEBAPPS }</div>
+<div id="content">
+	<div id="content-header">
+		<h1><spring:message code="title.role.table" /></h1>
+		
+		<div class="btn-group">
+			<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ROLE_CREATE')">
+				<%-- <a id="add-btn" href="${ WEBAPPS }/role/add${ SPRING_EXT }" class="btn btn-large tip-bottom" style="background-color:#4ea3da;" title="<spring:message code="button.viewRole.add" />"><i class="fa fa-plus"></i></a> --%>
+				<a id="add-btn" href="${ WEBAPPS }/role/add${ SPRING_EXT }" class="btn btn-large tip-bottom" title="<spring:message code="button.viewRole.add" />"><i class="fa fa-plus"></i></a>
+			</sec:authorize>
+			<sec:authorize access="hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_WS_ORG_DEFAULT', 'ROLE_AM_ROLE_DELETE')">
+				<%-- <a id="deleterow" href="#" class="btn btn-large tip-bottom" style="background-color: #EC5C5C;" title="<spring:message code="button.viewRole.delete" />" ><i class="fa fa-bitbucket"></i></a> --%>
+				<a id="deleterow" href="#" class="btn btn-large tip-bottom" title="<spring:message code="button.viewRole.delete" />" ><i class="fa fa-times"></i></a>
+			</sec:authorize>
+		</div>
+	</div>
+
+	<div id="breadcrumb">
+		<a href="${ WEBAPPS }/main${ SPRING_EXT }" title="<spring:message code="breadcrumb.home.title" />" class="tip-bottom"><i class="icon-home"></i><spring:message code="breadcrumb.home" /></a> 
+		<a class="#"><spring:message code="breadcrumb.role.management" /></a>
+		<a class="current"><spring:message code="breadcrumb.role.view" /></a>
+	</div>
+	
+	<!-- ----------------------------------------------------------- ROLE TABLE ------------------------------------------------------------- -->
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-xs-12 center">
+
+				<div class="widget-box">
+					<div class="widget-title">
+						<span class="icon"><i class="fa fa-table"></i></span>
+						<h5><spring:message code="title.role.table" /></h5>
+						<%-- <span title="<spring:message code="table.icon.help" /> class="label label-info tip-right" style="float:left;">
+							<i class="fa fa-info"></i>
+						</span> --%>
+					</div>
+					<div class="widget-content nopadding">
+						<table id ="roleList" class="table table-bordered table-striped table-hover data-table" style="text-align: center">
+							<thead>
+								<tr>
+									<th style="background-color: #E2E2E2; border-radius: 0;" width="0%"><spring:message code="table.role.columnname.id" /></th>
+									<th style="background-color: #DEDEDE; border-radius: 0;" width="25%"><spring:message code="table.role.columnname.name" /></th>
+									<th style="background-color: #E2E2E2; border-radius: 0;" width="25%"><spring:message code="table.role.columnname.ou" /></th>
+									<th style="background-color: #DEDEDE; border-radius: 0;" width="25%"><spring:message code="table.role.columnname.usertype" /></th>
+									<th width="0%"></th>
+									<th style="background-color: #E2E2E2; border-radius: 0;" width="25%"><spring:message code="table.columnname.detail" /></th>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr>
+									<td colspan="5" class="dataTables_empty" ><spring:message code="table.server.loading" /></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- ----------------------------------------------------------- ROLE TABLE ------------------------------------------------------------- -->
+</div>
+
+<script src="../js/custom/role_list.js"></script>
+
+<%@ include file="../include/copyright.jsp"%>
+<%@ include file="../home/footer.jsp"%>	

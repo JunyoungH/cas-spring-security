@@ -1,0 +1,267 @@
+<%@ page pageEncoding="UTF-8"%>
+<%@ include file="../include/import.jsp"%>
+<%@ include file="../home/header.jsp"%>
+<jsp:include page="../home/leftnav.jsp" />
+
+<!-- Attributes List -->
+		
+<div id="SPRING_EXT" style="display: none">${ SPRING_EXT }</div>
+<div id="errmsg" style="display: none">${ errmsg }</div>
+<div id="shortFormatOu" style="display: none">${ shortFormatOu }</div>
+<div id="prameterRoleId" style="display: none">${ roleId }</div>
+<%-- <div id="accountOu" style="display: none">${ accountOu }</div --%>>
+
+<!-- Attributes List -->
+
+<div id="WEBAPPS" style="display: none;">${ WEBAPPS }</div>
+<div id="content">
+	<div id="content-header">
+		<h1><spring:message code="title.editAccount.big" /></h1>
+	</div>
+
+	<div id="breadcrumb">
+		<a href="${ WEBAPPS }/main${ SPRING_EXT }" title="<spring:message code="breadcrumb.home.title" />" class="tip-bottom"><i class="icon-home"></i><spring:message code="breadcrumb.home" /></a> 
+		<a href="list${ SPRING_EXT }"><spring:message code="breadcrumb.account.view" /></a> 
+		<a class="current"><spring:message code="breadcrumb.account.edit" /></a>
+	</div>
+	<c:choose>
+	
+	  	<c:when test="${editable eq true}">
+			<!-- ----------------------------------------------------------- ACCOUNT EDITTING FORM ------------------------------------------------------------ -->
+			<sf:form modelAttribute="AccountDTO" method="POST" name="basic_validate" id="basic_validate" >
+			<div class="container-fluid" >
+				<div class="row">
+					<div class="col-xs-12 center">
+						
+						
+						<div class="widget-box">
+							<div class="widget-title">
+								<span class="icon"><i class="fa fa-pencil-square-o"></i></span>
+								<h5><spring:message code="title.editAccount.big" /></h5>
+								<span style="float:right; margin-top: 8px; padding-right:12px; color:red;">*&nbsp;<spring:message code="title.mandatoryfields" /></span>
+							</div>
+							
+							<div class="widget-content nopadding">
+								<div class="form-horizontal">
+								
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="editAccount.form.belong" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                    <input id="readonlyOu" class="form-control input-sm" style="width: 37%" type="text" readonly/>
+		                                	<sf:hidden path="ou"/>
+		                                </div>
+									</div>
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="editAccount.form.email" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                    <sf:input class="form-control input-sm" style="width: 37%" path="loginUid" type="text" />
+		                                </div>
+									</div>
+								
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="editAccount.form.first" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                    <sf:input class="form-control input-sm" style="width: 37%" path="firstName" type="text" />
+		                                </div>
+									</div>
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="editAccount.form.Mid" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                    <sf:input class="form-control input-sm" style="width: 37%" path="midName" type="text" />
+		                                    
+		                                </div>
+									</div>
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="editAccount.form.last" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                    <sf:input class="form-control input-sm" style="width: 37%" path="lastName" type="text" />
+		                                    
+		                                </div>
+									</div>
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="editAccount.form.mobile" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                    <sf:input class="form-control input-sm" style="width: 37%" path="contractNum" type="text" />
+		                                </div>
+									</div>
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="editAccount.form.roles" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                    <select  id="roleId" name="roleId" style="width: 37%">
+		                                    	<c:forEach var="r" items="${ rolesList }">
+													<option value="${ r.roleId }">${ r.name }</option>
+												</c:forEach>
+								  			</select>
+		                                </div>
+									</div>
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="editAccount.form.status" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                    <sf:select  path="status" style="width: 37%">
+		                                    	<sf:option value="1"><spring:message code="drowdown.active"/></sf:option>
+		                                    	<sf:option value="0"><spring:message code="drowdown.suspend"/></sf:option>
+								  			</sf:select>
+		                                </div>
+									</div>		
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="editAccount.form.remark" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                    <sf:textarea  class="form-control input-sm" style="width: 37%" path="remarks" name="remarks"  rows="6" cols="22"></sf:textarea>
+		                                </div>
+									</div>
+									
+									<sf:hidden path="accountId"/>
+									<sf:hidden path="encryptedPassword"/>
+									<sf:hidden path="passwordLastUpdated"/>
+									<sf:hidden path="createdDate"/>
+									<sf:hidden path="deleteFlag"/>
+									
+									<div class="form-actions">
+										<input id="submitButton" type="button" style="margin-left:0%" value='<spring:message code="button.save" />' class="btn btn-primary">
+										<input onclick="history.go(-1);" type="button" style="margin-left:3%" value='<spring:message code="button.cancel" />' class="btn btn-primary">
+									</div>
+									
+								</div>
+							</div>
+							
+							
+						</div>
+					</div>
+				</div>
+			</div>
+			</sf:form>
+			<!-- ----------------------------------------------------------- ACCOUNT EDITTING FORM ------------------------------------------------------------ -->
+	  	</c:when>
+	  	
+	  	<c:otherwise>
+	  		<!-- ----------------------------------------------------------- ACCOUNT EDITTING FORM ------------------------------------------------------------ -->
+			<sf:form modelAttribute="AccountDTO" method="POST" name="basic_validate" id="basic_validate" >
+			<div class="container-fluid" >
+				<div class="row">
+					<div class="col-xs-12 center">
+						
+						
+						<div class="widget-box">
+							<div class="widget-title">
+								<span class="icon"><i class="fa fa-pencil-square-o"></i></span>
+								<h5><spring:message code="title.editAccount.big" /></h5>
+								<span style="float:right; margin-top: 8px; padding-right:12px; color:red;">*&nbsp;<spring:message code="title.mandatoryfields" /></span>
+							</div>
+							
+							<div class="widget-content nopadding">
+								<div class="form-horizontal">
+								
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="editAccount.form.belong" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                    <input id="readonlyOu" class="form-control input-sm" style="width: 37%" type="text" readonly/>
+		                                	<sf:hidden path="ou"/>
+		                                </div>
+									</div>
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="editAccount.form.email" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                	<input id="readonlyLoginUid" class="form-control input-sm" style="width: 37%" type="text" readonly/>
+		                                	<sf:hidden path="loginUid"/>
+		                                </div>
+									</div>
+								
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="editAccount.form.first" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                	<input id="readonlyFirstName" class="form-control input-sm" style="width: 37%" type="text" readonly/>
+		                                	<sf:hidden path="firstName"/>
+		                                </div>
+									</div>
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="editAccount.form.Mid" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		    	                            <input id="readonlyMidName" class="form-control input-sm" style="width: 37%" type="text" readonly/>
+		                                	<sf:hidden path="midName"/>
+		                                </div>
+									</div>
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><span style="color:red;">*</span>&nbsp;<spring:message code="editAccount.form.last" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                	<input id="readonlyLastName" class="form-control input-sm" style="width: 37%" type="text" readonly/>
+		                                	<sf:hidden path="lastName"/>
+		                                    
+		                                </div>
+									</div>
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="editAccount.form.mobile" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                	<input id="readonlyContractNum" class="form-control input-sm" style="width: 37%" type="text" readonly/>
+		                                	<sf:hidden path="contractNum"/>
+		                                </div>
+									</div>
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="editAccount.form.roles" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                    <select  id="roleId" name="roleId" style="width: 37%" disabled="true">
+		                                    	<c:forEach var="r" items="${ rolesList }">
+													<option value="${ r.roleId }">${ r.name }</option>
+												</c:forEach>
+								  			</select>
+		                                </div>
+									</div>
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="editAccount.form.status" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                    <sf:select  path="status" style="width: 37%" disabled="true">
+		                                    	<sf:option value="1"><spring:message code="drowdown.active"/></sf:option>
+		                                    	<sf:option value="0"><spring:message code="drowdown.suspend"/></sf:option>
+								  			</sf:select>
+		                                </div>
+									</div>		
+									
+									<div class="form-group">
+										<label class="col-sm-3 col-md-3 col-lg-2 control-label" style=" font-weight: bold;  font-size: 12px; color:#666666"><spring:message code="editAccount.form.remark" /></label>
+		                                <div class="col-sm-9 col-md-9 col-lg-10">
+		                                	<textarea id="readonlyRemarks" class="form-control input-sm" style="width: 37%" rows="6" cols="22" readonly></textarea>
+		                                	<sf:hidden path="remarks"/>
+		                                </div>
+									</div>
+									
+									<sf:hidden path="accountId"/>
+									<sf:hidden path="encryptedPassword"/>
+									<sf:hidden path="passwordLastUpdated"/>
+									<sf:hidden path="createdDate"/>
+									<sf:hidden path="deleteFlag"/>
+									
+									<div class="form-actions">
+										<input onclick="history.go(-1);" type="button" style="margin-left:0%" value='<spring:message code="button.cancel" />' class="btn btn-primary">
+									</div>
+									
+								</div>
+							</div>
+							
+							
+						</div>
+					</div>
+				</div>
+			</div>
+			</sf:form>
+			<!-- ----------------------------------------------------------- ACCOUNT EDITTING FORM ------------------------------------------------------------ -->
+	  	</c:otherwise>
+	</c:choose>
+	
+</div>
+
+<script src="../js/custom/account_info_edit.js"></script>
+
+<%@ include file="../include/copyright.jsp"%>
+<%@ include file="../home/footer.jsp"%>	

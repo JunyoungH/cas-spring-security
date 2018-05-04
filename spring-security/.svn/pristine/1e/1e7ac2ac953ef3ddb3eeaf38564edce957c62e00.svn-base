@@ -1,0 +1,133 @@
+package com.techstudio.common;
+
+public class StatusCode {
+	
+	/*Category*/
+	
+	public static int SYSTEM = 100;
+
+	public static int HARDWARE = 101;
+
+	public static int SOFTWARE = 102;
+
+	public static int CONNECTIVITY = 200;
+
+	public static int INCOMEING_REQUESTS = 201;
+
+	public static int OUTGOING_CALLS = 202;
+
+	public static int DATA = 300;
+
+	public static int INTERNAL_SOURCES = 301;
+
+	public static int EXTERNAL_SOURCES = 302;
+
+	public static int FILE = 400;
+
+	public static int TEXT = 401;
+
+	public static int IMAGE = 402;
+
+	public static int VIDEO = 403;
+
+	public static int AUDIO = 404;
+
+	public static int GENERAL_UNKNOWN = 900;
+
+	public static int STATUS = 901;
+	
+
+	/*Detail*/
+	
+	//901 STATUS | Example: 901xxx
+	
+	public static int CREATE_SUCCESS = 901701;
+	
+	public static int CREATE_FAILED = 901702;
+	
+	public static int READ_SUCCESS = 901703;
+	
+	public static int READ_FAILED = 901704;
+	
+	public static int UPDATE_SUCCESS = 901705;
+	
+	public static int UPDATE_FAILED = 901706;
+	
+	public static int DELETE_SUCCESS = 901707;
+	
+	public static int DELETE_FAILED = 901708;
+	
+	public static int SUSPEND_SUCCESS = 901709;
+	
+	public static int SUSPEND_FAILED = 901710;
+	
+	public static int ACTIVE_SUCCESS = 901714;
+	
+	public static int ACTIVE_FAILED = 901715;
+	
+	public static int ASSIGN_SUCCESS = 901711;
+	
+	public static int ASSIGN_FAILED = 901712;
+	
+	public static int EMAIL_SENT = 901713;
+
+	//300 DATA
+
+	//3001xx data format / value / type 
+
+	public static int FORMAT_PHASEING_ERROR = 300100;
+
+	public static int DATA_NULL_ERROR= 300101;
+
+	public static int DATA_ZERO_ERROR= 300102;
+
+
+	//301 INTERNAL_SOURCES
+
+	//3010xx
+
+	public static int LDAP_ERROR = 301001;
+
+	public static int LDAP_OU_ERROR = 301001;
+
+
+	//302 EXTERNAL_SOURCES
+
+	//3020xx API call
+
+	public static int API_SUCCESS = 302000;
+
+	public static int API_PENDING = 302001;
+	
+	public static int API_RESULT_NO_FOUND = 302003;
+
+	//3021xx API dummy
+
+	public static int API_DUMMY = 302100;
+
+	//3024xx api fail
+
+	public static int API_FAIL = 302400;
+
+	public static int API_TIME_OUT = 302408;
+
+
+	//400 FILE
+
+	//4000xx config
+
+	public static int CONFIG_FILE_NOT_FOUND = 400000;
+
+	//4001xx i18n language
+
+	public static int LANGUAGE_CONFIG_FIRST_CACHE = 400100;
+
+
+
+	//900 GENERAL_UNKNOWN
+
+	//900100 email
+
+	public static int GENERAL_EXCEPTION = 900101;
+	
+}

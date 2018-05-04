@@ -1,0 +1,1108 @@
+package com.techstudio.form.controller.am;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.jsoup.helper.StringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.HttpSessionRequiredException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+import com.techstudio.common.AjaxListResponse;
+import com.techstudio.common.EasyClient;
+//import com.techstudio.common.LocalConstant;
+import com.techstudio.common.StatusCode;
+import com.techstudio.dao.am.AccountDao;
+import com.techstudio.dao.am.CaptivePortalDao;
+import com.techstudio.dao.am.OrganizationDao;
+import com.techstudio.dao.am.PiwikSiteDao;
+import com.techstudio.form.controller.BaseController;
+import com.techstudio.model.am.AuthenticationTypeDTO;
+import com.techstudio.model.am.CaptivePortalDTO;
+import com.techstudio.model.am.OrganizationAliasDTO;
+import com.techstudio.model.am.OrganizationDTO;
+import com.techstudio.model.am.filter.DataTableParameterObj;
+import com.techstudio.model.am.filter.OrganizationFilterObj;
+import com.techstudio.model.ldap.OUDTO;
+import com.techstudio.model.ldap.UsrDTO;
+import com.techstudio.service.am.AuthenticationTypeServiceImpl;
+import com.techstudio.service.am.BaseService;
+import com.techstudio.service.am.CaptivePortalServiceImpl;
+import com.techstudio.service.am.OrganizationAliasServiceImpl;
+import com.techstudio.service.am.OrganizationServiceImpl;
+import com.techstudio.service.am.PiwikSiteServiceImpl;
+import com.techstudio.service.ldap.GrpService;
+import com.techstudio.service.ldap.OUService;
+import com.techstudio.service.ldap.UsrService;
+import com.techstudio.util.LdapUtils;
+//import com.techstudio.common.am.AjaxListResponse;
+
+//@SessionAttributes(BaseController.SESSION_ATTR_USER)
+@Controller
+public class OrganizationController extends BaseController{
+	
+	private static final Logger log = Logger.getLogger(OrganizationController.class);
+	
+	private static final int MANIPULATE_LAYER = 1;
+	private static final String NORMAL_PAGE = "Normal Page";
+	
+	private static final boolean CREATE_CAPTIVE_PORTAL = false;
+	private static final boolean UPDATE_CAPTIVE_PORTAL = true;
+	
+	private static final boolean CONTAINING_LOGIN_OU = true;
+	private static final boolean NOT_CONTAINING_LOGIN_OU = false;
+	
+	private static final boolean NOT_CONTAINING_LOGIN_HIERARCHY = false;
+	
+	private static final boolean ACTION_VIEW = true;
+	private static final boolean ACTION_MANIPULATE = false;
+	
+	private static final int ORGANIZATION_STATUS_SUSPEND = 0;
+	private static final int ORGANIZATION_STATUS_ACTIVE = 1;
+	private static final int ORGANIZATION_STATUS_DELETED = 2;
+	
+	private static final boolean CREATE_PIWIK_SITE = false;
+	private static final boolean UPDATE_PIWIK_SITE = true;
+	
+	@Value("${ROOT_ADMIN}")
+	private String ROOT_ADMIN;
+	
+	@Value("${wilascp.add.url}")
+	private String WILAS_CP_ADD_URL;
+	
+	@Autowired
+	private OrganizationServiceImpl organizationService;
+	
+	@Autowired
+	private OrganizationAliasServiceImpl organizationAliasService;
+	
+	@Autowired
+	private AuthenticationTypeServiceImpl authenticationTypeService;
+	
+	@Autowired
+	private CaptivePortalServiceImpl captivePortalService;
+	
+	@Autowired
+	private PiwikSiteServiceImpl piwikSiteService;
+	
+	/*============ Plz Delete after refactoring ===========*/
+	@Autowired
+	private OUDTO odto;
+	
+	@Autowired
+	private UsrDTO udto;
+	
+	@Autowired
+	private OrganizationDao organizationDao;
+	
+	@Autowired
+	private CaptivePortalDao captivePortalDao;
+	
+	/*============ Plz Delete after refactoring ===========*/
+	
+	@Autowired
+	private OUService ouSer;
+	
+	@Autowired
+	private UsrService usr;
+	
+	@Autowired
+	private GrpService grp;
+	
+	@Autowired
+	private MessageSource messageSource;
+
+	@Override
+	protected String getModuleFolder() {
+		return "organization/";
+	}
+	
+	@ExceptionHandler(HttpSessionRequiredException.class)
+	public String handleTimeout() {
+		return getRedirectedLoginPath();
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_ORGANIZATION_VIEW', 'ROLE_AM_ORGANIZATION_MANAGE')")
+	@RequestMapping(value = { "organization/index" + SPRING_EXT, "organization/list" + SPRING_EXT })
+	public String index(
+			Model model, 
+			Authentication principal
+			) {
+		
+		log.debug("OrganizationController | organization/list | entry");
+		
+		String loginOu = getCurrentLoginOu(principal);
+		int loginHierarchyLevel = getCurrentLoginHierarchyLevel(loginOu);
+		
+		Map<String, String> ouList = organizationService.getSubodinatesOuList(loginHierarchyLevel, loginOu, NOT_CONTAINING_LOGIN_OU, ACTION_VIEW);
+		List<OrganizationAliasDTO> userTypeList = organizationAliasService.getLowerLevelUserTypeList(loginHierarchyLevel, NOT_CONTAINING_LOGIN_HIERARCHY);
+		model.addAttribute("OuList", ouList);
+		model.addAttribute("UserTypeList", userTypeList);
+		model.addAttribute("LoginHierarchyLevel", loginHierarchyLevel);
+		
+		log.debug("OrganizationController | organization/list | exit");
+		return goToPageJsp("list");
+
+	}
+	
+
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_ORGANIZATION_VIEW', 'ROLE_AM_ORGANIZATION_MANAGE')")
+	@ResponseBody
+	@RequestMapping(value = "organization/ajax_list" + SPRING_EXT, headers = "Accept=application/json")
+	public AjaxListResponse ajax_oranization_list(
+			Model model, 
+			String sEcho, 
+			int iDisplayStart, 
+			int iDisplayLength,
+			int iSortCol_0,
+			String sSortDir_0,
+			String sSearch,
+			HttpServletRequest req, 
+			HttpServletResponse rep,
+			Locale loc,
+			Authentication principal
+			) 
+	{
+
+		log.debug("OrganizationController | organization/ajax_oranization_list | entry");
+
+		OrganizationFilterObj filter = new OrganizationFilterObj(getCurrentLoginHierarchyLevel(LdapUtils.getOuWithDot(principal)),  
+				getCurrentLoginOu(principal), req.getParameter("company_name"), req.getParameter("contact_email"),
+				req.getParameter("contact_name"), req.getParameter("contact_number"),
+				req.getParameter("hierarchy_level"), req.getParameter("ou"), req.getParameter("status"));
+		
+		DataTableParameterObj dataTableParameters = new DataTableParameterObj(sEcho, iDisplayStart, 
+				iDisplayLength, iSortCol_0, sSortDir_0, sSearch);
+		
+		AjaxListResponse resp = organizationService.getOrganizationAjaxListResponse(filter, dataTableParameters, req.getParameter("isAdmin"), req.getParameter("isReadOnly"), req.getParameter("isManage"));
+		
+		log.info("|listOrganization()|"+StatusCode.READ_SUCCESS+"|"+LdapUtils.getDn(principal)+"|NO PARAMETER|List successfully.");
+		log.debug("OrganizationController | organization/ajax_oranization_list | exit");
+		return resp;
+
+	}
+
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_ORGANIZATION_MANAGE')")
+	@RequestMapping(value = "organization/add" + SPRING_EXT, method = RequestMethod.GET)
+	public String add_organization(
+			Model model,
+			Authentication principal
+			) 
+	{
+		
+		log.debug("OrganizationController | organization/add | GET | entry");
+		
+		String accountOu = null;
+		if(!StringUtil.isBlank(getCurrentLoginOu(principal))) {
+			accountOu = getCurrentLoginOu(principal);
+		}
+		
+		if(!model.containsAttribute("OrganizationDTO")) {
+			model.addAttribute("OrganizationDTO", new OrganizationDTO()); // adding in model
+		}
+		model.addAttribute("shortFormatOu", BaseService.showOuFromCurrentHierarchy(getCurrentLoginHierarchyLevel(accountOu), accountOu));
+		model.addAttribute("superiorOu", accountOu);
+		model.addAttribute("hierarchyLevel", getCurrentLoginHierarchyLevel(LdapUtils.getOuWithDot(principal)));
+		
+		log.debug("OrganizationController | organization/add | GET | AccountOu: " + accountOu);
+		log.debug("OrganizationController | organization/add | GET | exit");
+		return goToPageJsp("add");
+            
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_ORGANIZATION_MANAGE')")
+	@RequestMapping(value = "organization/add" + SPRING_EXT, method = RequestMethod.POST)
+	public String organization_add_submit(
+			Model model,
+			@ModelAttribute("OrganizationDTO") OrganizationDTO organizationDTO,
+			HttpServletRequest req,
+			Authentication principal,
+			Locale loc
+			) 
+	{
+		log.debug("OrganizationController | organization/add | POST | entry");
+//		String aliasList = req.getParameter("aliasList");
+		
+		/*================Change "flag" to more meaningful name===================================*/
+		boolean passedFormValidation = req.getParameter("flag").equals("true");
+		/*================Change "flag" to more meaningful name===================================*/
+		
+		try {
+			log.debug(LdapUtils.getDn(principal)+" is trying to add a new organization.");
+			log.debug("OrganizationController | organization/add | POST | Organization Name: "+ organizationDTO.getOrganizationName());
+			
+			ouSer.create(setUpOuDTO(/*aliasList, */organizationDTO.getOu()), odto);
+			log.debug("OrganizationController | organization/add | POST | Inserted into LDAP.");
+			
+			organizationService.createOrganization(organizationDTO, LdapUtils.getOuWithDot(principal), getCurrentLoginHierarchyLevel(LdapUtils.getOuWithDot(principal))+1/*, aliasList*/);
+			log.debug("OrganizationController | organization/add | POST | Inserted into Database");
+			
+			log.info("|addOrganization()|"+StatusCode.CREATE_SUCCESS+"|"+LdapUtils.getDn(principal)+"|New Organization|Add successfully.");
+			log.debug("OrganizationController | organization/add | POST | exit");
+	        return redirectToAddAccountPage(model, passedFormValidation, principal, loc);
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|addOrganization()|"+StatusCode.CREATE_FAILED+"|"+LdapUtils.getDn(principal)+"|New Organization|Add failed.");
+			model.addAttribute("errmsg", messageSource.getMessage("crud.respond.add.unsuccessful", null, loc));
+			return add_organization( model, principal );
+		}
+        
+	}
+
+	private String setUpOuDTO(/*String aliasList, */String ou) {
+		String base = "";
+		String ouName = ou;
+		
+		if(ou.contains(".")) {
+			String[] arr = ou.split("\\.");
+			ouName = arr[arr.length - 1];
+			if(arr.length==1) {
+				
+				base = ou;
+				
+			}else {
+				
+				for(int i=0; i<arr.length-1; i++) {
+					if(i==0) {
+						base = arr[i];
+					}else {
+						base += "."+arr[i];
+					}
+				}
+				
+			}
+			
+		}
+		
+		/* Create ou in LDAP */
+		odto.setOU(ouName);
+		odto.setBusinessCategory(ou);
+//		odto.setDescription(aliasList);
+		return base;
+	}
+
+	private String redirectToAddAccountPage(Model model, boolean passedFormValidation,
+			Authentication principal, Locale loc) {
+		
+		if(passedFormValidation) {
+			model.addAttribute("errmsg", messageSource.getMessage("crud.respond.add.successful", null, loc));
+			return redirect("/account/add"+ SPRING_EXT);
+		}else {
+			return add_organization( model, principal );
+		}
+		
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_ORGANIZATION_VIEW', 'ROLE_AM_ORGANIZATION_MANAGE')")
+	@RequestMapping(value = "organization/readonly" + SPRING_EXT, method = RequestMethod.GET)
+	public String organization_readonly(
+			Model model
+			, HttpServletRequest req
+			, @RequestParam(required = true) Long id
+			, Authentication principal
+			) 
+	{
+		log.debug("OrganizationController | organization/edit | GET | entry");
+		
+		OrganizationDTO organizationDTO = organizationService.findByOrganizationId(id);
+		
+        model.addAttribute("OrganizationDTO", organizationDTO); // adding in model
+        model.addAttribute("shortFormatOu", BaseService.showOuFromCurrentHierarchy(getCurrentLoginHierarchyLevel(getCurrentLoginOu(principal)), organizationDTO.getOu()));
+		model.addAttribute("superiorOu", getCurrentLoginOu(principal));
+		model.addAttribute("hierarchyLevel", getCurrentLoginHierarchyLevel(LdapUtils.getOuWithDot(principal)));
+		model.addAttribute("editable", false);
+//		model.addAttribute("aliasIdList", organizationService.getAliasIdStringByOrganizationId(id));
+		
+		log.debug("OrganizationController | organization/edit | GET | editable: " + false);
+		log.debug("OrganizationController | organization/edit | GET | AccountOu: " + getCurrentLoginOu(principal));
+		log.debug("OrganizationController | organization/edit | GET | exit");
+		
+		return goToPageJsp("readonly");
+        
+	}
+
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_ORGANIZATION_MANAGE')")
+	@RequestMapping(value = "organization/edit" + SPRING_EXT, method = RequestMethod.GET)
+	public String organization_edit(
+			Model model
+			, HttpServletRequest req
+			, @RequestParam(required = true) Long id
+			, Authentication principal
+			) 
+	{
+		log.debug("OrganizationController | organization/edit | GET | entry");
+		
+		OrganizationDTO organizationDTO = organizationService.findByOrganizationId(id);
+		
+        model.addAttribute("OrganizationDTO", organizationDTO); // adding in model
+        model.addAttribute("shortFormatOu", BaseService.showOuFromCurrentHierarchy(getCurrentLoginHierarchyLevel(getCurrentLoginOu(principal)), organizationDTO.getOu()));
+		model.addAttribute("superiorOu", getCurrentLoginOu(principal));
+		model.addAttribute("hierarchyLevel", getCurrentLoginHierarchyLevel(LdapUtils.getOuWithDot(principal)));
+		model.addAttribute("editable", organizationDTO.getHierarchyLevel()-getCurrentLoginHierarchyLevel(LdapUtils.getOuWithDot(principal))<=MANIPULATE_LAYER);
+//		model.addAttribute("aliasIdList", organizationService.getAliasIdStringByOrganizationId(id));
+		
+		log.debug("OrganizationController | organization/edit | GET | editable: " + (organizationDTO.getHierarchyLevel()-getCurrentLoginHierarchyLevel(LdapUtils.getOuWithDot(principal))<=MANIPULATE_LAYER));
+		log.debug("OrganizationController | organization/edit | GET | AccountOu: " + getCurrentLoginOu(principal));
+		log.debug("OrganizationController | organization/edit | GET | exit");
+		
+		return goToPageJsp("edit");
+        
+	}
+
+	
+
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_ORGANIZATION_MANAGE')")
+	@RequestMapping(value = "organization/edit" + SPRING_EXT, method = RequestMethod.POST)
+	public String organization_edit_submit(
+			Model model,
+			@ModelAttribute("OrganizationDTO") OrganizationDTO organizationDTO,
+			HttpServletRequest req,
+			Authentication principal,
+			Locale loc
+			)
+	{
+		
+		log.debug("OrganizationController | organization/edit | POST | entry");
+//		String aliasList = req.getParameter("aliasList");
+		
+		try {
+			
+			log.debug(LdapUtils.getDn(principal)+" try to edit organization which organization_id = " + organizationDTO.getOrganizationId());
+			
+//			ouSer.updateDesc(setUpOuDTO(/*aliasList, */organizationDTO.getOu()), odto);
+			log.debug("OrganizationController | organization/edit | POST | LDAP Updated");
+			
+			organizationService.editOrganization(organizationDTO/*, aliasList*/);
+			log.debug("OrganizationController | organization/edit | POST | Database Updated");
+			
+			log.info("|editOrganization()|"+StatusCode.UPDATE_SUCCESS+"|"+LdapUtils.getDn(principal)+"|organization_id = "+organizationDTO.getOrganizationId()+ "|Edit successfully.");
+			model.addAttribute("errmsg", messageSource.getMessage("crud.respond.edit.successful", null, loc));
+			log.debug("OrganizationController | organization/edit | POST | exit");
+			return index(model, principal);
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|editOrganization()|"+StatusCode.UPDATE_FAILED+"|"+LdapUtils.getDn(principal)+"|organization_id = "+organizationDTO.getOrganizationId()+ "|Edit failed.");
+			model.addAttribute("errmsg", messageSource.getMessage("crud.respond.edit.unsuccessful", null, loc));
+			return organization_edit(model, 
+					req, 
+					organizationDTO.getOrganizationId(),
+					principal 
+					);
+		}
+		
+		
+	}
+
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_ORGANIZATION_MANAGE')")
+	@ResponseBody
+	@RequestMapping(value = "organization/delete" + SPRING_EXT, method = RequestMethod.POST)
+	public void delete_organization(
+			Model model
+			, @RequestParam("id") String idList
+			, Authentication principal)
+	{
+		
+		log.debug("OrganizationController | organization/delete | POST | entry");
+		
+		try {
+			
+			organizationService.changeOrganizationStatusByIdList(idList, LdapUtils.getDn(principal), ORGANIZATION_STATUS_DELETED);
+			log.info("|delete_organization()|"+StatusCode.DELETE_SUCCESS+"|"+LdapUtils.getDn(principal)+"|Deleted successfully.");
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|delete_organization()|"+StatusCode.DELETE_FAILED+"|"+LdapUtils.getDn(principal)+"|Delete failed.");
+		}
+		
+		log.debug("OrganizationController | organization/delete | POST | exit");
+		
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN', 'ROLE_AM_ORGANIZATION_MANAGE')")
+	@ResponseBody
+	@RequestMapping(value = "organization/suspend" + SPRING_EXT, method = RequestMethod.POST)
+	public void suspend_organization(
+			Model model
+			, @RequestParam("id") String idList
+			, Authentication principal)
+	{
+		
+		log.debug("OrganizationController | organization/suspend | POST | entry");
+		
+		try {
+			
+			organizationService.changeOrganizationStatusByIdList(idList, LdapUtils.getDn(principal), ORGANIZATION_STATUS_SUSPEND);
+			log.info("|suspend_organization()|"+StatusCode.SUSPEND_SUCCESS+"|"+LdapUtils.getDn(principal)+"|Suspend successfully.");
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|suspendAccount()|"+StatusCode.SUSPEND_FAILED+"|"+LdapUtils.getDn(principal)+"|Suspend failed.");
+		}
+		
+		log.debug("OrganizationController | organization/suspend | POST | exit");
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "organization/test" + SPRING_EXT, method = RequestMethod.GET)
+	public List<Map<String, Object>> test_organization(
+			Model model
+			, Authentication principal)
+	{
+		
+		log.debug("OrganizationController | organization/test | GET | entry");
+
+		log.debug("OrganizationController | organization/test | GET | exit");
+		return null;
+		
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "organization/check_unique_ou" + SPRING_EXT, method = RequestMethod.POST)
+	public boolean checkUniqueOu(
+			@RequestParam("ou") String ou
+		)
+	{
+		
+		log.debug("OrganizationController | organization/check_unique_ou | POST | entry");
+		
+		boolean isUniqueOrganization = organizationService.checkUniqueOranizationByOu(ou);
+		
+		log.debug("OrganizationController | organization/check_unique_ou | POST | exit");
+		return isUniqueOrganization;
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "organization/check_unique_organization_name_exclude_organization_name_is_being_editing" + SPRING_EXT, method = RequestMethod.POST)
+	public boolean checkUniqueOrganizationNameExcludeOrganizationNameIsBeingEditing(
+			@RequestParam("organizationId") String organizationId,
+			@RequestParam("organizationName") String organizationName
+		)
+	{
+		
+		log.debug("OrganizationController | organization/check_unique_ou | POST | entry");
+		
+		boolean isUniqueOrganization = organizationService.checkUniqueOrganizationNameExcludeOrganizationNameIsBeingEditing(Long.valueOf(organizationId), organizationName);
+		
+		log.debug("OrganizationController | organization/check_unique_ou | POST | exit");
+		return isUniqueOrganization;
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "organization/reload_organization_id_dropdown" + SPRING_EXT, method = RequestMethod.GET)
+	public Map<String, String> reloadOrganizationIdDropdown(
+			@RequestParam("hierarchyLevel") String hierarchyLevel, 
+			Authentication principal
+		)
+	{
+		
+		log.debug("OrganizationController | organization/reload_organization_id_dropdown | POST | entry");
+		
+		String loginOu = getCurrentLoginOu(principal);
+		int loginHierarchyLevel = getCurrentLoginHierarchyLevel(loginOu);
+		Map<String, String> ouList = new HashMap<String, String>();
+		
+		if(hierarchyLevel.equals("all")) {
+			
+			ouList = organizationService.getSubodinatesOuList(loginHierarchyLevel, loginOu, NOT_CONTAINING_LOGIN_OU, ACTION_VIEW);
+			
+		}else {
+			
+			ouList = organizationService.getSubodinatesOuListByHierarchyLevel(Integer.valueOf(hierarchyLevel), loginOu);
+			
+		}
+		
+		log.debug("OrganizationController | organization/reload_organization_id_dropdown | POST | exit");
+		return ouList;
+		
+	}
+	
+	
+	
+	/* ===================================================== License ===================================================== */
+	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN')")
+	@RequestMapping(value = { "organization/cp_manage" + SPRING_EXT})
+	public String cp_manage(
+			Model model, 
+			HttpServletRequest req, 
+			Authentication principal
+			) {
+
+		log.debug("OrganizationController | organization/cp_manage | entry");
+		
+		List<AuthenticationTypeDTO> authenticationTypeList = authenticationTypeService.getAuthenticationTypeListExcept(NORMAL_PAGE);
+		
+		model.addAttribute("AuthenticationTypeList", authenticationTypeList);
+		
+		log.debug("OrganizationController | organization/cp_manage | exit");
+		return goToPageJsp("cp_manage");
+
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_AM_MANAGE_CP_URL')")
+	@RequestMapping(value = { "organization/cp_url_manage" + SPRING_EXT})
+	public String cp_url_manage(
+			Model model,
+			HttpServletRequest req, 
+			Authentication principal
+			) {
+
+		log.debug("OrganizationController | organization/cp_url_manage | entry");
+		OrganizationDTO organizationDTO = organizationService.getOrganzationByOu(getCurrentLoginOu(principal));
+		String apQuotaString = organizationDTO.getQuota();
+		String[] splitApQuota = apQuotaString.split(",");
+		String apQuota = splitApQuota[0];
+		int cpUrlQuantity = captivePortalService.getCpUrlQuantityByOu(getCurrentLoginOu(principal));
+		model.addAttribute("apQuota", apQuota);
+		model.addAttribute("cpUrlQuantity", cpUrlQuantity);
+		model.addAttribute("organizationId", organizationDTO.getOrganizationId().toString());
+		model.addAttribute("AuthenticationTypeList", authenticationTypeService.getAuthenticationTypeListExcept(NORMAL_PAGE));
+		model.addAttribute("loginOu", getCurrentLoginOu(principal));
+		
+		log.debug("OrganizationController | organization/cp_url_manage | exit");
+		return goToPageJsp("cp_url_manage");
+
+	}
+
+
+//	@PreAuthorize("hasAnyRole('ROLE_WS_ROOT_ADMIN')")
+	@ResponseBody
+	@RequestMapping(value = "organization/ajax_organization_list" + SPRING_EXT, headers = "Accept=application/json")
+	public AjaxListResponse ajax_organization_list(
+			Model model,
+			String sEcho,
+			int iDisplayStart,
+			int iDisplayLength,
+			String sSearch,
+			int iSortCol_0,
+			String sSortDir_0,
+			HttpServletRequest req,
+			HttpServletResponse rep,
+			HttpSession ses,
+			Authentication principal
+			) 
+	{
+
+		log.debug("OrganizationController | organization/ajax_organization_list | entry");
+
+		OrganizationFilterObj filter = new OrganizationFilterObj(getCurrentLoginHierarchyLevel(LdapUtils.getOuWithDot(principal)),  
+				getCurrentLoginOu(principal), req.getParameter("company_name"), req.getParameter("contact_email"),
+				null, null, null, req.getParameter("ou"), "1");
+		
+		DataTableParameterObj dataTableParameters = new DataTableParameterObj(sEcho, iDisplayStart, 
+				iDisplayLength, iSortCol_0, sSortDir_0, sSearch);
+		
+		AjaxListResponse resp = organizationService.getOrganizationAjaxListResponseForCaptivePortal(filter, dataTableParameters);
+		log.info("|LicensesListOrganization()|NO ERRORCODE|"+LdapUtils.getDn(principal)+"|NO PARAMETER|List successfully.");
+		log.debug("OrganizationController | organization/ajax_organization_list | exit");
+		return resp;
+
+	}
+
+	
+	@ResponseBody
+	@RequestMapping(value = "organization/ajax_cp_list" + SPRING_EXT, headers = "Accept=application/json")
+	public AjaxListResponse ajax_cp_list(
+			Model model, 
+			String sEcho, 
+			int iDisplayStart, 
+			int iDisplayLength,
+			int iSortCol_0,
+			String sSortDir_0,
+			String sSearch,
+			HttpServletRequest req, 
+			HttpServletResponse rep, 
+			HttpSession ses,
+			Authentication principal
+			) 
+	{
+
+		log.debug("OrganizationController | organization/ajax_cp_list | entry");
+		log.debug("OrganizationController | organization/ajax_cp_list | organization_id: "+ req.getParameter("organization_id"));
+		
+		DataTableParameterObj dataTableParameters = new DataTableParameterObj(sEcho, iDisplayStart, 
+				iDisplayLength, iSortCol_0, sSortDir_0, sSearch);
+		
+		Long organizationId = (long)-1;
+		if(!StringUtil.isBlank(req.getParameter("organization_id"))) {
+			organizationId = Long.valueOf(req.getParameter("organization_id"));
+		}
+		AjaxListResponse resp = captivePortalService.getCaptivePortalAjaxListResponse(organizationId, dataTableParameters);
+
+		log.info("|OrganizationListCp()|NO ERRORCODE|"+LdapUtils.getDn(principal)+"|NO PARAMETER|List successfully.");
+		log.debug("OrganizationController | organization/ajax_cp_list | exit");
+		return resp;
+
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_AM_MANAGE_CP_URL')")
+	@ResponseBody
+	@RequestMapping(value = "organization/cp_add" + SPRING_EXT, method = RequestMethod.POST)
+	public  String organization_cp_add_submit(
+			Model model,
+			HttpServletRequest req,
+			Authentication principal
+			)
+	{
+		log.debug("OrganizationController | organization/cp_add | POST | entry");
+		String result = null;
+		
+		try {
+			log.debug(LdapUtils.getDn(principal)+" is trying to add a new captive portal");
+			
+			Map<String, Object> resultMap = captivePortalService.saveCaptivePortal(req, CREATE_CAPTIVE_PORTAL);
+			result = (String) resultMap.get("result");
+//			if(result.equals("true")) {
+//				result = piwikSiteService.savePiwikSite(getCurrentLoginOu(principal), req.getParameter("cp_name")
+//						, (Long) resultMap.get("cpId") , LdapUtils.getDn(principal), CREATE_PIWIK_SITE);
+//			}
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|OrganizationAddCp()|NO ERRORCODE|"+LdapUtils.getDn(principal)+"|New Captive Portal|Add failed.");
+		} 
+		log.debug("OrganizationController | organization/cp_add | POST | exit");
+		return result;
+		
+	}
+
+	@PreAuthorize("hasAnyRole('ROLE_AM_MANAGE_CP_URL')")
+	@ResponseBody
+	@RequestMapping(value = "organization/cp_edit" + SPRING_EXT, method = RequestMethod.POST)
+	public String organization_cp_edit_submit(
+			Model model,
+			HttpServletRequest req,
+			Authentication principal
+			)
+	{
+		
+		log.debug("OrganizationController | organization/cp_edit | POST | entry");
+		String result = "false";
+		
+		try {
+			
+			Map<String, Object> resultMap = captivePortalService.saveCaptivePortal(req, UPDATE_CAPTIVE_PORTAL);
+			result = (String) resultMap.get("result");
+//			if(result.equals("true")) {
+//				result = piwikSiteService.savePiwikSite(getCurrentLoginOu(principal), req.getParameter("cp_name")
+//						, (Long) resultMap.get("cpId") , LdapUtils.getDn(principal), UPDATE_PIWIK_SITE);
+//			}
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|licensesEditCp()|NO ERRORCODE|"+LdapUtils.getDn(principal)+"|cp_id = "+req.getParameter("cp_id")+", organization_id = "+req.getParameter("organization_id")
+	        		+ "|Edit failed.");
+		}
+		
+		log.debug("OrganizationController | organization/cp_edit | POST | exit");
+		return result;
+		
+	}
+	
+	
+	@PreAuthorize("hasAnyRole('ROLE_AM_MANAGE_CP_URL')")
+	@ResponseBody
+	@RequestMapping(value = "organization/cp_delete" + SPRING_EXT, method = RequestMethod.POST)
+	public boolean delete_captiveportal(
+			Model model
+			, @RequestParam("id") String idList
+			, @RequestParam("special_code") String specialCodeList
+			, Authentication principal
+			)
+	{
+		
+		log.debug("OrganizationController | organization/cp_delete | POST | entry");
+		try {
+			
+			captivePortalService.batchDeleteCaptivePortal(idList, specialCodeList, LdapUtils.getDn(principal));
+//			piwikSiteService.batchDeletePiwikByCpIdList(idList, LdapUtils.getDn(principal));
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|organizationDeleteCp()|NO ERRORCODE|"+LdapUtils.getDn(principal)+"|cp_id list = "+ idList
+	        		+ "|Delete failed.");
+			log.debug("OrganizationController | organization/cp_delete | POST | exit");
+			return false;
+			
+		}
+		return true;
+		
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "organization/get_cp_url_quantity_by_ou" + SPRING_EXT, headers = "Accept=application/json")
+	public String get_cp_url_quantity_by_ou(
+			@RequestParam("ou") String ou
+			) 
+	{
+
+		log.debug("OrganizationController | organization/get_cp_url_quantity_by_ou() | entry");
+		
+		int cpUrlQuantity = captivePortalService.getCpUrlQuantityByOu(ou);
+		
+		log.debug("OrganizationController | organization/get_cp_url_quantity_by_ou() | cpUrlQuantity: "+cpUrlQuantity);
+		log.debug("OrganizationController | organization/get_cp_url_quantity_by_ou() | exit");
+		return String.valueOf(cpUrlQuantity);
+
+	}
+	
+	
+	
+	
+	/* ===================================================== Need to refactoring ===================================================== */
+	
+	@PreAuthorize("hasAnyRole('ROLE_AM_LICENSE_DISTRIBUTOR_VIEW', 'ROLE_AM_LICENSE_RESELLER_VIEW')")
+	@RequestMapping(value = { "organization/view_license" + SPRING_EXT })
+	public String view_licenses(
+			Model model, 
+			Authentication principal
+			)
+	{
+		log.debug("OrganizationController | organization/view_license | entry");
+		
+		List<OrganizationDTO> organizaitonList = organizationDao.findByStatusAndSuperior_Ou(ORGANIZATION_STATUS_ACTIVE, getCurrentLoginOu(principal));
+		
+		model.addAttribute("OrganizaitonList", organizaitonList);
+		model.addAttribute("ResellerOu", getCurrentLoginOu(principal));
+		
+		log.debug("OrganizationController | organization/view_license | exit");
+		return goToPageJsp("view_license");
+
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "organization/reload_clientlist" + SPRING_EXT, method = RequestMethod.GET)
+	public List<Map<String, Object>> reload_clientlist(
+			HttpServletRequest req
+		)
+	{
+		
+		log.debug("OrganizationController | organization/reload_clientlist | GET | entry");
+		
+		List<OrganizationDTO> organizationList = organizationDao.findByStatusAndSuperior_OrganizationId(ORGANIZATION_STATUS_ACTIVE, Long.valueOf(req.getParameter("reseller_id")));
+		List<Map<String, Object>> resultList = new LinkedList<Map<String, Object>>();
+		for (OrganizationDTO o : organizationList) {
+			
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", o.getOrganizationId().toString());
+			map.put("name", o.getOrganizationName().toString());
+			
+			resultList.add(map);
+			
+		}
+		log.debug("OrganizationController | organization/reload_clientlist | GET | exit");
+		return resultList;
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "organization/ajax_client_license_list" + SPRING_EXT, headers = "Accept=application/json")
+	public AjaxListResponse ajax_client_license_list(
+			Model model, 
+			String sEcho, 
+			int iDisplayStart, 
+			int iDisplayLength,
+			int iSortCol_0,
+			String sSortDir_0,
+			String sSearch,
+			HttpServletRequest req, 
+			HttpServletResponse rep, 
+			HttpSession ses,
+			Authentication principal
+			) 
+	{
+
+		log.debug("OrganizationController | organization/ajax_client_license_list | entry");
+
+		
+		String reseller_id = req.getParameter("reseller_id");
+		String reseller_client_id = req.getParameter("reseller_client_id");
+		String client_id = req.getParameter("client_id");
+		
+		String final_client_id = null;
+		
+		log.debug("OrganizationController | organization/ajax_client_license_list | reseller_id: "+reseller_id);
+		log.debug("OrganizationController | organization/ajax_client_license_list | reseller_client_id: "+reseller_client_id);
+		log.debug("OrganizationController | organization/ajax_client_license_list | client_id: "+client_id);
+		
+		if((StringUtils.isBlank(reseller_id) || reseller_id.equals("0")) && StringUtils.isBlank(client_id)) {
+			final_client_id = "0";
+			
+		}else if((StringUtils.isBlank(reseller_client_id) || reseller_client_id.equals("0")) && StringUtils.isBlank(client_id)){
+			final_client_id = "0";
+			
+		}else if(!StringUtils.isBlank(reseller_id) && !StringUtils.isBlank(reseller_client_id)&& StringUtils.isBlank(client_id)){
+			final_client_id = reseller_client_id;
+			
+		}else if(StringUtils.isBlank(reseller_id) && StringUtils.isBlank(reseller_client_id) && !StringUtils.isBlank(client_id)) {
+			if(client_id.equals("0")) {
+				final_client_id = "0";
+			}else {
+				final_client_id = client_id;
+			}
+		}else {
+			final_client_id = "0";
+			
+		}
+		
+		log.info("OrganizationController | organization/ajax_client_license_list | final_client_id: "+final_client_id);
+		DataTableParameterObj dataTableParameters = new DataTableParameterObj(sEcho, iDisplayStart, 
+				iDisplayLength, iSortCol_0, sSortDir_0, sSearch);
+		
+		AjaxListResponse resp = captivePortalService.getCaptivePortalAjaxListResponse(Long.valueOf(final_client_id), dataTableParameters);
+		
+		log.info("|listCp()|"+StatusCode.READ_SUCCESS+"|"+LdapUtils.getDn(principal)+"|NO PARAMETER|List successfully.");
+		
+		log.debug("OrganizationController | organization/ajax_client_license_list | exit");
+		return resp;
+
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_AM_LICENSE_ASSIGN')")
+	@RequestMapping(value = { "organization/assign_license" + SPRING_EXT })
+	public String assign_license(
+			Model model, 
+			Authentication principal
+			) 
+	{
+		
+		log.debug("OrganizationController | organization/assign_license | entry");
+		
+		List<OrganizationDTO> organizationList = organizationDao.findByStatusAndSuperior_Ou(ORGANIZATION_STATUS_ACTIVE, LdapUtils.getOuWithDot(principal));
+		model.addAttribute("OrganizationList", organizationList);
+		List<CaptivePortalDTO> cpList = captivePortalDao.findByOrganizationDTO_StatusAndOrganizationDTO_Ou(ORGANIZATION_STATUS_ACTIVE, LdapUtils.getOuWithDot(principal));
+		
+		model.addAttribute("CpList", cpList);
+		
+		log.debug("OrganizationController | organization/assign_license | exit");
+		return goToPageJsp("assign_license");
+
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "organization/assign_cp_to_dept" + SPRING_EXT, method = RequestMethod.POST)
+	public  String assign_cp_to_dept(
+			Model model,
+			HttpServletRequest req,
+			Authentication principal
+			)
+	{
+		log.debug("OrganizationController | organization/assign_cp_to_dept | POST | entry");
+		String result = "false";
+		
+		try {
+			
+			OrganizationDTO organizationDTO = organizationDao.findOne(Long.valueOf(req.getParameter("organization_id")));
+			CaptivePortalDTO captivePortalDTO = captivePortalDao.findOne(Long.valueOf(req.getParameter("cp_id")));
+			
+			log.debug(LdapUtils.getDn(principal)+" is trying to assign a captive portal which cp_name = "+captivePortalDTO.getCpName()
+					+"to an organization which organization_ou = " + captivePortalDTO.getOu());
+			
+			log.debug("LicensesController | licenses/assign_cp_to_dept | POST | agent_id: " + req.getParameter("organization_id"));
+			log.debug("LicensesController | licenses/assign_cp_to_dept | POST | cp_id: " + req.getParameter("cp_id"));
+			log.debug("LicensesController | licenses/assign_cp_to_dept | POST | cp_name: " + captivePortalDTO.getCpName());
+			log.debug("LicensesController | licenses/assign_cp_to_dept | POST | cp_specialcode: " + captivePortalDTO.getCpSpecialCode());
+			log.debug("LicensesController | licenses/assign_cp_to_dept | POST | domain_name: " + captivePortalDTO.getDomainName());
+			log.debug("LicensesController | licenses/assign_cp_to_dept | POST | auth_type_id: " + captivePortalDTO.getAuthenticationTypeDTO().getAuthTypeId().toString());
+			log.debug("LicensesController | licenses/assign_cp_to_dept | POST | status: " + captivePortalDTO.getStatus());
+//			log.debug("LicensesController | licenses/assign_cp_to_dept | POST | startdate: " + captivePortalDTO.getStartdate().toString());
+			
+			captivePortalDTO.setOrganizationDTO(organizationDTO);
+			captivePortalDTO.setOu(organizationDTO.getOu());
+			
+			result = saveCaptivePortalFromBackend(captivePortalDTO);
+			
+			if(result.equals("true")) {
+				
+				captivePortalDao.save(captivePortalDTO);
+				log.debug("OrganizationController | organization/assign_cp_to_dept | POST | Inserted into table am_captiveportal(Database): ");
+				
+			}else {
+				
+				log.info("|assignCp()|"+StatusCode.ASSIGN_FAILED+"|"+LdapUtils.getDn(principal)+"|Assign failed.");
+				
+			}
+			
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|assignCp()|"+StatusCode.ASSIGN_FAILED+"|"+LdapUtils.getDn(principal)+"|cp_id = "+req.getParameter("cp_id")+"|Assign failed.");
+		}
+		log.debug("OrganizationController | organization/assign_cp_to_dept | POST | entry");
+		return result;
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "organization/get_back_cp" + SPRING_EXT, method = RequestMethod.POST)
+	public String get_back_cp(
+			Model model
+			, @RequestParam("id") String idList
+			, Authentication principal
+			)
+			
+	{
+		log.debug("OrganizationController | organization/get_back_cp | POST | entry");
+		
+		String[] splitId = null;
+		String result;
+		try {
+			splitId = idList.split(",");
+			
+			
+			for (int i = 0; i < splitId.length; i++) {
+				CaptivePortalDTO captivePortalDTO = captivePortalDao.findOne(Long.valueOf(splitId[i]));
+				captivePortalDTO.setOu(LdapUtils.getOuWithDot(principal));
+				result = saveCaptivePortalFromBackend(captivePortalDTO);
+				if(result.equals("true")) {
+					
+					log.debug(LdapUtils.getDn(principal)+" is trying to delete captive portal which cp_id = " + splitId[i]);
+					OrganizationDTO organizationDTO = organizationDao.findByOu(LdapUtils.getOuWithDot(principal)).get(0);
+					captivePortalDTO.setOrganizationDTO(organizationDTO);
+					captivePortalDao.save(captivePortalDTO);
+					log.info("|updateCp()|"+StatusCode.UPDATE_SUCCESS+"|"+LdapUtils.getDn(principal)+"|cp_id = "+splitId[i]
+			        		+ "|Update successfully.");
+					log.debug("OrganizationController | organization/get_back_cp | POST | exit");
+					
+				}else {
+					
+					log.info("|updateCp()|"+StatusCode.UPDATE_SUCCESS+"|"+LdapUtils.getDn(principal)+"|cp_id list = "+ idList
+			        		+ "|Update failed.");
+					log.debug("OrganizationController | organization/get_back_cp | POST | exit");
+					return "false";
+					
+				}
+				
+			}
+		} catch (Exception e) {
+			log.info(e,e);
+			log.info("|updateCp()|"+StatusCode.UPDATE_SUCCESS+"|"+LdapUtils.getDn(principal)+"|cp_id list = "+ idList
+	        		+ "|Update failed.");
+			log.debug("OrganizationController | organization/get_back_cp | POST | exit");
+			return "false";
+			
+		}
+		return "true";
+		
+	}
+	
+	private String saveCaptivePortalFromBackend(CaptivePortalDTO captivePortalDTO) throws Exception
+	{
+		
+		log.debug("CaptivePortalServiceImpl | saveCaptivePortalFromBackend | POST | entry");
+		
+		String saveCpPostUrl = WILAS_CP_ADD_URL+SPRING_EXT;      // (cp/captiveportal/add) Please config url in config file
+		log.debug("CaptivePortalServiceImpl | saveCaptivePortalFromBackend | POST | saveCpPostUrl: " + saveCpPostUrl);
+		
+		MultivaluedMap<String, String> formData = setUpFormData(captivePortalDTO);
+		
+		String result = (String) httpBackendPost(saveCpPostUrl, formData, new EasyClient().getClient(), MediaType.APPLICATION_FORM_URLENCODED, String.class);
+		log.debug("CaptivePortalServiceImpl | saveCaptivePortalFromBackend | POST | exit");
+		return result;
+
+	}
+	
+
+	private MultivaluedMap<String, String> setUpFormData(
+			CaptivePortalDTO captivePortalDTO) throws Exception{
+		MultivaluedMap<String, String> formData = new MultivaluedMapImpl();
+		formData.add("cp_name", captivePortalDTO.getCpName());
+		formData.add("cp_specialcode", captivePortalDTO.getCpSpecialCode());
+		formData.add("ou", captivePortalDTO.getOu());
+		formData.add("domain_name", captivePortalDTO.getDomainName());
+		formData.add("a_mode", captivePortalDTO.getAuthenticationTypeDTO().getAuthTypeId().toString());
+		formData.add("state", captivePortalDTO.getStatus().toString());
+		/* Hardcode */
+		formData.add("ssid", "willas-wifi");
+		/* Hardcode */
+		return formData;
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected <T> Object httpBackendPost(String url,
+			MultivaluedMap<String, String> formData,
+			Client smallClient, String mediaType, T t) throws Exception{
+		
+		//smallClient.addFilter(new HTTPBasicAuthFilter(User, Password));
+		WebResource webResource = smallClient.resource(url);
+		ClientResponse clientResponse;
+		if(formData == null) {
+			clientResponse = webResource.type(mediaType).post(ClientResponse.class);
+		}else {
+			clientResponse = webResource.type(mediaType).post(ClientResponse.class, formData);
+		}
+		
+		if(t == String.class) {
+			String strResponse = (String)clientResponse.getEntity(String.class);
+			log.debug("BaseService | httpBackendPost() | POST | Http Backend POST Respond Result: " + strResponse);
+			return strResponse;
+		}
+		
+		log.debug("BaseService | httpBackendPost() | POST | Http Backend POST Respond Result: " + clientResponse.getEntity((Class<T>) t));
+		return clientResponse.getEntity((Class<T>) t);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "organization/reload_cp_dropdown" + SPRING_EXT, method = RequestMethod.POST)
+	public List<Map<String, Object>> reload_cp_dropdown(
+			HttpServletRequest req
+			, Authentication principal
+		)
+	{
+		
+		log.debug("OrganizationController | organization/reload_cp_dropdown | POST | entry");
+		
+		List<CaptivePortalDTO> captivePortalList = captivePortalDao.findByOrganizationDTO_StatusAndOrganizationDTO_Ou(ORGANIZATION_STATUS_ACTIVE, LdapUtils.getOuWithDot(principal));
+		List<Map<String, Object>> resultList = new LinkedList<Map<String, Object>>();
+		for (CaptivePortalDTO c : captivePortalList) {
+			
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", c.getCpId().toString());
+			map.put("name", c.getCpName().toString());
+			
+			resultList.add(map);
+			
+		}
+		log.debug("OrganizationController | organization/reload_cp_dropdown | POST | exit");
+		return resultList;
+		
+	}
+	
+	/* ===================================================== Need to refactoring ===================================================== */
+	
+	/* ===================================================== License ===================================================== */
+	
+}
